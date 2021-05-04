@@ -173,7 +173,7 @@ public class Dungeon {
 
 		version = Game.versionCode;
 		challenges = SPDSettings.challenges();
-		mobsToChampion = -1;
+		mobsToChampion = 2;
 
 		seed = DungeonSeed.randomSeed();
 
