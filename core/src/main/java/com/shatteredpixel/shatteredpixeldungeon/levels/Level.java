@@ -462,9 +462,8 @@ public abstract class Level implements Bundlable {
 		}
 
 		Mob m = Reflection.newInstance(mobsToSpawn.remove(0));
-		if (Dungeon.isChallenged(Challenges.CHAMPION_ENEMIES)){
-			ChampionEnemy.rollForChampion(m);
-		}
+		ChampionEnemy.rollForChampion(m);
+		m.HP = m.HT = m.HT * 2;
 		return m;
 	}
 

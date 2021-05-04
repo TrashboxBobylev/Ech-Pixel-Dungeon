@@ -25,15 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Charm;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Frost;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Light;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LockedFloor;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Paralysis;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Sleep;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Terror;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Vertigo;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.*;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Beam;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Pushing;
@@ -66,7 +58,7 @@ public class YogDzewa extends Mob {
 	{
 		spriteClass = YogSprite.class;
 
-		HP = HT = 1000;
+		HP = HT = 2000;
 
 		EXP = 50;
 
@@ -191,7 +183,7 @@ public class YogDzewa extends Mob {
 
 			if (abilityCooldown <= 0){
 
-				int beams = 1 + (HT - HP)/400;
+				int beams = 1 + (HT - HP)/800;
 				HashSet<Integer> affectedCells = new HashSet<>();
 				for (int i = 0; i < beams; i++){
 
@@ -255,6 +247,7 @@ public class YogDzewa extends Mob {
 				if (spawnPos != -1) {
 					summon.pos = spawnPos;
 					GameScene.add( summon );
+					ChampionEnemy.rollForChampion(summon);
 					Actor.addDelayed( new Pushing( summon, pos, summon.pos ), -1 );
 					summon.beckon(Dungeon.hero.pos);
 
@@ -303,9 +296,9 @@ public class YogDzewa extends Mob {
 		if (phase == 0 || findFist() != null) return;
 
 		if (phase < 4) {
-			HP = Math.max(HP, HT - 300 * phase);
+			HP = Math.max(HP, HT - 600 * phase);
 		} else if (phase == 4) {
-			HP = Math.max(HP, 100);
+			HP = Math.max(HP, 200);
 		}
 		int dmgTaken = preHP - HP;
 
@@ -314,7 +307,7 @@ public class YogDzewa extends Mob {
 			summonCooldown -= dmgTaken / 10f;
 		}
 
-		if (phase < 4 && HP <= HT - 300*phase){
+		if (phase < 4 && HP <= HT - 600*phase){
 
 			phase++;
 
@@ -340,6 +333,7 @@ public class YogDzewa extends Mob {
 			} else if (Actor.findChar(targetPos+1) == null){
 				fist.pos = targetPos+1;
 			}
+			ChampionEnemy.rollForChampion(fist);
 
 			GameScene.add(fist, 4);
 			Actor.addDelayed( new Pushing( fist, Dungeon.level.exit, fist.pos ), -1 );
@@ -411,6 +405,7 @@ public class YogDzewa extends Mob {
 	public void notice() {
 		if (!BossHealthBar.isAssigned()) {
 			BossHealthBar.assignBoss(this);
+			ChampionEnemy.rollForChampion(this);
 			yell(Messages.get(this, "notice"));
 			for (Char ch : Actor.chars()){
 				if (ch instanceof DriedRose.GhostHero){

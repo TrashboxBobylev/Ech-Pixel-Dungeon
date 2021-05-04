@@ -53,7 +53,7 @@ public class WandOfWarding extends Wand {
 		for (Buff buff : curUser.buffs()){
 			if (buff instanceof Wand.Charger){
 				if (((Charger) buff).wand() instanceof WandOfWarding){
-					maxWardEnergy += 2 + ((Charger) buff).wand().level();
+					maxWardEnergy += 3 + ((Charger) buff).wand().level();
 				}
 			}
 		}
@@ -204,16 +204,16 @@ public class WandOfWarding extends Wand {
 				case 1: case 2: default:
 					break; //do nothing
 				case 3:
-					HT = 35;
-					HP = 15 + (5-totalZaps)*4;
+					HT = 40;
+					HP = 20 + (5-totalZaps)*4;
 					break;
 				case 4:
-					HT = 54;
-					HP += 19;
+					HT = 60;
+					HP += 24;
 					break;
 				case 5:
-					HT = 84;
-					HP += 30;
+					HT = 90;
+					HP += 36;
 					break;
 				case 6:
 					wandHeal(wandLevel);
@@ -242,13 +242,13 @@ public class WandOfWarding extends Wand {
 				default:
 					return;
 				case 4:
-					heal = 9;
+					heal = 11;
 					break;
 				case 5:
-					heal = 12;
+					heal = 14;
 					break;
 				case 6:
-					heal = 16;
+					heal = 21;
 					break;
 			}
 
@@ -304,7 +304,7 @@ public class WandOfWarding extends Wand {
 			spend( 1f );
 
 			//always hits
-			int dmg = Random.NormalIntRange( 2 + wandLevel, 8 + 4*wandLevel );
+			int dmg = Random.NormalIntRange( 3 + wandLevel, 10 + 5*wandLevel );
 			enemy.damage( dmg, this );
 			if (enemy.isAlive()){
 				Wand.processSoulMark(enemy, wandLevel, 1);
@@ -400,7 +400,7 @@ public class WandOfWarding extends Wand {
 
 		@Override
 		public String description() {
-			return Messages.get(this, "desc_" + tier, 2+wandLevel, 8 + 4*wandLevel, tier );
+			return Messages.get(this, "desc_" + tier, 3+wandLevel, 10 + 5*wandLevel, tier );
 		}
 		
 		{

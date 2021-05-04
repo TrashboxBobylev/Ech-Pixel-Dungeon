@@ -63,6 +63,19 @@ public class v0_9_X_Changes {
 
 		changes.addButton(new ChangeButton(new Image(Assets.Sprites.WARRIOR, 0, 90, 12, 15), "Ech",
 				"Each hero has different name."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.WARRIOR, 0, 15, 12, 15), "Ech",
+				"The Heroes are getting some balance tweaks to offset their new talents:\n\n" +
+						"_-_ Increased HP to 25 (+9 per level).\n\n" +
+						"_-_ Heroes take 75% - 300% damage from any source.\n\n" +
+						"_-_ Monsters have 100% more HP.\n\n" +
+						"_-_ Increased flat scaling on weapons, armor and wands."));
+
+		changes.addButton(new ChangeButton(new Image(new GolemSprite()), "Ech",
+				"_-_ Champions spawn always.\n\n" +
+						"_-_ There is a lot more champions.\n\n" +
+						"_-_ Bosses can be champions too."));
+
 	}
 
 	public static void add_v0_9_2_Changes( ArrayList<ChangeInfo> changeInfos ) {

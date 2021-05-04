@@ -81,7 +81,7 @@ public class NewTengu extends Mob {
 	{
 		spriteClass = TenguSprite.class;
 		
-		HP = HT = 200;
+		HP = HT = 400;
 		EXP = 20;
 		defenseSkill = 15;
 		
@@ -141,7 +141,7 @@ public class NewTengu extends Mob {
 
 		NewPrisonBossLevel.State state = ((NewPrisonBossLevel)Dungeon.level).state();
 		
-		int hpBracket = HT / 8;
+		int hpBracket = HT / 16;
 		
 		int beforeHitHP = HP;
 		super.damage(dmg, src);

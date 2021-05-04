@@ -29,6 +29,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Regrowth;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.StormCloud;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ChampionEnemy;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Doom;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.NewTengu;
@@ -395,6 +396,7 @@ public class NewPrisonBossLevel extends Level {
 				tengu.state = tengu.HUNTING;
 				tengu.pos = tenguPos;
 				GameScene.add( tengu );
+				ChampionEnemy.rollForChampion(tengu);
 				tengu.notice();
 				
 				state = State.FIGHT_START;

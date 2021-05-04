@@ -27,11 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Barrier;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Doom;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LifeLink;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LockedFloor;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.*;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Beam;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Pushing;
@@ -68,7 +64,7 @@ public class DwarfKing extends Mob {
 	{
 		spriteClass = KingSprite.class;
 
-		HP = HT = 300;
+		HP = HT = 600;
 		EXP = 40;
 		defenseSkill = 22;
 
@@ -188,7 +184,7 @@ public class DwarfKing extends Mob {
 				spend(3*TICK);
 				summonsMade++;
 				return true;
-			} else if (shielding() <= 200 && summonsMade < 8){
+			} else if (shielding() <= 400 && summonsMade < 8){
 				if (summonsMade == 4){
 					sprite.centerEmitter().start( Speck.factory( Speck.SCREAM ), 0.4f, 2 );
 					Sample.INSTANCE.play( Assets.Sounds.CHALLENGE );
@@ -202,7 +198,7 @@ public class DwarfKing extends Mob {
 				summonsMade++;
 				spend(TICK);
 				return true;
-			} else if (shielding() <= 100 && summonsMade < 12) {
+			} else if (shielding() <= 200 && summonsMade < 12) {
 				sprite.centerEmitter().start( Speck.factory( Speck.SCREAM ), 0.4f, 2 );
 				Sample.INSTANCE.play( Assets.Sounds.CHALLENGE );
 				yell(Messages.get(this, "wave_3"));
@@ -342,6 +338,7 @@ public class DwarfKing extends Mob {
 		super.notice();
 		if (!BossHealthBar.isAssigned()) {
 			BossHealthBar.assignBoss(this);
+			ChampionEnemy.rollForChampion(this);
 			yell(Messages.get(this, "notice"));
 			for (Char ch : Actor.chars()){
 				if (ch instanceof DriedRose.GhostHero){
@@ -380,8 +377,8 @@ public class DwarfKing extends Mob {
 			int dmgTaken = preHP - HP;
 			abilityCooldown -= dmgTaken/8f;
 			summonCooldown -= dmgTaken/8f;
-			if (HP <= 50) {
-				HP = 50;
+			if (HP <= 100) {
+				HP = 100;
 				sprite.showStatus(CharSprite.POSITIVE, Messages.get(this, "invulnerable"));
 				ScrollOfTeleportation.appear(this, NewCityBossLevel.throne);
 				properties.add(Property.IMMOVABLE);
@@ -405,7 +402,7 @@ public class DwarfKing extends Mob {
 			sprite.centerEmitter().start( Speck.factory( Speck.SCREAM ), 0.4f, 2 );
 			Sample.INSTANCE.play( Assets.Sounds.CHALLENGE );
 			yell(  Messages.get(this, "enraged", Dungeon.hero.name()) );
-		} else if (phase == 3 && preHP > 20 && HP < 20){
+		} else if (phase == 3 && preHP > 40 && HP < 40){
 			yell( Messages.get(this, "losing") );
 		}
 	}
