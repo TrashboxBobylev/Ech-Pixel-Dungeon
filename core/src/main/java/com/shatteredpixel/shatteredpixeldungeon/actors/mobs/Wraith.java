@@ -24,6 +24,7 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ChampionEnemy;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ShadowParticle;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.WraithSprite;
@@ -45,6 +46,7 @@ public class Wraith extends Mob {
 		EXP = 0;
 
 		maxLvl = -2;
+		baseSpeed = 2f;
 		
 		flying = true;
 
@@ -78,8 +80,13 @@ public class Wraith extends Mob {
 	
 	public void adjustStats( int level ) {
 		this.level = level;
-		defenseSkill = attackSkill( null ) * 5;
+		defenseSkill = attackSkill( null ) * 9;
 		enemySeen = true;
+	}
+
+	@Override
+	protected float attackDelay() {
+		return super.attackDelay() * 0.5f;
 	}
 
 	@Override
@@ -106,6 +113,7 @@ public class Wraith extends Mob {
 			w.adjustStats( Dungeon.depth );
 			w.pos = pos;
 			w.state = w.HUNTING;
+			ChampionEnemy.rollForChampion(w);
 			GameScene.add( w, SPAWN_DELAY );
 			
 			w.sprite.alpha( 0 );

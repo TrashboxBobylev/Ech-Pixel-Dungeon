@@ -50,7 +50,7 @@ public class WndSupportPrompt extends Window {
 		if (Messages.lang() != Languages.ENGLISH) {
 			message += "\n" + Messages.get(SupporterScene.class, "patreon_english");
 		}
-		message += "\n- Evan";
+		message += "\n- author of this garbage mod";
 
 		RenderedTextBlock text = PixelScene.renderTextBlock( 6 );
 		text.text( message, width );

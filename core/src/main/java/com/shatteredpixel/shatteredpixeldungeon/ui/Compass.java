@@ -60,14 +60,13 @@ public class Compass extends Image {
 		if (!visible) {
 			visible = Dungeon.level.visited[cell] || Dungeon.level.mapped[cell];
 		}
-		
-		if (visible) {
-			PointF scroll = Camera.main.scroll;
-			if (!scroll.equals( lastScroll )) {
-				lastScroll.set( scroll );
-				PointF center = Camera.main.center().offset( scroll );
-				angle = (float)Math.atan2( cellCenter.x - center.x, center.y - cellCenter.y ) * RAD_2_G;
-			}
+
+		PointF scroll = Camera.main.scroll;
+		if (!scroll.equals( lastScroll )) {
+			lastScroll.set( scroll );
+			PointF center = Camera.main.center().offset( scroll );
+//				angle = (float)Math.atan2( cellCenter.x - center.x, center.y - cellCenter.y ) * RAD_2_G;
+			angularSpeed = 200;
 		}
 	}
 }

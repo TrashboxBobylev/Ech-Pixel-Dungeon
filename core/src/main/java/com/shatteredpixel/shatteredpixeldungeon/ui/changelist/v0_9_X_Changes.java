@@ -63,10 +63,14 @@ public class v0_9_X_Changes {
 						"_-_ Dungeon contains 20 scrolls of upgrade, plus scroll in each shop. Potions of strength also appear in shops.\n\n" +
 						"_-_ Gold drops are increased by 10%, but shop prices are increased by 20%.\n\n" +
 						"_-_ On despawning shopkeeper places wicked brew at positions of his wares.\n\n" +
-						"_-_ Ring of Wealth's drops frequency increases with upgrades."));
+						"_-_ Ring of Wealth's drops frequency increases with upgrades.\n\n" +
+						"_-_ Wraiths dodge better and have both 2x movement speed and 2x attack speed.\n\n" +
+						"_-_ Compass is no longer working.\n\n" +
+						"_-_ Mob show their HP while being examined."));
 
 		changes.addButton(new ChangeButton(new Image(Assets.Sprites.WARRIOR, 0, 90, 12, 15), "Ech",
-				"Each hero has different name."));
+				"Each hero and sewer enemy has different name.\n\n" +
+						"Story has been rewritten to use more modern storytelling."));
 
 		changes.addButton(new ChangeButton(new Image(Assets.Sprites.WARRIOR, 0, 15, 12, 15), "Ech",
 				"The Heroes are getting some balance tweaks to offset their new talents:\n\n" +
@@ -81,7 +85,8 @@ public class v0_9_X_Changes {
 						"_-_ Bosses can be champions too.\n\n" +
 						"_-_ Champion modifiers can stack on top of each other.\n\n" +
 						"_-_ Champions get another 100% HP boost, which also stacks.\n\n" +
-						"_-_ Champions glow with rainbow colors."));
+						"_-_ Champions glow with rainbow colors.\n\n" +
+						"_-_ Wraiths can also become champions."));
 
 
 	}
