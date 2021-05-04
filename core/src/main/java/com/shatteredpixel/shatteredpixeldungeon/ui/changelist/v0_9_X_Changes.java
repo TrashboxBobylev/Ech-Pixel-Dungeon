@@ -61,7 +61,9 @@ public class v0_9_X_Changes {
 		changes.addButton(new ChangeButton(Icons.get(Icons.ENTER), "Ech",
 				"_-_ Hero splashes and main menu visuals are ech.\n\n" +
 						"_-_ Dungeon contains 20 scrolls of upgrade, plus scroll in each shop. Potions of strength also appear in shops.\n\n" +
-						"_-_ Gold drops are increased by 10%, but shop prices are increased by 20%."));
+						"_-_ Gold drops are increased by 10%, but shop prices are increased by 20%.\n\n" +
+						"_-_ On despawning shopkeeper places wicked brew at positions of his wares.\n\n" +
+						"_-_ Ring of Wealth's drops frequency increases with upgrades."));
 
 		changes.addButton(new ChangeButton(new Image(Assets.Sprites.WARRIOR, 0, 90, 12, 15), "Ech",
 				"Each hero has different name."));

@@ -136,7 +136,7 @@ public class RingOfWealth extends Ring {
 				drops.add(i);
 				dropsToEquip--;
 			}
-			triesToDrop += Random.NormalIntRange(0, 25);
+			triesToDrop += Random.NormalIntRange(0, 25 - getBuffedBonus(target, Wealth.class)*3);
 		}
 
 		//store values back into rings

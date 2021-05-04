@@ -23,6 +23,9 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.ParalyticGas;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.ToxicGas;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ElmoParticle;
@@ -88,6 +91,8 @@ public class Shopkeeper extends NPC {
 				} else {
 					heap.items.remove(heap.size()-1);
 					heap.type = Heap.Type.HEAP;
+					GameScene.add( Blob.seed( heap.pos, 1000, ParalyticGas.class ) );
+					GameScene.add( Blob.seed( heap.pos, 1000, ToxicGas.class ) );
 				}
 			}
 		}
