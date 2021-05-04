@@ -114,7 +114,7 @@ public abstract class ChampionEnemy extends Buff {
 				case 4:             Buff.affect(m, Blessed.class);      break;
 				case 5:             Buff.affect(m, Growing.class);      break;
 			}
-			if (!m.properties().contains(Char.Property.BOSS) || !m.properties().contains(Char.Property.MINIBOSS))
+			if (!(m.properties().contains(Char.Property.BOSS)) && !(m.properties().contains(Char.Property.MINIBOSS)))
 				m.HP = m.HT = Math.round(m.HT*1.3f);
 
 			m.state = m.WANDERING;

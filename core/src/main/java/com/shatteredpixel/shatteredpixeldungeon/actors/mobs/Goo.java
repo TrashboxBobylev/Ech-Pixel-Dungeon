@@ -102,10 +102,11 @@ public class Goo extends Mob {
 			}
 			HP++;
 		}
+
+		if (!Dungeon.level.locked) ChampionEnemy.rollForChampion(this);
 		
 		if (state != SLEEPING){
 			Dungeon.level.seal();
-			ChampionEnemy.rollForChampion(this);
 		}
 
 		return super.act();

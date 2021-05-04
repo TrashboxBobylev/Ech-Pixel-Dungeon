@@ -1161,8 +1161,9 @@ public class Hero extends Char {
 			dmg = thorns.proc(dmg, (src instanceof Char ? (Char)src : null),  this);
 		}
 
-		dmg *= 1.85f;
-		if (src instanceof Buff || src instanceof Blob) dmg *= 0.75f;
+
+		if (src instanceof Buff || src instanceof Blob) dmg *= 1.3875f;
+		else dmg *= 1.85f;
 
 		dmg = (int)Math.ceil(dmg * RingOfTenacity.damageMultiplier( this ));
 

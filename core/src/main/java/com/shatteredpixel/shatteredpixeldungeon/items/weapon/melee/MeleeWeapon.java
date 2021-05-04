@@ -88,6 +88,7 @@ public class MeleeWeapon extends Weapon {
 				}
 			}
 		}
+		else super.onThrow(cell);
 	}
 	
 	@Override
