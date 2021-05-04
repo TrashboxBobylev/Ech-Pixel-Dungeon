@@ -221,13 +221,13 @@ public abstract class Wand extends Item {
 		return this;
 	}
 	
-	public void onHeroGainExp( float levelPercent, Hero hero ){
-		levelPercent *= Talent.itemIDSpeedFactor(hero, this);
-		if (!isIdentified() && availableUsesToID <= USES_TO_ID/2f) {
-			//gains enough uses to ID over 1 level
-			availableUsesToID = Math.min(USES_TO_ID/2f, availableUsesToID + levelPercent * USES_TO_ID/2f);
-		}
-	}
+//	public void onHeroGainExp( float levelPercent, Hero hero ){
+//		levelPercent *= Talent.itemIDSpeedFactor(hero, this);
+//		if (!isIdentified() && availableUsesToID <= USES_TO_ID/2f) {
+//			//gains enough uses to ID over 1 level
+//			availableUsesToID = Math.min(USES_TO_ID/2f, availableUsesToID + levelPercent * USES_TO_ID/2f);
+//		}
+//	}
 
 	@Override
 	public String info() {
@@ -350,10 +350,8 @@ public abstract class Wand extends Item {
 
 	protected void wandUsed() {
 		if (!isIdentified()) {
-			float uses = Math.min( availableUsesToID, Talent.itemIDSpeedFactor(Dungeon.hero, this) );
-			availableUsesToID -= uses;
-			usesLeftToID -= uses;
-			if (usesLeftToID <= 0 || Dungeon.hero.pointsInTalent(Talent.SCHOLARS_INTUITION) == 2) {
+			usesLeftToID -= 1;
+			if (usesLeftToID <= 0) {
 				identify();
 				GLog.p( Messages.get(Wand.class, "identify") );
 				Badges.validateItemLevelAquired( this );
@@ -383,6 +381,10 @@ public abstract class Wand extends Item {
 			if (Dungeon.hero.hasTalent(Talent.EMPOWERED_STRIKE)){
 				Buff.prolong(Dungeon.hero, Talent.EmpoweredStrikeTracker.class, 5f);
 			}
+		}
+
+		if (Dungeon.hero.hasTalent(Talent.MAGIC_PROFICIENCY)){
+			gainCharge(0.25f * Dungeon.hero.pointsInTalent(Talent.MAGIC_PROFICIENCY), false);
 		}
 
 		Invisibility.dispel();

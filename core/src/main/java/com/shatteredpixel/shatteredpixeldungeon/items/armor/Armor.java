@@ -415,9 +415,7 @@ public class Armor extends EquipableItem {
 		}
 		
 		if (!levelKnown && defender == Dungeon.hero) {
-			float uses = Math.min( availableUsesToID, Talent.itemIDSpeedFactor(Dungeon.hero, this) );
-			availableUsesToID -= uses;
-			usesLeftToID -= uses;
+			usesLeftToID -= 1;
 			if (usesLeftToID <= 0) {
 				identify();
 				GLog.p( Messages.get(Armor.class, "identify") );
@@ -426,15 +424,6 @@ public class Armor extends EquipableItem {
 		}
 		
 		return damage;
-	}
-	
-	@Override
-	public void onHeroGainExp(float levelPercent, Hero hero) {
-		levelPercent *= Talent.itemIDSpeedFactor(hero, this);
-		if (!levelKnown && isEquipped(hero) && availableUsesToID <= USES_TO_ID/2f) {
-			//gains enough uses to ID over 0.5 levels
-			availableUsesToID = Math.min(USES_TO_ID/2f, availableUsesToID + levelPercent * USES_TO_ID);
-		}
 	}
 	
 	@Override

@@ -22,8 +22,10 @@
 package com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.watabou.utils.Random;
@@ -60,6 +62,32 @@ public class MeleeWeapon extends Weapon {
 		}
 		
 		return damage;
+	}
+
+	@Override
+	public int reachFactor(Char owner) {
+		if (Dungeon.hero.pointsInTalent(Talent.BARBARIAN) == 2 && owner == Dungeon.hero){
+			return Integer.MAX_VALUE;
+		}
+		return super.reachFactor(owner);
+	}
+
+	@Override
+	protected void onThrow( int cell ) {
+		if (Dungeon.hero.hasTalent(Talent.BARBARIAN)) {
+			Char enemy = Actor.findChar(cell);
+			if (enemy == null || enemy == curUser) {
+				super.onThrow(cell);
+			} else {
+				if (!curUser.shoot(enemy, this)) {
+					super.onThrow(cell);
+				} else {
+
+					Dungeon.level.drop( this, cell ).sprite.drop();
+
+				}
+			}
+		}
 	}
 	
 	@Override

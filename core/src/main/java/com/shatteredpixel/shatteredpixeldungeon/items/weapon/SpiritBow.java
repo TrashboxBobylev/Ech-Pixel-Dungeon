@@ -32,6 +32,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Splash;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfFuror;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfSharpshooting;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Elastic;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
@@ -199,7 +200,7 @@ public class SpiritBow extends Weapon {
 					return 2f * RingOfFuror.attackDelayMultiplier(owner);
 			}
 		} else {
-			return super.speedFactor(owner);
+			return super.speedFactor(owner) * 0.75f;
 		}
 	}
 	
@@ -220,6 +221,9 @@ public class SpiritBow extends Weapon {
 	}
 	
 	public SpiritArrow knockArrow(){
+		if (Dungeon.hero.hasTalent(Talent.SPIRIT_JAVELINS) && Random.Int(4) < Dungeon.hero.pointsInTalent(Talent.SPIRIT_JAVELINS)){
+			return new SpiritJavelin();
+		}
 		return new SpiritArrow();
 	}
 	
@@ -354,6 +358,30 @@ public class SpiritBow extends Weapon {
 
 				super.cast(user, dst);
 			}
+		}
+	}
+
+	public class SpiritJavelin extends SpiritArrow {
+		{
+			image = ItemSpriteSheet.SPIRIT_JAVELIN;
+
+			hitSound = Assets.Sounds.HIT_STAB;
+		}
+
+		@Override
+		public int damageRoll(Char owner) {
+			return Math.round(SpiritBow.this.damageRoll(owner) * 2f);
+		}
+
+		@Override
+		public void throwSound() {
+			Sample.INSTANCE.play( Assets.Sounds.ATK_CROSSBOW, 1, Random.Float(0.87f, 1.15f) );
+		}
+
+		@Override
+		public int proc(Char attacker, Char defender, int damage) {
+			new Elastic().proc(this, attacker, defender, damage);
+			return super.proc(attacker, defender, damage);
 		}
 	}
 	

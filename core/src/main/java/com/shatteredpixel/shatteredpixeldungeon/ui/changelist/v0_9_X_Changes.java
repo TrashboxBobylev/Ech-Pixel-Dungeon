@@ -54,7 +54,27 @@ public class v0_9_X_Changes {
 
 	public static void add_Ech_Changes( ArrayList<ChangeInfo> changeInfos ) {
 
-		ChangeInfo changes = new ChangeInfo("v0.1", true, "");
+		ChangeInfo changes = new ChangeInfo("v0.1.1", true, "");
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.ENTER), "Ech",
+				"_-_ Compass spins more erratically."));
+
+		changes.addButton(new ChangeButton(new Image(new GolemSprite()), "Ech",
+				"_-_ Nerfed HP boost for champs from 100% to 30%.\n\n" +
+						"_-_ Champion stacking doesn't happen until depth 7."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.WARRIOR, 0, 90, 12, 15), "Ech",
+				"_-_ Fixed healthy meal healing nothing.\n\n" +
+						"_-_ Beautiful Young Woman gets 33% speed boost on a bow.\n\n" +
+						"_-_ Heroes now consistently get 38.75% more damage from debuffs and 85% more damage from everything else."));
+
+		changes.addButton( new ChangeButton( new ItemSprite(ItemSpriteSheet.WEAPON_HOLDER, null), "Ech",
+				"EXP is no longer required for identifying weapons, armor and wands.\n\n" +
+						"There is 4 new talents replacing identification talents."));
+
+		changes = new ChangeInfo("v0.1", true, "");
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 

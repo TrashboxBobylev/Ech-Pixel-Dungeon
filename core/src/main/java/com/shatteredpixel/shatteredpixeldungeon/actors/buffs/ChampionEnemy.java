@@ -98,7 +98,7 @@ public abstract class ChampionEnemy extends Buff {
 
 	public static void rollForChampion(Mob m, int step){
 		if (Dungeon.mobsToChampion[step] <= 0) {
-			Dungeon.mobsToChampion[step] = 4;
+			Dungeon.mobsToChampion[step] = 5;
 			if (step > 0) Dungeon.mobsToChampion[step] = 2;
 		}
 
@@ -115,10 +115,10 @@ public abstract class ChampionEnemy extends Buff {
 				case 5:             Buff.affect(m, Growing.class);      break;
 			}
 			if (!m.properties().contains(Char.Property.BOSS) || !m.properties().contains(Char.Property.MINIBOSS))
-				m.HP = m.HT = m.HT*2;
+				m.HP = m.HT = Math.round(m.HT*1.3f);
 
 			m.state = m.WANDERING;
-			if (step < 100) {
+			if (step < 100 && Dungeon.depth > 6) {
 				ChampionEnemy.rollForChampion(m, step+1);
 			}
 		}

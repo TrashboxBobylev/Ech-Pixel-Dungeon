@@ -85,6 +85,7 @@ public class ItemSpriteSheet {
 	public static final int PETAL           = UNCOLLECTIBLE+2;
 	public static final int SANDBAG         = UNCOLLECTIBLE+3;
 	public static final int SPIRIT_ARROW    = UNCOLLECTIBLE+4;
+	public static final int SPIRIT_JAVELIN  = UNCOLLECTIBLE+5;
 	
 	public static final int GUIDE_PAGE      = UNCOLLECTIBLE+6;
 	public static final int ALCH_PAGE       = UNCOLLECTIBLE+7;
@@ -97,6 +98,7 @@ public class ItemSpriteSheet {
 		assignItemRect(PETAL,       8,  8);
 		assignItemRect(SANDBAG,     10, 10);
 		assignItemRect(SPIRIT_ARROW,11, 11);
+		assignItemRect(SPIRIT_JAVELIN, 15, 15);
 		
 		assignItemRect(GUIDE_PAGE,  10, 11);
 		assignItemRect(ALCH_PAGE,   10, 11);

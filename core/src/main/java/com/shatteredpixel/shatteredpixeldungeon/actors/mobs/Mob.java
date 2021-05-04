@@ -984,8 +984,20 @@ public abstract class Mob extends Char {
 					spend( TICK );
 					if (!enemyInFOV) {
 						sprite.showLost();
-						state = WANDERING;
-						target = Dungeon.level.randomDestination( Mob.this );
+						if (Dungeon.hero.pointsInTalent(Talent.TRICKERY) == 2){
+							state = SLEEPING;
+							target = -1;
+							enemy = null;
+						}
+						else if (Dungeon.hero.pointsInTalent(Talent.TRICKERY) == 1){
+							state = FLEEING;
+							target = Dungeon.level.randomDestination( Mob.this );
+							enemy = Dungeon.hero;
+						} else {
+							state = WANDERING;
+							target = Dungeon.level.randomDestination(Mob.this);
+						}
+
 					}
 					return true;
 				}

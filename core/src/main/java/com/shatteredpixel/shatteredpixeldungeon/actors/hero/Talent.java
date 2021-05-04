@@ -41,16 +41,11 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.SpellSprite;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.LeafParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HornOfPlenty;
-import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRecharging;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.exotic.ScrollOfEnchantment;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
-import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
-import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MeleeWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
@@ -69,7 +64,7 @@ import java.util.LinkedHashMap;
 public enum Talent {
 
 	//Warrior T1
-	HEARTY_MEAL(0), ARMSMASTERS_INTUITION(1), TEST_SUBJECT(2), IRON_WILL(3),
+	HEARTY_MEAL(0), BARBARIAN(1), TEST_SUBJECT(2), IRON_WILL(3),
 	//Warrior T2
 	IRON_STOMACH(4), RESTORED_WILLPOWER(5), RUNIC_TRANSFERENCE(6), LETHAL_MOMENTUM(7), IMPROVISED_PROJECTILES(8),
 	//Warrior T3
@@ -80,7 +75,7 @@ public enum Talent {
 	CLEAVE(14, 3), LETHAL_DEFENSE(15, 3), ENHANCED_COMBO(16, 3),
 
 	//Mage T1
-	EMPOWERING_MEAL(32), SCHOLARS_INTUITION(33), TESTED_HYPOTHESIS(34), BACKUP_BARRIER(35),
+	EMPOWERING_MEAL(32), MAGIC_PROFICIENCY(33), TESTED_HYPOTHESIS(34), BACKUP_BARRIER(35),
 	//Mage T2
 	ENERGIZING_MEAL(36), ENERGIZING_UPGRADE(37), WAND_PRESERVATION(38), ARCANE_VISION(39), SHIELD_BATTERY(40),
 	//Mage T3
@@ -91,7 +86,7 @@ public enum Talent {
 	SOUL_EATER(46, 3), SOUL_SIPHON(47, 3), NECROMANCERS_MINIONS(48, 3),
 
 	//Rogue T1
-	CACHED_RATIONS(64), THIEFS_INTUITION(65), SUCKER_PUNCH(66), PROTECTIVE_SHADOWS(67),
+	CACHED_RATIONS(64), TRICKERY(65), SUCKER_PUNCH(66), PROTECTIVE_SHADOWS(67),
 	//Rogue T2
 	MYSTICAL_MEAL(68), MYSTICAL_UPGRADE(69), WIDE_SEARCH(70), SILENT_STEPS(71), ROGUES_FORESIGHT(72),
 	//Rogue T3
@@ -102,7 +97,7 @@ public enum Talent {
 	EVASIVE_ARMOR(78, 3), PROJECTILE_MOMENTUM(79, 3), SPEEDY_STEALTH(80, 3),
 
 	//Huntress T1
-	NATURES_BOUNTY(96), SURVIVALISTS_INTUITION(97), FOLLOWUP_STRIKE(98), NATURES_AID(99),
+	NATURES_BOUNTY(96), SPIRIT_JAVELINS(97), FOLLOWUP_STRIKE(98), NATURES_AID(99),
 	//Huntress T2
 	INVIGORATING_MEAL(100), RESTORED_NATURE(101), REJUVENATING_STEPS(102), HEIGHTENED_SENSES(103), DURABLE_PROJECTILES(104),
 	//Huntress T3
@@ -119,6 +114,7 @@ public enum Talent {
 	public static class BountyHunterTracker extends FlavourBuff{};
 	public static class RejuvenatingStepsCooldown extends FlavourBuff{};
 	public static class SeerShotCooldown extends FlavourBuff{};
+	public static class TrickeryEffect extends FlavourBuff{};
 
 	int icon;
 	int maxPoints;
@@ -157,24 +153,6 @@ public enum Talent {
 			else                                           Buff.count(hero, NatureBerriesAvailable.class, 300);
 		}
 
-		if (talent == ARMSMASTERS_INTUITION && hero.pointsInTalent(ARMSMASTERS_INTUITION) == 2){
-			if (hero.belongings.weapon != null) hero.belongings.weapon.identify();
-			if (hero.belongings.armor != null)  hero.belongings.armor.identify();
-		}
-		if (talent == THIEFS_INTUITION && hero.pointsInTalent(THIEFS_INTUITION) == 2){
-			if (hero.belongings.ring instanceof Ring) hero.belongings.ring.identify();
-			if (hero.belongings.misc instanceof Ring) hero.belongings.misc.identify();
-			for (Item item : Dungeon.hero.belongings){
-				if (item instanceof Ring){
-					((Ring) item).setKnown();
-				}
-			}
-		}
-		if (talent == THIEFS_INTUITION && hero.pointsInTalent(THIEFS_INTUITION) == 1){
-			if (hero.belongings.ring instanceof Ring) hero.belongings.ring.setKnown();
-			if (hero.belongings.misc instanceof Ring) ((Ring) hero.belongings.misc).setKnown();
-		}
-
 		if (talent == FARSIGHT){
 			Dungeon.observe();
 		}
@@ -187,11 +165,11 @@ public enum Talent {
 		if (hero.hasTalent(HEARTY_MEAL)){
 			//3/5 HP healed, when hero is below 25% health
 			if (hero.HP <= hero.HT/4) {
-				hero.HP = (int) Math.min(hero.HP + hero.HP * 0.1f + hero.HP * 0.2f * (hero.pointsInTalent(HEARTY_MEAL)) , hero.HT);
+				hero.HP = (int) Math.min(hero.HP + hero.HT * 0.1f + hero.HT * 0.2f * (hero.pointsInTalent(HEARTY_MEAL)) , hero.HT);
 				hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), 1+hero.pointsInTalent(HEARTY_MEAL));
 			//2/3 HP healed, when hero is below 50% health
 			} else if (hero.HP <= hero.HT/2){
-				hero.HP = (int) Math.min(hero.HP + hero.HP * 0.05f + hero.HP * 0.1f * hero.pointsInTalent(HEARTY_MEAL), hero.HT);
+				hero.HP = (int) Math.min(hero.HP + hero.HT * 0.05f + hero.HT * 0.1f * hero.pointsInTalent(HEARTY_MEAL), hero.HT);
 				hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), hero.pointsInTalent(HEARTY_MEAL));
 			}
 		}
@@ -223,25 +201,6 @@ public enum Talent {
 
 	public static class WarriorFoodImmunity extends FlavourBuff{
 		{ actPriority = HERO_PRIO+1; }
-	}
-
-	public static float itemIDSpeedFactor( Hero hero, Item item ){
-		// 1.75x/2.5x speed with huntress talent
-		float factor = 1f + hero.pointsInTalent(SURVIVALISTS_INTUITION)*20f;
-
-		// 2x/instant for Warrior (see onItemEquipped)
-		if (item instanceof MeleeWeapon || item instanceof Armor){
-			factor *= 1f + hero.pointsInTalent(ARMSMASTERS_INTUITION);
-		}
-		// 3x/instant for mage (see Wand.wandUsed())
-		if (item instanceof Wand){
-			factor *= 9f + 2*hero.pointsInTalent(SCHOLARS_INTUITION);
-		}
-		// 2x/instant for rogue (see onItemEqupped), also id's type on equip/on pickup
-		if (item instanceof Ring){
-			factor *= 1f + hero.pointsInTalent(THIEFS_INTUITION)*4;
-		}
-		return factor;
 	}
 
 	public static void onHealingPotionUsed( Hero hero ){
@@ -315,22 +274,6 @@ public enum Talent {
 	}
 
 	public static void onItemEquipped( Hero hero, Item item ){
-		if (hero.pointsInTalent(ARMSMASTERS_INTUITION) == 2 && (item instanceof Weapon || item instanceof Armor)){
-			item.identify();
-		}
-		if (hero.hasTalent(THIEFS_INTUITION) && item instanceof Ring){
-			if (hero.pointsInTalent(THIEFS_INTUITION) == 2){
-				item.identify();
-			} else {
-				((Ring) item).setKnown();
-			}
-		}
-	}
-
-	public static void onItemCollected( Hero hero, Item item ){
-		if (hero.pointsInTalent(THIEFS_INTUITION) == 2){
-			if (item instanceof Ring) ((Ring) item).setKnown();
-		}
 	}
 
 	//note that IDing can happen in alchemy scene, so be careful with VFX here
@@ -391,16 +334,16 @@ public enum Talent {
 		//tier 1
 		switch (cls){
 			case WARRIOR: default:
-				Collections.addAll(tierTalents, HEARTY_MEAL, ARMSMASTERS_INTUITION, TEST_SUBJECT, IRON_WILL);
+				Collections.addAll(tierTalents, HEARTY_MEAL, BARBARIAN, TEST_SUBJECT, IRON_WILL);
 				break;
 			case MAGE:
-				Collections.addAll(tierTalents, EMPOWERING_MEAL, SCHOLARS_INTUITION, TESTED_HYPOTHESIS, BACKUP_BARRIER);
+				Collections.addAll(tierTalents, EMPOWERING_MEAL, MAGIC_PROFICIENCY, TESTED_HYPOTHESIS, BACKUP_BARRIER);
 				break;
 			case ROGUE:
-				Collections.addAll(tierTalents, CACHED_RATIONS, THIEFS_INTUITION, SUCKER_PUNCH, PROTECTIVE_SHADOWS);
+				Collections.addAll(tierTalents, CACHED_RATIONS, TRICKERY, SUCKER_PUNCH, PROTECTIVE_SHADOWS);
 				break;
 			case HUNTRESS:
-				Collections.addAll(tierTalents, NATURES_BOUNTY, SURVIVALISTS_INTUITION, FOLLOWUP_STRIKE, NATURES_AID);
+				Collections.addAll(tierTalents, NATURES_BOUNTY, SPIRIT_JAVELINS, FOLLOWUP_STRIKE, NATURES_AID);
 				break;
 		}
 		for (Talent talent : tierTalents){

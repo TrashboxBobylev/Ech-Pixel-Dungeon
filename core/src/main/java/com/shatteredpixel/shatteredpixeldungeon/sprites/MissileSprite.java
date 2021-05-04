@@ -156,6 +156,8 @@ public class MissileSprite extends ItemSprite implements Tweener.Listener {
 				|| item instanceof ScorpioSprite.ScorpioShot
 				|| item instanceof TenguSprite.TenguShuriken){
 			speed *= 1.5f;
+		} else if (item instanceof SpiritBow.SpiritJavelin){
+			speed *= 0.75f;
 		}
 		
 		PosTweener tweener = new PosTweener( this, to, d.length() / speed );

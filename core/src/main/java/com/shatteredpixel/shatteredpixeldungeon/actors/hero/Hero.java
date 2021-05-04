@@ -31,6 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Alchemy;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.AdrenalineSurge;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Awareness;
@@ -369,7 +370,7 @@ public class Hero extends Char {
 		return belongings.armor == null ? 0 : belongings.armor.tier;
 	}
 	
-	public boolean shoot( Char enemy, MissileWeapon wep ) {
+	public boolean shoot( Char enemy, Weapon wep ) {
 
 		this.enemy = enemy;
 
@@ -1160,7 +1161,8 @@ public class Hero extends Char {
 			dmg = thorns.proc(dmg, (src instanceof Char ? (Char)src : null),  this);
 		}
 
-		dmg *= Random.Float(0.75f, 3f);
+		dmg *= 1.85f;
+		if (src instanceof Buff || src instanceof Blob) dmg *= 0.75f;
 
 		dmg = (int)Math.ceil(dmg * RingOfTenacity.damageMultiplier( this ));
 

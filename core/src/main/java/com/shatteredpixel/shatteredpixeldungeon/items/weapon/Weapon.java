@@ -108,9 +108,7 @@ abstract public class Weapon extends KindOfWeapon {
 		}
 		
 		if (!levelKnown && attacker == Dungeon.hero) {
-			float uses = Math.min( availableUsesToID, Talent.itemIDSpeedFactor(Dungeon.hero, this) );
-			availableUsesToID -= uses;
-			usesLeftToID -= uses;
+			usesLeftToID -= 1;
 			if (usesLeftToID <= 0) {
 				identify();
 				GLog.p( Messages.get(Weapon.class, "identify") );
@@ -120,14 +118,14 @@ abstract public class Weapon extends KindOfWeapon {
 
 		return damage;
 	}
-	
-	public void onHeroGainExp( float levelPercent, Hero hero ){
-		levelPercent *= Talent.itemIDSpeedFactor(hero, this);
-		if (!levelKnown && isEquipped(hero) && availableUsesToID <= USES_TO_ID/2f) {
-			//gains enough uses to ID over 0.5 levels
-			availableUsesToID = Math.min(USES_TO_ID/2f, availableUsesToID + levelPercent * USES_TO_ID);
-		}
-	}
+//
+//	public void onHeroGainExp( float levelPercent, Hero hero ){
+//		levelPercent *= Talent.itemIDSpeedFactor(hero, this);
+//		if (!levelKnown && isEquipped(hero) && availableUsesToID <= USES_TO_ID/2f) {
+//			//gains enough uses to ID over 0.5 levels
+//			availableUsesToID = Math.min(USES_TO_ID/2f, availableUsesToID + levelPercent * USES_TO_ID);
+//		}
+//	}
 	
 	private static final String USES_LEFT_TO_ID = "uses_left_to_id";
 	private static final String AVAILABLE_USES  = "available_uses";
