@@ -59,7 +59,9 @@ public class v0_9_X_Changes {
 		changeInfos.add(changes);
 
 		changes.addButton(new ChangeButton(Icons.get(Icons.ENTER), "Ech",
-				"_-_ Hero splashes and main menu visuals are ech."));
+				"_-_ Hero splashes and main menu visuals are ech.\n\n" +
+						"_-_ Dungeon contains 20 scrolls of upgrade, plus scroll in each shop. Potions of strength also appear in shops.\n\n" +
+						"_-_ Gold drops are increased by 10%, but shop prices are increased by 20%."));
 
 		changes.addButton(new ChangeButton(new Image(Assets.Sprites.WARRIOR, 0, 90, 12, 15), "Ech",
 				"Each hero has different name."));
@@ -74,7 +76,11 @@ public class v0_9_X_Changes {
 		changes.addButton(new ChangeButton(new Image(new GolemSprite()), "Ech",
 				"_-_ Champions spawn always.\n\n" +
 						"_-_ There is a lot more champions.\n\n" +
-						"_-_ Bosses can be champions too."));
+						"_-_ Bosses can be champions too.\n\n" +
+						"_-_ Champion modifiers can stack on top of each other.\n\n" +
+						"_-_ Champions get another 100% HP boost, which also stacks.\n\n" +
+						"_-_ Champions glow with rainbow colors."));
+
 
 	}
 

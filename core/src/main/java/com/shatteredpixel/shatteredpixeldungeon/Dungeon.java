@@ -150,7 +150,7 @@ public class Dungeon {
 	}
 
 	public static int challenges;
-	public static int mobsToChampion;
+	public static int[] mobsToChampion = new int[100];
 
 	public static Hero hero;
 	public static Level level;
@@ -173,7 +173,7 @@ public class Dungeon {
 
 		version = Game.versionCode;
 		challenges = SPDSettings.challenges();
-		mobsToChampion = 2;
+		mobsToChampion[0] = -1;
 
 		seed = DungeonSeed.randomSeed();
 
@@ -427,9 +427,9 @@ public class Dungeon {
 		int souLeftThisSet;
 		//3 SOU each floor set, 1.5 (rounded) on forbidden runes challenge
 		if (isChallenged(Challenges.NO_SCROLLS)){
-			souLeftThisSet = Math.round(1.5f - (LimitedDrops.UPGRADE_SCROLLS.count - (depth / 5) * 1.5f));
+			souLeftThisSet = Math.round(2f - (LimitedDrops.UPGRADE_SCROLLS.count - (depth / 5) * 2f));
 		} else {
-			souLeftThisSet = 3 - (LimitedDrops.UPGRADE_SCROLLS.count - (depth / 5) * 3);
+			souLeftThisSet = 4 - (LimitedDrops.UPGRADE_SCROLLS.count - (depth / 5) * 4);
 		}
 		if (souLeftThisSet <= 0) return false;
 
@@ -566,7 +566,7 @@ public class Dungeon {
 		QuickSlotButton.reset();
 
 		Dungeon.challenges = bundle.getInt( CHALLENGES );
-		Dungeon.mobsToChampion = bundle.getInt( MOBS_TO_CHAMPION );
+		Dungeon.mobsToChampion = bundle.getIntArray( MOBS_TO_CHAMPION );
 		
 		Dungeon.level = null;
 		Dungeon.depth = -1;

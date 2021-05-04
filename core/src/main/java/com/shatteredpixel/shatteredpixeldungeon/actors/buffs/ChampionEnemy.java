@@ -93,11 +93,19 @@ public abstract class ChampionEnemy extends Buff {
 	}
 
 	public static void rollForChampion(Mob m){
-		if (Dungeon.mobsToChampion <= 0) Dungeon.mobsToChampion = 4;
+		rollForChampion(m, 0);
+	}
 
-		Dungeon.mobsToChampion--;
+	public static void rollForChampion(Mob m, int step){
+		if (Dungeon.mobsToChampion[step] <= 0) {
+			Dungeon.mobsToChampion[step] = 4;
+			if (step > 0) Dungeon.mobsToChampion[step] = 2;
+		}
 
-		if (Dungeon.mobsToChampion <= 0){
+
+		Dungeon.mobsToChampion[step]--;
+
+		if (Dungeon.mobsToChampion[step] <= 0){
 			switch (Random.Int(6)){
 				case 0: default:    Buff.affect(m, Blazing.class);      break;
 				case 1:             Buff.affect(m, Projecting.class);   break;
@@ -106,7 +114,13 @@ public abstract class ChampionEnemy extends Buff {
 				case 4:             Buff.affect(m, Blessed.class);      break;
 				case 5:             Buff.affect(m, Growing.class);      break;
 			}
+			if (!m.properties().contains(Char.Property.BOSS) || !m.properties().contains(Char.Property.MINIBOSS))
+				m.HP = m.HT = m.HT*2;
+
 			m.state = m.WANDERING;
+			if (step < 100) {
+				ChampionEnemy.rollForChampion(m, step+1);
+			}
 		}
 	}
 
