@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TimekeepersHourglass;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -88,12 +89,16 @@ public class Invisibility extends FlavourBuff {
 	}
 
 	public static void dispel() {
+
 		for ( Buff invis : Dungeon.hero.buffs( Invisibility.class )){
 			invis.detach();
 		}
-		CloakOfShadows.cloakStealth cloakBuff = Dungeon.hero.buff( CloakOfShadows.cloakStealth.class );
-		if (cloakBuff != null) {
-			cloakBuff.dispel();
+
+		if (Dungeon.hero.pointsInTalent(Talent.BOUNTY_HUNTER) < 2) {
+			CloakOfShadows.cloakStealth cloakBuff = Dungeon.hero.buff(CloakOfShadows.cloakStealth.class);
+			if (cloakBuff != null) {
+				cloakBuff.dispel();
+			}
 		}
 		
 		//these aren't forms of invisibilty, but do dispel at the same time as it.
@@ -101,10 +106,12 @@ public class Invisibility extends FlavourBuff {
 		if (timeFreeze != null) {
 			timeFreeze.detach();
 		}
-		
-		Preparation prep = Dungeon.hero.buff( Preparation.class );
-		if (prep != null){
-			prep.detach();
+
+		if (Dungeon.hero.pointsInTalent(Talent.BOUNTY_HUNTER) < 1) {
+			Preparation prep = Dungeon.hero.buff(Preparation.class);
+			if (prep != null) {
+				prep.detach();
+			}
 		}
 		
 		Swiftthistle.TimeBubble bubble =  Dungeon.hero.buff( Swiftthistle.TimeBubble.class );

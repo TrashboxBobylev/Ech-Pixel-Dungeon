@@ -35,6 +35,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.Artifact;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
+import com.shatteredpixel.shatteredpixeldungeon.items.food.MeatPie;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.SmallRation;
 import com.shatteredpixel.shatteredpixeldungeon.items.journal.GuidePage;
 import com.shatteredpixel.shatteredpixeldungeon.items.keys.GoldenKey;
@@ -418,7 +419,7 @@ public abstract class RegularLevel extends Level {
 		//cached rations try to drop in a special room on floors 2/3/4/6/7/8, to a max of 4/6
 		if (Dungeon.hero.hasTalent(Talent.CACHED_RATIONS)){
 			Talent.CachedRationsDropped dropped = Buff.affect(Dungeon.hero, Talent.CachedRationsDropped.class);
-			if (dropped.count() < 2 + 2*Dungeon.hero.pointsInTalent(Talent.CACHED_RATIONS)){
+			if (dropped.count() < 2 + 6*Dungeon.hero.pointsInTalent(Talent.CACHED_RATIONS)){
 				int cell;
 				int tries = 100;
 				do {
@@ -429,7 +430,7 @@ public abstract class RegularLevel extends Level {
 						map[cell] = Terrain.GRASS;
 						losBlocking[cell] = false;
 					}
-					drop(new SmallRation(), cell).type = Heap.Type.CHEST;
+					drop(new MeatPie(), cell).type = Heap.Type.CHEST;
 					dropped.countUp(1);
 				}
 			}

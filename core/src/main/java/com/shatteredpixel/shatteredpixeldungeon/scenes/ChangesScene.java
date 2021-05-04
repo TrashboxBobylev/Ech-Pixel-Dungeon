@@ -86,28 +86,8 @@ public class ChangesScene extends PixelScene {
 		add( panel );
 		
 		final ArrayList<ChangeInfo> changeInfos = new ArrayList<>();
-		
-		switch (changesSelected){
-			case 0: default:
-				v0_9_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 1:
-				v0_8_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 2:
-				v0_7_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 3:
-				v0_6_X_Changes.addAllChanges(changeInfos);
-				break;
-			case 4:
-				v0_5_X_Changes.addAllChanges(changeInfos);
-				v0_4_X_Changes.addAllChanges(changeInfos);
-				v0_3_X_Changes.addAllChanges(changeInfos);
-				v0_2_X_Changes.addAllChanges(changeInfos);
-				v0_1_X_Changes.addAllChanges(changeInfos);
-				break;
-		}
+
+		v0_9_X_Changes.addAllChanges(changeInfos);
 
 		ScrollPane list = new ScrollPane( new Component() ){
 

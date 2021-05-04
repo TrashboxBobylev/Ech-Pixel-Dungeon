@@ -30,10 +30,11 @@ import com.watabou.noosa.NoosaScript;
 import com.watabou.noosa.NoosaScriptNoLighting;
 import com.watabou.noosa.SkinnedBlock;
 import com.watabou.noosa.ui.Component;
+import com.watabou.utils.Random;
 
 public class Archs extends Component {
 
-	private static final float SCROLL_SPEED	= 20f;
+	private static float SCROLL_SPEED	= 99f;
 
 	private SkinnedBlock arcsBg;
 	private SkinnedBlock arcsFg;
@@ -82,13 +83,13 @@ public class Archs extends Component {
 	@Override
 	protected void layout() {
 		arcsBg.size( width, height );
-		arcsBg.offset( arcsBg.texture.width / 4 - (width % arcsBg.texture.width) / 2, 0 );
+		arcsBg.offset( arcsBg.texture.width / 8 - (width % arcsBg.texture.width) / 2, 0 );
 
 		arcsFg.size( width, height );
-		arcsFg.offset( arcsFg.texture.width / 4 - (width % arcsFg.texture.width) / 2, 0 );
+		arcsFg.offset( arcsFg.texture.width / 8 - (width % arcsFg.texture.width) / 2, 0 );
 
 		darkness.x = width;
-		darkness.scale.x = height/5f;
+		darkness.scale.x = height/4f;
 		darkness.scale.y = width;
 	}
 
@@ -98,12 +99,14 @@ public class Archs extends Component {
 		super.update();
 
 		float shift = Game.elapsed * SCROLL_SPEED;
+		SCROLL_SPEED = Random.Int(35, 150);
 		if (reversed) {
 			shift = -shift;
 		}
 
 		arcsBg.offset( 0, shift );
 		arcsFg.offset( 0, shift * 2 );
+		arcsFg.hardlight(Random.Int(0x000000, 0xFFFFFF));
 
 		offsB = arcsBg.offsetY();
 		offsF = arcsFg.offsetY();

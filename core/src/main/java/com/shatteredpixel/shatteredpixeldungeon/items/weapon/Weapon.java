@@ -207,12 +207,19 @@ abstract public class Weapon extends KindOfWeapon {
 	public abstract int STRReq(int lvl);
 
 	protected static int STRReq(int tier, int lvl){
+
+		int base = 8 + Math.round(tier * 2);
+
+		if (Dungeon.hero.hasTalent(Talent.STRONGMAN)){
+			if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN) == 1) base = 6 + Math.round(tier);
+			if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN) == 2) base = 10;
+			if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN) == 1) base = 0;
+		}
+
 		lvl = Math.max(0, lvl);
 
 		//strength req decreases at +1,+3,+6,+10,etc.
-		int req = (8 + tier * 2) - (int)(Math.sqrt(8 * lvl + 1) - 1)/2;
-
-		if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN) >= 2) req--;
+		int req = base - (int)(Math.sqrt(8 * lvl + 1) - 1)/2;
 
 		return req;
 	}
@@ -352,7 +359,7 @@ abstract public class Weapon extends KindOfWeapon {
 			if (attacker instanceof Hero && ((Hero) attacker).hasTalent(Talent.ENRAGED_CATALYST)){
 				Berserk rage = attacker.buff(Berserk.class);
 				if (rage != null) {
-					multi += (rage.rageAmount() / 6f) * ((Hero) attacker).pointsInTalent(Talent.ENRAGED_CATALYST);
+					multi += (rage.rageAmount() / 2f) * ((Hero) attacker).pointsInTalent(Talent.ENRAGED_CATALYST);
 				}
 			}
 			return multi;

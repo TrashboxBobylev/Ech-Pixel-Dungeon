@@ -946,7 +946,7 @@ public abstract class Level implements Bundlable {
 				set(ch.pos, Terrain.HIGH_GRASS);
 			}
 			GameScene.updateMap(ch.pos);
-			Buff.affect(ch, Talent.RejuvenatingStepsCooldown.class, 15f - 5f*Dungeon.hero.pointsInTalent(Talent.REJUVENATING_STEPS));
+			Buff.affect(ch, Talent.RejuvenatingStepsCooldown.class, 2f - Dungeon.hero.pointsInTalent(Talent.REJUVENATING_STEPS));
 		}
 
 		if (!ch.flying){
@@ -1143,7 +1143,7 @@ public abstract class Level implements Bundlable {
 			} else if (((Hero) c).hasTalent(Talent.HEIGHTENED_SENSES)) {
 				for (Mob mob : mobs) {
 					int p = mob.pos;
-					if (!fieldOfView[p] && distance(c.pos, p) <= 1+((Hero) c).pointsInTalent(Talent.HEIGHTENED_SENSES)) {
+					if (!fieldOfView[p] && distance(c.pos, p) <= 2+((Hero) c).pointsInTalent(Talent.HEIGHTENED_SENSES)*3) {
 						for (int i : PathFinder.NEIGHBOURS9) {
 							heroMindFov[mob.pos + i] = true;
 						}

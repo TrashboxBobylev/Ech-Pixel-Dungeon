@@ -397,7 +397,7 @@ public class Hero extends Char {
 		
 		if (wep instanceof MissileWeapon){
 			if (Dungeon.level.adjacent( pos, target.pos )) {
-				accuracy *= (0.5f + 0.2f*pointsInTalent(Talent.POINT_BLANK));
+				accuracy *= (0.5f + 0.45f*pointsInTalent(Talent.POINT_BLANK));
 			} else {
 				accuracy *= 1.5f;
 			}
@@ -442,7 +442,7 @@ public class Hero extends Char {
 			return super.defenseVerb();
 		} else {
 			parry.parried = true;
-			if (buff(Combo.class).getComboCount() < 9 || pointsInTalent(Talent.ENHANCED_COMBO) < 2){
+			if (buff(Combo.class).getComboCount() < 5 || pointsInTalent(Talent.ENHANCED_COMBO) < 2){
 				parry.detach();
 			}
 			return Messages.get(Monk.class, "parried");
@@ -474,7 +474,7 @@ public class Hero extends Char {
 		if (block != null)              dr += block.blockingRoll();
 
 		if (buff(HoldFast.class) != null){
-			dr += Random.NormalIntRange(0, 2*pointsInTalent(Talent.HOLD_FAST));
+			dr += 4*pointsInTalent(Talent.HOLD_FAST);
 		}
 		
 		return dr;
@@ -672,7 +672,7 @@ public class Hero extends Char {
 		}
 		
 		if(hasTalent(Talent.BARKSKIN) && Dungeon.level.map[pos] == Terrain.FURROWED_GRASS){
-			Buff.affect(this, Barkskin.class).set( lvl, pointsInTalent(Talent.BARKSKIN) );
+			Buff.affect(this, Barkskin.class).set( lvl, (int) Math.pow(5, pointsInTalent(Talent.BARKSKIN)));
 		}
 		
 		return actResult;
@@ -1807,9 +1807,9 @@ public class Hero extends Char {
 		
 		boolean smthFound = false;
 
-		boolean circular = pointsInTalent(Talent.WIDE_SEARCH) == 1;
+		boolean circular = false;
 		int distance = heroClass == HeroClass.ROGUE ? 2 : 1;
-		if (hasTalent(Talent.WIDE_SEARCH)) distance++;
+		if (hasTalent(Talent.WIDE_SEARCH)) distance *= 1 + pointsInTalent(Talent.WIDE_SEARCH);
 		
 		boolean foresight = buff(Foresight.class) != null;
 		

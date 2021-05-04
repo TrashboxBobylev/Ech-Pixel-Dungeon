@@ -181,7 +181,7 @@ public abstract class Wand extends Item {
 	//TODO some naming issues here. Consider renaming this method and externalizing char awareness buff
 	protected static void processSoulMark(Char target, int wandLevel, int chargesUsed){
 		if (Dungeon.hero.hasTalent(Talent.ARCANE_VISION)) {
-			int dur = 5 + 5*Dungeon.hero.pointsInTalent(Talent.ARCANE_VISION);
+			int dur = 100*Dungeon.hero.pointsInTalent(Talent.ARCANE_VISION);
 			Buff.append(Dungeon.hero, TalismanOfForesight.CharAwareness.class, dur).charID = target.id();
 		}
 
@@ -307,7 +307,7 @@ public abstract class Wand extends Item {
 
 		if (charger != null && charger.target != null) {
 			if (charger.target.buff(ScrollEmpower.class) != null){
-				lvl += Dungeon.hero.pointsInTalent(Talent.EMPOWERING_SCROLLS);
+				lvl += 10 * Dungeon.hero.pointsInTalent(Talent.EMPOWERING_SCROLLS);
 			}
 
 			WandOfMagicMissile.MagicCharge buff = charger.target.buff(WandOfMagicMissile.MagicCharge.class);
@@ -378,7 +378,7 @@ public abstract class Wand extends Item {
 				&& !Dungeon.hero.belongings.contains(this)) {
 			if (curCharges == 0 && Dungeon.hero.hasTalent(Talent.BACKUP_BARRIER)) {
 				//grants 4/6 shielding
-				Buff.affect(Dungeon.hero, Barrier.class).setShield(2 + 2 * Dungeon.hero.pointsInTalent(Talent.BACKUP_BARRIER));
+				Buff.affect(Dungeon.hero, Barrier.class).setShield(10 * Dungeon.hero.pointsInTalent(Talent.BACKUP_BARRIER));
 			}
 			if (Dungeon.hero.hasTalent(Talent.EMPOWERED_STRIKE)){
 				Buff.prolong(Dungeon.hero, Talent.EmpoweredStrikeTracker.class, 5f);
@@ -495,8 +495,8 @@ public abstract class Wand extends Item {
 				
 				if (target == curUser.pos || cell == curUser.pos) {
 					if (target == curUser.pos && curUser.hasTalent(Talent.SHIELD_BATTERY)){
-						float shield = curUser.HT * (0.05f*curWand.curCharges);
-						if (curUser.pointsInTalent(Talent.SHIELD_BATTERY) == 2) shield *= 1.5f;
+						float shield = curUser.HT * (0.34f*curWand.curCharges);
+						if (curUser.pointsInTalent(Talent.SHIELD_BATTERY) == 2) shield *= 2f;
 						Buff.affect(curUser, Barrier.class).setShield(Math.round(shield));
 						curWand.curCharges = 0;
 						curUser.sprite.operate(curUser.pos);

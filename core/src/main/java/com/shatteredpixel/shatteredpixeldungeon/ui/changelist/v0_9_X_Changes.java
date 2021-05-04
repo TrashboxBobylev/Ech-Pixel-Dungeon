@@ -46,9 +46,23 @@ import java.util.ArrayList;
 public class v0_9_X_Changes {
 
 	public static void addAllChanges( ArrayList<ChangeInfo> changeInfos ){
-		add_v0_9_2_Changes(changeInfos);
-		add_v0_9_1_Changes(changeInfos);
-		add_v0_9_0_Changes(changeInfos);
+//		add_v0_9_2_Changes(changeInfos);
+//		add_v0_9_1_Changes(changeInfos);
+//		add_v0_9_0_Changes(changeInfos);
+		add_Ech_Changes(changeInfos);
+	}
+
+	public static void add_Ech_Changes( ArrayList<ChangeInfo> changeInfos ) {
+
+		ChangeInfo changes = new ChangeInfo("v0.1", true, "");
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.ENTER), "Ech",
+				"_-_ Hero splashes and main menu visuals are ech."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.WARRIOR, 0, 90, 12, 15), "Ech",
+				"Each hero has different name."));
 	}
 
 	public static void add_v0_9_2_Changes( ArrayList<ChangeInfo> changeInfos ) {

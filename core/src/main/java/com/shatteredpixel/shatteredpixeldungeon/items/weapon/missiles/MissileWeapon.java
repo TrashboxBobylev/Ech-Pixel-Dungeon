@@ -170,7 +170,7 @@ abstract public class MissileWeapon extends Weapon {
 	public float accuracyFactor(Char owner) {
 		float accFactor = super.accuracyFactor(owner);
 		if (owner instanceof Hero && owner.buff(Momentum.class) != null && owner.buff(Momentum.class).freerunning()){
-			accFactor *= 1f + 0.2f*((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM);
+			accFactor *= 1f + 0.6f*((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM);
 		}
 		return accFactor;
 	}
@@ -201,14 +201,10 @@ abstract public class MissileWeapon extends Weapon {
 	@Override
 	public int proc(Char attacker, Char defender, int damage) {
 		if (attacker == Dungeon.hero && Random.Int(3) < Dungeon.hero.pointsInTalent(Talent.SHARED_ENCHANTMENT)){
-			if (this instanceof Dart && ((Dart) this).crossbowHasEnchant(Dungeon.hero)){
-				//do nothing
-			} else {
 				SpiritBow bow = Dungeon.hero.belongings.getItem(SpiritBow.class);
 				if (bow != null && bow.enchantment != null && Dungeon.hero.buff(MagicImmune.class) == null) {
 					damage = bow.enchantment.proc(this, attacker, defender, damage);
 				}
-			}
 		}
 
 		return super.proc(attacker, defender, damage);
@@ -261,7 +257,7 @@ abstract public class MissileWeapon extends Weapon {
 
 		//+50%/75% durability
 		if (Dungeon.hero.hasTalent(Talent.DURABLE_PROJECTILES)){
-			usages *= 1.25f + (0.25f*Dungeon.hero.pointsInTalent(Talent.DURABLE_PROJECTILES));
+			usages *= 1.25f + (Dungeon.hero.pointsInTalent(Talent.DURABLE_PROJECTILES));
 		}
 		if (holster) {
 			usages *= MagicalHolster.HOLSTER_DURABILITY_FACTOR;
@@ -312,7 +308,7 @@ abstract public class MissileWeapon extends Weapon {
 				damage += Random.IntRange( 0, exStr );
 			}
 			if (owner.buff(Momentum.class) != null && owner.buff(Momentum.class).freerunning()) {
-				damage = Math.round(damage * (1f + 0.15f * ((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM)));
+				damage = Math.round(damage * (1f + 0.45f * ((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM)));
 			}
 		}
 		

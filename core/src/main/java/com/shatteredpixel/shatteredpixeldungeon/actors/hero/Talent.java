@@ -46,6 +46,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.HornOfPlenty;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfRecharging;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.exotic.ScrollOfEnchantment;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
@@ -152,8 +153,8 @@ public enum Talent {
 
 	public static void onTalentUpgraded( Hero hero, Talent talent){
 		if (talent == NATURES_BOUNTY){
-			if ( hero.pointsInTalent(NATURES_BOUNTY) == 1) Buff.count(hero, NatureBerriesAvailable.class, 4);
-			else                                           Buff.count(hero, NatureBerriesAvailable.class, 2);
+			if ( hero.pointsInTalent(NATURES_BOUNTY) == 1) Buff.count(hero, NatureBerriesAvailable.class, 200);
+			else                                           Buff.count(hero, NatureBerriesAvailable.class, 300);
 		}
 
 		if (talent == ARMSMASTERS_INTUITION && hero.pointsInTalent(ARMSMASTERS_INTUITION) == 2){
@@ -186,11 +187,11 @@ public enum Talent {
 		if (hero.hasTalent(HEARTY_MEAL)){
 			//3/5 HP healed, when hero is below 25% health
 			if (hero.HP <= hero.HT/4) {
-				hero.HP = Math.min(hero.HP + 1 + 2 * hero.pointsInTalent(HEARTY_MEAL), hero.HT);
+				hero.HP = (int) Math.min(hero.HP + hero.HP * 0.1f + hero.HP * 0.2f * (hero.pointsInTalent(HEARTY_MEAL)) , hero.HT);
 				hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), 1+hero.pointsInTalent(HEARTY_MEAL));
 			//2/3 HP healed, when hero is below 50% health
 			} else if (hero.HP <= hero.HT/2){
-				hero.HP = Math.min(hero.HP + 1 + hero.pointsInTalent(HEARTY_MEAL), hero.HT);
+				hero.HP = (int) Math.min(hero.HP + hero.HP * 0.05f + hero.HP * 0.1f * hero.pointsInTalent(HEARTY_MEAL), hero.HT);
 				hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), hero.pointsInTalent(HEARTY_MEAL));
 			}
 		}
@@ -201,22 +202,22 @@ public enum Talent {
 		}
 		if (hero.hasTalent(EMPOWERING_MEAL)){
 			//2/3 bonus wand damage for next 3 zaps
-			Buff.affect( hero, WandEmpower.class).set(1 + hero.pointsInTalent(EMPOWERING_MEAL), 3);
+			Buff.affect( hero, WandEmpower.class).set(3 * hero.pointsInTalent(EMPOWERING_MEAL), 30);
 			ScrollOfRecharging.charge( hero );
 		}
 		if (hero.hasTalent(ENERGIZING_MEAL)){
 			//5/8 turns of recharging
-			Buff.prolong( hero, Recharging.class, 2 + 3*(hero.pointsInTalent(ENERGIZING_MEAL)) );
+			Buff.prolong( hero, Recharging.class, 10*(hero.pointsInTalent(ENERGIZING_MEAL)) );
 			ScrollOfRecharging.charge( hero );
 		}
 		if (hero.hasTalent(MYSTICAL_MEAL)){
 			//3/5 turns of recharging
-			Buff.affect( hero, ArtifactRecharge.class).set(1 + 2*(hero.pointsInTalent(MYSTICAL_MEAL))).ignoreHornOfPlenty = foodSource instanceof HornOfPlenty;
+			Buff.affect( hero, ArtifactRecharge.class).set(10 + 20*(hero.pointsInTalent(MYSTICAL_MEAL))).ignoreHornOfPlenty = foodSource instanceof HornOfPlenty;
 			ScrollOfRecharging.charge( hero );
 		}
 		if (hero.hasTalent(INVIGORATING_MEAL)){
 			//effectively 1/2 turns of haste
-			Buff.prolong( hero, Haste.class, 0.67f+hero.pointsInTalent(INVIGORATING_MEAL));
+			Buff.prolong( hero, Haste.class, (0.67f+hero.pointsInTalent(INVIGORATING_MEAL))*3);
 		}
 	}
 
@@ -226,7 +227,7 @@ public enum Talent {
 
 	public static float itemIDSpeedFactor( Hero hero, Item item ){
 		// 1.75x/2.5x speed with huntress talent
-		float factor = 1f + hero.pointsInTalent(SURVIVALISTS_INTUITION)*0.75f;
+		float factor = 1f + hero.pointsInTalent(SURVIVALISTS_INTUITION)*20f;
 
 		// 2x/instant for Warrior (see onItemEquipped)
 		if (item instanceof MeleeWeapon || item instanceof Armor){
@@ -234,11 +235,11 @@ public enum Talent {
 		}
 		// 3x/instant for mage (see Wand.wandUsed())
 		if (item instanceof Wand){
-			factor *= 1f + 2*hero.pointsInTalent(SCHOLARS_INTUITION);
+			factor *= 9f + 2*hero.pointsInTalent(SCHOLARS_INTUITION);
 		}
 		// 2x/instant for rogue (see onItemEqupped), also id's type on equip/on pickup
 		if (item instanceof Ring){
-			factor *= 1f + hero.pointsInTalent(THIEFS_INTUITION);
+			factor *= 1f + hero.pointsInTalent(THIEFS_INTUITION)*4;
 		}
 		return factor;
 	}
@@ -247,7 +248,7 @@ public enum Talent {
 		if (hero.hasTalent(RESTORED_WILLPOWER)){
 			BrokenSeal.WarriorShield shield = hero.buff(BrokenSeal.WarriorShield.class);
 			if (shield != null){
-				int shieldToGive = Math.round(shield.maxShield() * 0.33f*(1+hero.pointsInTalent(RESTORED_WILLPOWER)));
+				int shieldToGive = Math.round(shield.maxShield() * (1+hero.pointsInTalent(RESTORED_WILLPOWER)));
 				shield.supercharge(shieldToGive);
 			}
 		}
@@ -260,7 +261,7 @@ public enum Talent {
 			for (int cell : grassCells){
 				Char ch = Actor.findChar(cell);
 				if (ch != null){
-					Buff.affect(ch, Roots.class, 1f + hero.pointsInTalent(RESTORED_NATURE));
+					Buff.affect(ch, Roots.class, 20f + hero.pointsInTalent(RESTORED_NATURE)*10);
 				}
 				if (Dungeon.level.map[cell] == Terrain.EMPTY ||
 						Dungeon.level.map[cell] == Terrain.EMBERS ||
@@ -292,7 +293,7 @@ public enum Talent {
 		if (hero.hasTalent(ENERGIZING_UPGRADE)){
 			MagesStaff staff = hero.belongings.getItem(MagesStaff.class);
 			if (staff != null){
-				staff.gainCharge(1 + hero.pointsInTalent(ENERGIZING_UPGRADE), true);
+				staff.gainCharge(25 * hero.pointsInTalent(ENERGIZING_UPGRADE), true);
 				ScrollOfRecharging.charge( Dungeon.hero );
 				SpellSprite.show( hero, SpellSprite.CHARGE );
 			}
@@ -300,7 +301,7 @@ public enum Talent {
 		if (hero.hasTalent(MYSTICAL_UPGRADE)){
 			CloakOfShadows cloak = hero.belongings.getItem(CloakOfShadows.class);
 			if (cloak != null){
-				cloak.overCharge(1 + hero.pointsInTalent(MYSTICAL_UPGRADE));
+				cloak.overCharge(10 + hero.pointsInTalent(MYSTICAL_UPGRADE)*10);
 				ScrollOfRecharging.charge( Dungeon.hero );
 				SpellSprite.show( hero, SpellSprite.CHARGE );
 			}
@@ -309,7 +310,7 @@ public enum Talent {
 
 	public static void onArtifactUsed( Hero hero ){
 		if (hero.hasTalent(ENHANCED_RINGS)){
-			Buff.prolong(hero, EnhancedRings.class, 3f*hero.pointsInTalent(ENHANCED_RINGS));
+			Buff.prolong(hero, EnhancedRings.class, 15f*hero.pointsInTalent(ENHANCED_RINGS));
 		}
 	}
 
@@ -335,14 +336,15 @@ public enum Talent {
 	//note that IDing can happen in alchemy scene, so be careful with VFX here
 	public static void onItemIdentified( Hero hero, Item item ){
 		if (hero.hasTalent(TEST_SUBJECT)){
-			//heal for 2/3 HP
-			hero.HP = Math.min(hero.HP + 1 + hero.pointsInTalent(TEST_SUBJECT), hero.HT);
+			int heal = 6;
+			if (hero.pointsInTalent(TEST_SUBJECT) == 2) heal = 18;
+			hero.HP = Math.min(hero.HP + heal, hero.HT);
 			Emitter e = hero.sprite.emitter();
 			if (e != null) e.burst(Speck.factory(Speck.HEALING), hero.pointsInTalent(TEST_SUBJECT));
 		}
 		if (hero.hasTalent(TESTED_HYPOTHESIS)){
 			//2/3 turns of wand recharging
-			Buff.affect(hero, Recharging.class, 1f + hero.pointsInTalent(TESTED_HYPOTHESIS));
+			new ScrollOfEnchantment().quantity(hero.pointsInTalent(TESTED_HYPOTHESIS)).collect();
 			ScrollOfRecharging.charge(hero);
 		}
 	}
@@ -351,7 +353,7 @@ public enum Talent {
 		if (hero.hasTalent(Talent.SUCKER_PUNCH)
 				&& enemy instanceof Mob && ((Mob) enemy).surprisedBy(hero)
 				&& enemy.buff(SuckerPunchTracker.class) == null){
-			dmg += Random.IntRange(hero.pointsInTalent(Talent.SUCKER_PUNCH) , 2);
+			dmg += Random.IntRange(hero.pointsInTalent(Talent.SUCKER_PUNCH)*5, 10);
 			Buff.affect(enemy, SuckerPunchTracker.class);
 		}
 
@@ -359,7 +361,7 @@ public enum Talent {
 			if (hero.belongings.weapon instanceof MissileWeapon) {
 				Buff.affect(enemy, FollowupStrikeTracker.class);
 			} else if (enemy.buff(FollowupStrikeTracker.class) != null){
-				dmg += 1 + hero.pointsInTalent(FOLLOWUP_STRIKE);
+				dmg += 2 + hero.pointsInTalent(FOLLOWUP_STRIKE)*5;
 				if (!(enemy instanceof Mob) || !((Mob) enemy).surprisedBy(hero)){
 					Sample.INSTANCE.play(Assets.Sounds.HIT_STRONG, 0.75f, 1.2f);
 				}

@@ -28,17 +28,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.Statistics;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Adrenaline;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Amok;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ChampionEnemy;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Charm;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Corruption;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Hunger;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Preparation;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Sleep;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.SoulMark;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Terror;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.*;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
@@ -592,20 +582,6 @@ public abstract class Mob extends Char {
 			target = enemy.pos;
 		}
 
-		if (buff(SoulMark.class) != null) {
-			int restoration = Math.min(damage, HP);
-			
-			//physical damage that doesn't come from the hero is less effective
-			if (enemy != Dungeon.hero){
-				restoration = Math.round(restoration * 0.15f*Dungeon.hero.pointsInTalent(Talent.SOUL_SIPHON));
-			}
-			if (restoration > 0) {
-				Buff.affect(Dungeon.hero, Hunger.class).affectHunger(restoration*Dungeon.hero.pointsInTalent(Talent.SOUL_EATER)/3f);
-				Dungeon.hero.HP = (int) Math.ceil(Math.min(Dungeon.hero.HT, Dungeon.hero.HP + (restoration * 0.4f)));
-				Dungeon.hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), 1);
-			}
-		}
-
 		return damage;
 	}
 
@@ -634,6 +610,20 @@ public abstract class Mob extends Char {
 		}
 		if (state != HUNTING && !(src instanceof Corruption)) {
 			alerted = true;
+		}
+
+		if (buff(SoulMark.class) != null) {
+			int restoration = Math.min(dmg, HP);
+
+			//physical damage that doesn't come from the hero is less effective
+			if (enemy != Dungeon.hero){
+				restoration = Math.round(restoration * 0.3f*Dungeon.hero.pointsInTalent(Talent.SOUL_SIPHON));
+			}
+			if (restoration > 0) {
+				Buff.affect(Dungeon.hero, Hunger.class).affectHunger(restoration*Dungeon.hero.pointsInTalent(Talent.SOUL_EATER)*6f);
+				Dungeon.hero.HP = (int) Math.ceil(Math.min(Dungeon.hero.HT, Dungeon.hero.HP + (restoration * 0.4f)));
+				Dungeon.hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), 1);
+			}
 		}
 		
 		super.damage( dmg, src );
@@ -692,7 +682,7 @@ public abstract class Mob extends Char {
 
 		if (!(this instanceof Wraith)
 				&& soulMarked
-				&& Random.Int(10) < Dungeon.hero.pointsInTalent(Talent.NECROMANCERS_MINIONS)){
+				&& Random.Int(10) < Dungeon.hero.pointsInTalent(Talent.NECROMANCERS_MINIONS)*4){
 			Wraith w = Wraith.spawnAt(pos);
 			if (w != null) {
 				Buff.affect(w, Corruption.class);
@@ -737,13 +727,13 @@ public abstract class Mob extends Char {
 
 		//soul eater talent
 		if (buff(SoulMark.class) != null &&
-				Random.Int(10) < Dungeon.hero.pointsInTalent(Talent.SOUL_EATER)){
+				Random.Int(4) < Dungeon.hero.pointsInTalent(Talent.SOUL_EATER)){
 			Talent.onFoodEaten(Dungeon.hero, 0, null);
 		}
 
 		//bounty hunter talent
 		if (Dungeon.hero.buff(Talent.BountyHunterTracker.class) != null){
-			Dungeon.level.drop(new Gold(10 * Dungeon.hero.pointsInTalent(Talent.BOUNTY_HUNTER)), pos).sprite.drop();
+			Buff.affect(Dungeon.hero, Invisibility.class, 10f);
 		}
 
 	}
@@ -841,7 +831,10 @@ public abstract class Mob extends Char {
 				float enemyStealth = enemy.stealth();
 
 				if (enemy instanceof Hero && ((Hero) enemy).hasTalent(Talent.SILENT_STEPS)){
-					if (Dungeon.level.distance(pos, enemy.pos) >= 4 - ((Hero) enemy).pointsInTalent(Talent.SILENT_STEPS)) {
+					if (((Hero) enemy).pointsInTalent(Talent.SILENT_STEPS) == 1 && !Dungeon.level.adjacent(enemy.pos, pos)) {
+						enemyStealth = Float.POSITIVE_INFINITY;
+					}
+					else if (((Hero) enemy).pointsInTalent(Talent.SILENT_STEPS) == 2){
 						enemyStealth = Float.POSITIVE_INFINITY;
 					}
 				}
