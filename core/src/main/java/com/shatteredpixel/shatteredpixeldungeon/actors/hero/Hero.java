@@ -380,8 +380,8 @@ public class Hero extends Char {
 		boolean hit = attack( enemy );
 		Invisibility.dispel();
 		belongings.weapon = belongings.stashedWeapon;
-		belongings.stashedWeapon = null;
-		
+//		belongings.stashedWeapon = null;
+//
 		if (hit && subClass == HeroSubClass.GLADIATOR){
 			Buff.affect( this, Combo.class ).hit( enemy );
 		}
@@ -398,7 +398,7 @@ public class Hero extends Char {
 		
 		if (wep instanceof MissileWeapon){
 			if (Dungeon.level.adjacent( pos, target.pos )) {
-				accuracy *= (0.5f + 0.45f*pointsInTalent(Talent.POINT_BLANK));
+				accuracy *= 0.5f;
 			} else {
 				accuracy *= 1.5f;
 			}
