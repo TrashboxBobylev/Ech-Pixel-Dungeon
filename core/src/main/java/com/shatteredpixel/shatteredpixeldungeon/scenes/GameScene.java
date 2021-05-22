@@ -475,7 +475,7 @@ public class GameScene extends PixelScene {
 				GLog.h(Messages.get(this, "return"), Dungeon.depth);
 			}
 
-			if (Dungeon.hero.hasTalent(Talent.ROGUES_FORESIGHT)
+			if (Dungeon.hero.hasTalent(Talent.ROGUES_FORESIGHT, Talent.DIVINE_SIGHT)
 					&& Dungeon.level instanceof RegularLevel){
 				int reqSecrets = Dungeon.level.feeling == Level.Feeling.SECRETS ? 2 : 1;
 				for (Room r : ((RegularLevel) Dungeon.level).rooms()){
@@ -484,7 +484,7 @@ public class GameScene extends PixelScene {
 
 				//50%/75% chance, use level's seed so that we get the same result for the same level
 				Random.pushGenerator(Dungeon.seedCurDepth());
-					if (reqSecrets <= 0 && Random.Int(4) <= Dungeon.hero.pointsInTalent(Talent.ROGUES_FORESIGHT)){
+					if (reqSecrets <= 0 && Random.Int(4) <= Dungeon.hero.pointsInTalent(Talent.ROGUES_FORESIGHT, Talent.DIVINE_SIGHT)){
 						GLog.p(Messages.get(this, "secret_hint"));
 					}
 				Random.popGenerator();
@@ -527,6 +527,21 @@ public class GameScene extends PixelScene {
 		
 		fadeIn();
 
+	}
+
+	public static synchronized void redrawMobs(){
+		if (scene != null){
+			for (Mob mob : Dungeon.level.mobs) {
+				if (mob.sprite != null){
+					mob.sprite.killAndErase();
+				}
+			}
+			scene.mobs = new Group();
+			scene.add( scene.mobs );
+			for (Mob mob : Dungeon.level.mobs) {
+				scene.addMobSprite( mob );
+			}
+		}
 	}
 	
 	public void destroy() {

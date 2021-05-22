@@ -517,6 +517,7 @@ public class Item implements Bundlable {
 	}
 
 	public int throwPos( Hero user, int dst){
+		if (user.pointsInTalent(Talent.SEER_SHOT, Talent.OMNISTRENGTH) == 3) return dst;
 		return new Ballistica( user.pos, dst, Ballistica.PROJECTILE ).collisionPos;
 	}
 
@@ -548,12 +549,12 @@ public class Item implements Bundlable {
 							curUser = user;
 							Item i = Item.this.detach(user.belongings.backpack);
 							if (i != null) i.onThrow(cell);
-							if (curUser.hasTalent(Talent.IMPROVISED_PROJECTILES)
+							if (curUser.hasTalent(Talent.IMPROVISED_PROJECTILES, Talent.DIVINE_SIGHT)
 									&& !(Item.this instanceof MissileWeapon)
 									&& curUser.buff(Talent.ImprovisedProjectileCooldown.class) == null){
 								if (enemy != null && enemy.alignment != curUser.alignment){
 									Sample.INSTANCE.play(Assets.Sounds.HIT);
-									Buff.affect(enemy, Blindness.class, 1f + 2f * curUser.pointsInTalent(Talent.IMPROVISED_PROJECTILES));
+									Buff.affect(enemy, Blindness.class, 1f + 2f * curUser.pointsInTalent(Talent.IMPROVISED_PROJECTILES, Talent.DIVINE_SIGHT));
 									Buff.affect(curUser, Talent.ImprovisedProjectileCooldown.class, 5f);
 								}
 							}

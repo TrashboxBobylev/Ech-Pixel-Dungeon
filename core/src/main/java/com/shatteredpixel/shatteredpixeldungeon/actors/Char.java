@@ -29,7 +29,9 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.*;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.DwarfKing;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Elemental;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.items.Heap;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.AntiMagic;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.Potential;
@@ -128,7 +130,7 @@ public abstract class Char extends Actor {
 		if (Dungeon.level.adjacent( pos, c.pos )){
 			return true;
 		} else if (c instanceof Hero
-				&& Dungeon.level.distance(pos, c.pos) <= 9*Dungeon.hero.pointsInTalent(Talent.ALLY_WARP)){
+				&& Dungeon.level.distance(pos, c.pos) <= 9*Dungeon.hero.pointsInTalent(Talent.ALLY_WARP, Talent.POWER_TRIP_2)){
 			return true;
 		} else {
 			return false;
@@ -158,7 +160,7 @@ public abstract class Char extends Actor {
 		int curPos = pos;
 
 		//warp instantly with allies in this case
-		if (Dungeon.hero.hasTalent(Talent.ALLY_WARP)){
+		if (Dungeon.hero.hasTalent(Talent.ALLY_WARP, Talent.POWER_TRIP_2)){
 			PathFinder.buildDistanceMap(c.pos, BArray.or(Dungeon.level.passable, Dungeon.level.avoid, null));
 			if (PathFinder.distance[pos] == Integer.MAX_VALUE){
 				return true;
@@ -258,7 +260,7 @@ public abstract class Char extends Actor {
 			if (this instanceof Hero){
 				Hero h = (Hero)this;
 				if (h.belongings.weapon instanceof MissileWeapon
-						&& h.subClass == HeroSubClass.SNIPER
+						&& (h.subClass == HeroSubClass.SNIPER || h.subClass == HeroSubClass.NOTHING_1)
 						&& !Dungeon.level.adjacent(h.pos, enemy.pos)){
 					dr = 0;
 				}
@@ -268,7 +270,7 @@ public abstract class Char extends Actor {
 			Preparation prep = buff(Preparation.class);
 			if (prep != null){
 				dmg = prep.damageRoll(this);
-				if (this == Dungeon.hero && Dungeon.hero.hasTalent(Talent.BOUNTY_HUNTER)) {
+				if (this == Dungeon.hero && Dungeon.hero.hasTalent(Talent.BOUNTY_HUNTER, Talent.DIVERSITY)) {
 					Buff.affect(Dungeon.hero, Talent.BountyHunterTracker.class, 0.0f);
 				}
 			} else {
@@ -340,9 +342,6 @@ public abstract class Char extends Actor {
 
 				//TODO enemy.defenseSound? currently miss plays for monks/crab even when they parry
 				Sample.INSTANCE.play(Assets.Sounds.MISS);
-
-				HuntressCombo combo = enemy.buff(HuntressCombo.class);
-				if (combo != null) combo.detach();
 			}
 			
 			return false;
@@ -413,6 +412,9 @@ public abstract class Char extends Actor {
 			damage *= buff.meleeDamageFactor();
 			buff.onAttackProc( enemy );
 		}
+		if (this instanceof Mob){
+			damage += Random.IntRange(0, ((Mob) this).EXP/2);
+		}
 		return damage;
 	}
 	
@@ -456,9 +458,10 @@ public abstract class Char extends Actor {
 			sprite.showStatus(CharSprite.POSITIVE, Messages.get(this, "invulnerable"));
 			return;
 		}
-
-		for (ChampionEnemy buff : buffs(ChampionEnemy.class)){
-			dmg = (int) Math.ceil(dmg * buff.damageTakenFactor());
+		if (!(src instanceof DwarfKing.KingDamager)) {
+			for (ChampionEnemy buff : buffs(ChampionEnemy.class)) {
+				dmg = (int) Math.ceil(dmg * buff.damageTakenFactor());
+			}
 		}
 
 		if (!(src instanceof LifeLink) && buff(LifeLink.class) != null){

@@ -112,7 +112,7 @@ public abstract class Level implements Bundlable {
 	protected int height;
 	protected int length;
 	
-	protected static final float TIME_TO_RESPAWN	= 50;
+	protected static final float TIME_TO_RESPAWN	= 30;
 
 	public int version;
 	
@@ -463,7 +463,7 @@ public abstract class Level implements Bundlable {
 
 		Mob m = Reflection.newInstance(mobsToSpawn.remove(0));
 		ChampionEnemy.rollForChampion(m);
-		m.HP = m.HT = m.HT * 2;
+		m.HP = m.HT = Math.round(m.HT * 2.5f);
 		return m;
 	}
 
@@ -552,7 +552,7 @@ public abstract class Level implements Bundlable {
 				Mob mob = Dungeon.level.createMob();
 				mob.state = mob.WANDERING;
 				mob.pos = Dungeon.level.randomRespawnCell( mob );
-				if (Dungeon.hero.isAlive() && mob.pos != -1 && PathFinder.distance[mob.pos] >= 12) {
+				if (Dungeon.hero.isAlive() && mob.pos != -1 && PathFinder.distance[mob.pos] >= 7) {
 					GameScene.add( mob );
 					if (Statistics.amuletObtained) {
 						mob.beckon( Dungeon.hero.pos );
@@ -936,7 +936,7 @@ public abstract class Level implements Bundlable {
 		}
 
 		if ( (map[ch.pos] == Terrain.GRASS || map[ch.pos] == Terrain.EMBERS)
-				&& ch == Dungeon.hero && Dungeon.hero.hasTalent(Talent.REJUVENATING_STEPS)
+				&& ch == Dungeon.hero && Dungeon.hero.hasTalent(Talent.REJUVENATING_STEPS, Talent.PRAGMATISM)
 				&& ch.buff(Talent.RejuvenatingStepsCooldown.class) == null){
 
 			if (Dungeon.hero.buff(LockedFloor.class) != null && !Dungeon.hero.buff(LockedFloor.class).regenOn()){
@@ -945,7 +945,7 @@ public abstract class Level implements Bundlable {
 				set(ch.pos, Terrain.HIGH_GRASS);
 			}
 			GameScene.updateMap(ch.pos);
-			Buff.affect(ch, Talent.RejuvenatingStepsCooldown.class, 2f - Dungeon.hero.pointsInTalent(Talent.REJUVENATING_STEPS));
+			Buff.affect(ch, Talent.RejuvenatingStepsCooldown.class, 2f - Dungeon.hero.pointsInTalent(Talent.REJUVENATING_STEPS, Talent.PRAGMATISM));
 		}
 
 		if (!ch.flying){
@@ -1063,7 +1063,7 @@ public abstract class Level implements Bundlable {
 		if (sighted) {
 			boolean[] blocking;
 			
-			if ((c instanceof Hero && ((Hero) c).subClass == HeroSubClass.WARDEN)
+			if ((c instanceof Hero && (((Hero) c).subClass == HeroSubClass.WARDEN || ((Hero) c).subClass == HeroSubClass.NOTHING_1))
 				|| c instanceof YogFist.SoiledFist) {
 				blocking = Dungeon.level.losBlocking.clone();
 				for (int i = 0; i < blocking.length; i++){
@@ -1077,7 +1077,7 @@ public abstract class Level implements Bundlable {
 			
 			int viewDist = c.viewDistance;
 			if (c instanceof Hero){
-				viewDist *= 1f + 0.25f*((Hero) c).pointsInTalent(Talent.FARSIGHT);
+				viewDist *= 1f + 0.25f*((Hero) c).pointsInTalent(Talent.FARSIGHT, Talent.ENDURANCE);
 			}
 			
 			ShadowCaster.castShadow( cx, cy, fieldOfView, blocking, viewDist );
@@ -1094,8 +1094,11 @@ public abstract class Level implements Bundlable {
 			if (c.buff(MagicalSight.class) != null){
 				sense = 8;
 			}
-			if (((Hero)c).subClass == HeroSubClass.SNIPER){
+			if (((Hero)c).subClass == HeroSubClass.SNIPER || ((Hero)c).subClass == HeroSubClass.NOTHING_1){
 				sense *= 1.5f;
+			}
+			if (((Hero) c).pointsInTalent(Talent.SEER_SHOT, Talent.OMNISTRENGTH) >= 2){
+				sense = Math.min(8, sense*2);
 			}
 		}
 		
@@ -1139,10 +1142,10 @@ public abstract class Level implements Bundlable {
 						heroMindFov[mob.pos + i] = true;
 					}
 				}
-			} else if (((Hero) c).hasTalent(Talent.HEIGHTENED_SENSES)) {
+			} else if (((Hero) c).hasTalent(Talent.HEIGHTENED_SENSES, Talent.CONTROL)) {
 				for (Mob mob : mobs) {
 					int p = mob.pos;
-					if (!fieldOfView[p] && distance(c.pos, p) <= 2+((Hero) c).pointsInTalent(Talent.HEIGHTENED_SENSES)*3) {
+					if (!fieldOfView[p] && distance(c.pos, p) <= 2+((Hero) c).pointsInTalent(Talent.HEIGHTENED_SENSES, Talent.CONTROL)*3) {
 						for (int i : PathFinder.NEIGHBOURS9) {
 							heroMindFov[mob.pos + i] = true;
 						}

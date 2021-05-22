@@ -131,6 +131,13 @@ public class Assets {
 		public static final String TRAMPLE	= "sounds/trample.mp3";
 		public static final String STURDY	= "sounds/sturdy.mp3";
 
+		public static final String ABYSSAL_1 = "sounds/abyssal_1.mp3";
+		public static final String ABYSSAL_2 = "sounds/abyssal_2.mp3";
+		public static final String ABYSSAL_3 = "sounds/abyssal_3.mp3";
+		public static final String ABYSSAL_4 = "sounds/abyssal_4.mp3";
+		public static final String ABYSSAL_5 = "sounds/abyssal_5.mp3";
+		public static final String ABYSSAL_6 = "sounds/abyssal_6.mp3";
+
 		public static final String HIT		        = "sounds/hit.mp3";
 		public static final String MISS		        = "sounds/miss.mp3";
 		public static final String HIT_SLASH        = "sounds/hit_slash.mp3";
@@ -198,7 +205,9 @@ public class Assets {
 				DESCEND, EAT, READ, LULLABY, DRINK, SHATTER, ZAP, LIGHTNING, LEVELUP, DEATH,
 				CHALLENGE, CURSED, TRAP, EVOKE, TOMB, ALERT, MELD, BOSS, BLAST, PLANT, RAY, BEACON,
 				TELEPORT, CHARMS, MASTERY, PUFF, ROCKS, BURNING, FALLING, GHOST, SECRET, BONES,
-				BEE, DEGRADE, MIMIC, DEBUFF, CHARGEUP, GAS, CHAINS, SCAN, SHEEP
+				BEE, DEGRADE, MIMIC, DEBUFF, CHARGEUP, GAS, CHAINS, SCAN, SHEEP,
+
+				ABYSSAL_1, ABYSSAL_2, ABYSSAL_3, ABYSSAL_4, ABYSSAL_5, ABYSSAL_6
 		};
 	}
 
@@ -207,6 +216,7 @@ public class Assets {
 		public static final String MAGE		= "splashes/mage.jpg";
 		public static final String ROGUE	= "splashes/rogue.jpg";
 		public static final String HUNTRESS	= "splashes/huntress.jpg";
+		public static final String ADVENTURER	= "splashes/adventurer.jpg";
 	}
 
 	public static class Sprites {
@@ -217,6 +227,7 @@ public class Assets {
 		public static final String MAGE		= "sprites/mage.png";
 		public static final String ROGUE	= "sprites/rogue.png";
 		public static final String HUNTRESS	= "sprites/huntress.png";
+		public static final String ADVENTURER = "sprites/adventurer.png";
 		public static final String AVATARS	= "sprites/avatars.png";
 		public static final String PET		= "sprites/pet.png";
 		public static final String AMULET	= "sprites/amulet.png";

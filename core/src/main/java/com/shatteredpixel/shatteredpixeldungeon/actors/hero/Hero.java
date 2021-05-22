@@ -145,7 +145,7 @@ public class Hero extends Char {
 		alignment = Alignment.ALLY;
 	}
 	
-	public static final int MAX_LEVEL = 30;
+	public static final int MAX_LEVEL = 45;
 
 	public static final int STARTING_STR = 10;
 	
@@ -201,6 +201,9 @@ public class Hero extends Char {
 		int curHT = HT;
 		
 		HT = 25 + 9*(lvl-1) + HTBoost;
+		if (heroClass == HeroClass.ADVENTURER){
+			HT = 13 + Math.round(4.5f*(lvl - 1)) + HTBoost;
+		}
 		float multiplier = RingOfMight.HTMultiplier(this);
 		HT = Math.round(multiplier * HT);
 		
@@ -290,8 +293,18 @@ public class Hero extends Char {
 		Belongings.preview( info, bundle );
 	}
 
+	public boolean canHaveTalent(Talent talent) {
+		for(LinkedHashMap<Talent,Integer> tier : talents) if(tier.containsKey(talent)) return true;
+		return false;
+	}
 	public boolean hasTalent( Talent talent ){
 		return pointsInTalent(talent) > 0;
+	}
+	public boolean hasTalent( Talent... talents) {
+		for(Talent talent : talents ) {
+			if(hasTalent(talent)) return true;
+		}
+		return false;
 	}
 
 	public int pointsInTalent( Talent talent ){
@@ -301,6 +314,11 @@ public class Hero extends Char {
 			}
 		}
 		return 0;
+	}
+	public int pointsInTalent( Talent... talents) {
+		int sum = 0;
+		for(Talent talent : talents) sum += pointsInTalent(talent);
+		return sum;
 	}
 
 	public void upgradeTalent( Talent talent ){
@@ -322,7 +340,7 @@ public class Hero extends Char {
 
 	public int talentPointsAvailable(int tier){
 		if (lvl < Talent.tierLevelThresholds[tier]
-			|| (tier == 3 && subClass == HeroSubClass.NONE)){
+				|| (tier == 3 && subClass == HeroSubClass.NONE)){
 			return 0;
 		} else if (lvl >= Talent.tierLevelThresholds[tier+1]){
 			return Talent.tierLevelThresholds[tier+1] - Talent.tierLevelThresholds[tier] - talentPointsSpent(tier);
@@ -382,7 +400,7 @@ public class Hero extends Char {
 		belongings.weapon = belongings.stashedWeapon;
 //		belongings.stashedWeapon = null;
 //
-		if (hit && subClass == HeroSubClass.GLADIATOR){
+		if (hit && (subClass == HeroSubClass.GLADIATOR || subClass == HeroSubClass.NOTHING_1)){
 			Buff.affect( this, Combo.class ).hit( enemy );
 		}
 
@@ -443,7 +461,7 @@ public class Hero extends Char {
 			return super.defenseVerb();
 		} else {
 			parry.parried = true;
-			if (buff(Combo.class).getComboCount() < 5 || pointsInTalent(Talent.ENHANCED_COMBO) < 2){
+			if (buff(Combo.class).getComboCount() < 5 || pointsInTalent(Talent.ENHANCED_COMBO, Talent.DIVERSITY) < 2){
 				parry.detach();
 			}
 			return Messages.get(Monk.class, "parried");
@@ -475,7 +493,7 @@ public class Hero extends Char {
 		if (block != null)              dr += block.blockingRoll();
 
 		if (buff(HoldFast.class) != null){
-			dr += 4*pointsInTalent(Talent.HOLD_FAST);
+			dr += 4*pointsInTalent(Talent.HOLD_FAST, Talent.POWER_TRIP_2);
 		}
 		
 		return dr;
@@ -672,8 +690,8 @@ public class Hero extends Char {
 			}
 		}
 		
-		if(hasTalent(Talent.BARKSKIN) && Dungeon.level.map[pos] == Terrain.FURROWED_GRASS){
-			Buff.affect(this, Barkskin.class).set( lvl, (int) Math.pow(5, pointsInTalent(Talent.BARKSKIN)));
+		if(hasTalent(Talent.BARKSKIN, Talent.REACTION) && Dungeon.level.map[pos] == Terrain.FURROWED_GRASS){
+			Buff.affect(this, Barkskin.class).set( lvl, (int) Math.pow(5, pointsInTalent(Talent.BARKSKIN, Talent.REACTION)));
 		}
 		
 		return actResult;
@@ -1069,7 +1087,7 @@ public class Hero extends Char {
 	public void rest( boolean fullRest ) {
 		spendAndNext( TIME_TO_REST );
 		if (!fullRest) {
-			if (hasTalent(Talent.HOLD_FAST)){
+			if (hasTalent(Talent.HOLD_FAST, Talent.POWER_TRIP_2)){
 				Buff.affect(this, HoldFast.class);
 			}
 			if (sprite != null) {
@@ -1091,6 +1109,7 @@ public class Hero extends Char {
 		
 		switch (subClass) {
 		case SNIPER:
+			case NOTHING_1:
 			if (wep instanceof MissileWeapon && !(wep instanceof SpiritBow.SpiritArrow) && enemy != this) {
 				Actor.add(new Actor() {
 					
@@ -1101,7 +1120,7 @@ public class Hero extends Char {
 					@Override
 					protected boolean act() {
 						if (enemy.isAlive()) {
-							int bonusTurns = hasTalent(Talent.SHARED_UPGRADES) ? wep.buffedLvl() : 0;
+							int bonusTurns = hasTalent(Talent.SHARED_UPGRADES, Talent.DIVERSITY) ? wep.buffedLvl() : 0;
 							Buff.prolong(Hero.this, SnipersMark.class, SnipersMark.DURATION + bonusTurns).set(enemy.id(), bonusTurns);
 						}
 						Actor.remove(this);
@@ -1119,7 +1138,7 @@ public class Hero extends Char {
 	@Override
 	public int defenseProc( Char enemy, int damage ) {
 		
-		if (damage > 0 && subClass == HeroSubClass.BERSERKER){
+		if (damage > 0 && (subClass == HeroSubClass.BERSERKER || subClass == HeroSubClass.NOTHING_1)){
 			Berserk berserk = Buff.affect(this, Berserk.class);
 			berserk.damage(damage);
 		}
@@ -1174,8 +1193,8 @@ public class Hero extends Char {
 		}
 
 		if (buff(Talent.WarriorFoodImmunity.class) != null){
-			if (pointsInTalent(Talent.IRON_STOMACH) == 1)       dmg = Math.round(dmg*0.25f);
-			else if (pointsInTalent(Talent.IRON_STOMACH) == 2)  dmg = Math.round(dmg*0.00f);
+			if (pointsInTalent(Talent.IRON_STOMACH, Talent.SMORGASBORD_2) == 1)       dmg = Math.round(dmg*0.25f);
+			else if (pointsInTalent(Talent.IRON_STOMACH, Talent.SMORGASBORD_2) == 2)  dmg = Math.round(dmg*0.00f);
 		}
 
 		int preHP = HP + shielding();
@@ -1234,7 +1253,7 @@ public class Hero extends Char {
 		}
 		
 		if (newMob) {
-			interrupt();
+			if (pointsInTalent(Talent.SEER_SHOT, Talent.OMNISTRENGTH) < 2) interrupt();
 			if (resting){
 				Dungeon.observe();
 				resting = false;
@@ -1333,7 +1352,7 @@ public class Hero extends Char {
 
 		if (step != -1) {
 
-			if (subClass == HeroSubClass.FREERUNNER){
+			if (subClass == HeroSubClass.FREERUNNER || subClass == HeroSubClass.NOTHING_1){
 				Buff.affect(this, Momentum.class).gainStack();
 			}
 
@@ -1451,7 +1470,7 @@ public class Hero extends Char {
 		
 		if (source != PotionOfExperience.class) {
 			for (Item i : belongings) {
-				i.onHeroGainExp(percent, this);
+				i.onHeroGainExp(percent*2, this);
 			}
 		}
 		
@@ -1729,7 +1748,7 @@ public class Hero extends Char {
 		Invisibility.dispel();
 		spend( attackDelay() );
 
-		if (hit && subClass == HeroSubClass.GLADIATOR){
+		if (hit && (subClass == HeroSubClass.GLADIATOR || subClass == HeroSubClass.NOTHING_1)){
 			Buff.affect( this, Combo.class ).hit( enemy );
 		}
 
@@ -1813,8 +1832,8 @@ public class Hero extends Char {
 		boolean smthFound = false;
 
 		boolean circular = false;
-		int distance = heroClass == HeroClass.ROGUE ? 2 : 1;
-		if (hasTalent(Talent.WIDE_SEARCH)) distance *= 1 + pointsInTalent(Talent.WIDE_SEARCH);
+		int distance = (heroClass == HeroClass.ROGUE || heroClass == HeroClass.ADVENTURER) ? 2 : 1;
+		if (hasTalent(Talent.WIDE_SEARCH, Talent.PRAGMATISM)) distance *= 1 + pointsInTalent(Talent.WIDE_SEARCH, Talent.PRAGMATISM);
 		
 		boolean foresight = buff(Foresight.class) != null;
 		

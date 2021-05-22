@@ -54,13 +54,13 @@ public class Momentum extends Buff implements ActionIndicator.Action {
 			freerunCooldown--;
 		}
 
-		if (freerunCooldown == 0 && target.invisible > 0 && Dungeon.hero.pointsInTalent(Talent.SPEEDY_STEALTH) >= 1){
+		if (freerunCooldown == 0 && target.invisible > 0 && Dungeon.hero.pointsInTalent(Talent.SPEEDY_STEALTH, Talent.DIVERSITY) >= 1){
 			momentumStacks = Math.min(momentumStacks + 20, 10);
 			movedLastTurn = true;
 		}
 
 		if (freerunTurns > 0){
-			if (target.invisible == 0 || Dungeon.hero.pointsInTalent(Talent.SPEEDY_STEALTH) < 2) {
+			if (target.invisible == 0 || Dungeon.hero.pointsInTalent(Talent.SPEEDY_STEALTH, Talent.DIVERSITY) < 2) {
 				freerunTurns--;
 			}
 		} else if (!movedLastTurn){
@@ -92,7 +92,7 @@ public class Momentum extends Buff implements ActionIndicator.Action {
 	public float speedMultiplier(){
 		if (freerunning()){
 			return 2;
-		} else if (target.invisible > 0 && Dungeon.hero.pointsInTalent(Talent.SPEEDY_STEALTH) == 3){
+		} else if (target.invisible > 0 && Dungeon.hero.pointsInTalent(Talent.SPEEDY_STEALTH, Talent.DIVERSITY) == 3){
 			return 4;
 		} else {
 			return 1;
@@ -101,7 +101,7 @@ public class Momentum extends Buff implements ActionIndicator.Action {
 	
 	public int evasionBonus( int heroLvl, int excessArmorStr ){
 		if (freerunTurns > 0) {
-			return heroLvl/2 + excessArmorStr*Dungeon.hero.pointsInTalent(Talent.EVASIVE_ARMOR)*6;
+			return heroLvl/2 + excessArmorStr*Dungeon.hero.pointsInTalent(Talent.EVASIVE_ARMOR, Talent.ENDURANCE)*6;
 		} else {
 			return 0;
 		}
@@ -174,7 +174,7 @@ public class Momentum extends Buff implements ActionIndicator.Action {
 		momentumStacks = bundle.getInt(STACKS);
 		freerunTurns = bundle.getInt(FREERUN_TURNS);
 		freerunCooldown = bundle.getInt(FREERUN_CD);
-		if (momentumStacks > 0 && freerunTurns <= 0){
+		if ( usable() ){
 			ActionIndicator.setAction(this);
 		}
 		movedLastTurn = false;
@@ -197,6 +197,9 @@ public class Momentum extends Buff implements ActionIndicator.Action {
 		momentumStacks = 0;
 		BuffIndicator.refreshHero();
 		ActionIndicator.clearAction(this);
+	}
+	public boolean usable() {
+		return momentumStacks > 0 && freerunTurns <= 0;
 	}
 
 }

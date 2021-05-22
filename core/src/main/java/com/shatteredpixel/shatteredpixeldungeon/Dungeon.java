@@ -151,6 +151,7 @@ public class Dungeon {
 
 	public static int challenges;
 	public static int[] mobsToChampion = new int[100];
+	public static int nightmare;
 
 	public static Hero hero;
 	public static Level level;
@@ -175,6 +176,7 @@ public class Dungeon {
 		challenges = SPDSettings.challenges();
 		for (int i = 0; i < 100; i++)
 			mobsToChampion[i] = -1;
+		nightmare = 25;
 
 		seed = DungeonSeed.randomSeed();
 
@@ -453,6 +455,7 @@ public class Dungeon {
 	private static final String SEED		= "seed";
 	private static final String CHALLENGES	= "challenges";
 	private static final String MOBS_TO_CHAMPION	= "mobs_to_champion";
+	private static final String NIGHTMARE   = "nightmare";
 	private static final String HERO		= "hero";
 	private static final String GOLD		= "gold";
 	private static final String DEPTH		= "depth";
@@ -473,6 +476,7 @@ public class Dungeon {
 			bundle.put( SEED, seed );
 			bundle.put( CHALLENGES, challenges );
 			bundle.put( MOBS_TO_CHAMPION, mobsToChampion );
+			bundle.put( NIGHTMARE, nightmare);
 			bundle.put( HERO, hero );
 			bundle.put( GOLD, gold );
 			bundle.put( DEPTH, depth );
@@ -568,6 +572,7 @@ public class Dungeon {
 
 		Dungeon.challenges = bundle.getInt( CHALLENGES );
 		Dungeon.mobsToChampion = bundle.getIntArray( MOBS_TO_CHAMPION );
+		Dungeon.nightmare = bundle.getInt(NIGHTMARE);
 		
 		Dungeon.level = null;
 		Dungeon.depth = -1;
@@ -700,7 +705,7 @@ public class Dungeon {
 	}
 
 	public static void observe(){
-		int dist = 8 + 4*Dungeon.hero.pointsInTalent(Talent.FARSIGHT);
+		int dist = 8 + 4*Dungeon.hero.pointsInTalent(Talent.FARSIGHT, Talent.ENDURANCE);
 		observe( dist+1 );
 	}
 	

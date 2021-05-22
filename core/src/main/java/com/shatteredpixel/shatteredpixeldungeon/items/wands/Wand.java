@@ -180,13 +180,13 @@ public abstract class Wand extends Item {
 
 	//TODO some naming issues here. Consider renaming this method and externalizing char awareness buff
 	protected static void processSoulMark(Char target, int wandLevel, int chargesUsed){
-		if (Dungeon.hero.hasTalent(Talent.ARCANE_VISION)) {
-			int dur = 100*Dungeon.hero.pointsInTalent(Talent.ARCANE_VISION);
+		if (Dungeon.hero.hasTalent(Talent.ARCANE_VISION, Talent.CONTROL)) {
+			int dur = 100*Dungeon.hero.pointsInTalent(Talent.ARCANE_VISION, Talent.CONTROL);
 			Buff.append(Dungeon.hero, TalismanOfForesight.CharAwareness.class, dur).charID = target.id();
 		}
 
 		if (target != Dungeon.hero &&
-				Dungeon.hero.subClass == HeroSubClass.WARLOCK &&
+				(Dungeon.hero.subClass == HeroSubClass.WARLOCK || Dungeon.hero.subClass == HeroSubClass.NOTHING_1) &&
 				//standard 1 - 0.92^x chance, plus 7%. Starts at 15%
 				Random.Float() > (Math.pow(0.92f, (wandLevel*chargesUsed)+1) - 0.07f)){
 			SoulMark.prolong(target, SoulMark.class, SoulMark.DURATION + wandLevel);
@@ -241,7 +241,7 @@ public abstract class Wand extends Item {
 			desc += "\n\n" + Messages.get(Wand.class, "not_cursed");
 		}
 
-		if (Dungeon.hero.subClass == HeroSubClass.BATTLEMAGE){
+		if (Dungeon.hero.subClass == HeroSubClass.BATTLEMAGE || Dungeon.hero.subClass == HeroSubClass.NOTHING_1){
 			desc += "\n\n" + Messages.get(this, "bmage_desc");
 		}
 
@@ -307,7 +307,7 @@ public abstract class Wand extends Item {
 
 		if (charger != null && charger.target != null) {
 			if (charger.target.buff(ScrollEmpower.class) != null){
-				lvl += 10 * Dungeon.hero.pointsInTalent(Talent.EMPOWERING_SCROLLS);
+				lvl += 10 * Dungeon.hero.pointsInTalent(Talent.EMPOWERING_SCROLLS, Talent.POWER_TRIP_2);
 			}
 
 			WandOfMagicMissile.MagicCharge buff = charger.target.buff(WandOfMagicMissile.MagicCharge.class);
@@ -319,12 +319,12 @@ public abstract class Wand extends Item {
 	}
 
 	public void updateLevel() {
-		maxCharges = Math.min( initialCharges() + level(), 10 );
+		maxCharges = Math.min( initialCharges() + level()*2, 15 );
 		curCharges = Math.min( curCharges, maxCharges );
 	}
 	
 	protected int initialCharges() {
-		return 2;
+		return 4;
 	}
 
 	protected int chargesPerCast() {
@@ -374,17 +374,17 @@ public abstract class Wand extends Item {
 		if (charger != null
 				&& charger.target == Dungeon.hero
 				&& !Dungeon.hero.belongings.contains(this)) {
-			if (curCharges == 0 && Dungeon.hero.hasTalent(Talent.BACKUP_BARRIER)) {
+			if (curCharges == 0 && Dungeon.hero.hasTalent(Talent.BACKUP_BARRIER, Talent.BLOCKADE)) {
 				//grants 4/6 shielding
-				Buff.affect(Dungeon.hero, Barrier.class).setShield(10 * Dungeon.hero.pointsInTalent(Talent.BACKUP_BARRIER));
+				Buff.affect(Dungeon.hero, Barrier.class).setShield(10 * Dungeon.hero.pointsInTalent(Talent.BACKUP_BARRIER, Talent.BLOCKADE));
 			}
-			if (Dungeon.hero.hasTalent(Talent.EMPOWERED_STRIKE)){
+			if (Dungeon.hero.hasTalent(Talent.EMPOWERED_STRIKE, Talent.ENDURANCE)){
 				Buff.prolong(Dungeon.hero, Talent.EmpoweredStrikeTracker.class, 5f);
 			}
 		}
 
-		if (Dungeon.hero.hasTalent(Talent.MAGIC_PROFICIENCY)){
-			gainCharge(0.25f * Dungeon.hero.pointsInTalent(Talent.MAGIC_PROFICIENCY), false);
+		if (Dungeon.hero.hasTalent(Talent.MAGIC_PROFICIENCY, Talent.DOMINANCE)){
+			gainCharge(0.25f * Dungeon.hero.pointsInTalent(Talent.MAGIC_PROFICIENCY, Talent.DOMINANCE), false);
 		}
 
 		Invisibility.dispel();
@@ -496,9 +496,9 @@ public abstract class Wand extends Item {
 				int cell = shot.collisionPos;
 				
 				if (target == curUser.pos || cell == curUser.pos) {
-					if (target == curUser.pos && curUser.hasTalent(Talent.SHIELD_BATTERY)){
-						float shield = curUser.HT * (0.34f*curWand.curCharges);
-						if (curUser.pointsInTalent(Talent.SHIELD_BATTERY) == 2) shield *= 2f;
+					if (target == curUser.pos && curUser.hasTalent(Talent.SHIELD_BATTERY, Talent.DIVINE_SIGHT)){
+						float shield = curUser.HT * (0.14f*curWand.curCharges);
+						if (curUser.pointsInTalent(Talent.SHIELD_BATTERY, Talent.DIVINE_SIGHT) == 2) shield *= 2f;
 						Buff.affect(curUser, Barrier.class).setShield(Math.round(shield));
 						curWand.curCharges = 0;
 						curUser.sprite.operate(curUser.pos);
@@ -560,9 +560,9 @@ public abstract class Wand extends Item {
 	
 	public class Charger extends Buff {
 		
-		private static final float BASE_CHARGE_DELAY = 10f;
-		private static final float SCALING_CHARGE_ADDITION = 40f;
-		private static final float NORMAL_SCALE_FACTOR = 0.875f;
+		private static final float BASE_CHARGE_DELAY = 5f;
+		private static final float SCALING_CHARGE_ADDITION = 20f;
+		private static final float NORMAL_SCALE_FACTOR = 0.435f;
 
 		private static final float CHARGE_BUFF_BONUS = 0.25f;
 

@@ -184,7 +184,7 @@ public class DwarfKing extends Mob {
 				spend(3*TICK);
 				summonsMade++;
 				return true;
-			} else if (shielding() <= 400 && summonsMade < 8){
+			} else if (shielding() <= HT/3*2 && summonsMade < 8){
 				if (summonsMade == 4){
 					sprite.centerEmitter().start( Speck.factory( Speck.SCREAM ), 0.4f, 2 );
 					Sample.INSTANCE.play( Assets.Sounds.CHALLENGE );
@@ -198,7 +198,7 @@ public class DwarfKing extends Mob {
 				summonsMade++;
 				spend(TICK);
 				return true;
-			} else if (shielding() <= 200 && summonsMade < 12) {
+			} else if (shielding() <= HT/3 && summonsMade < 12) {
 				sprite.centerEmitter().start( Speck.factory( Speck.SCREAM ), 0.4f, 2 );
 				Sample.INSTANCE.play( Assets.Sounds.CHALLENGE );
 				yell(Messages.get(this, "wave_3"));
@@ -377,8 +377,8 @@ public class DwarfKing extends Mob {
 			int dmgTaken = preHP - HP;
 			abilityCooldown -= dmgTaken/8f;
 			summonCooldown -= dmgTaken/8f;
-			if (HP <= 100) {
-				HP = 100;
+			if (HP <= HT/6) {
+				HP = HT/6;
 				sprite.showStatus(CharSprite.POSITIVE, Messages.get(this, "invulnerable"));
 				ScrollOfTeleportation.appear(this, NewCityBossLevel.throne);
 				properties.add(Property.IMMOVABLE);
@@ -402,7 +402,7 @@ public class DwarfKing extends Mob {
 			sprite.centerEmitter().start( Speck.factory( Speck.SCREAM ), 0.4f, 2 );
 			Sample.INSTANCE.play( Assets.Sounds.CHALLENGE );
 			yell(  Messages.get(this, "enraged", Dungeon.hero.name()) );
-		} else if (phase == 3 && preHP > 40 && HP < 40){
+		} else if (phase == 3 && preHP > HT/15 && HP < HT/15){
 			yell( Messages.get(this, "losing") );
 		}
 	}

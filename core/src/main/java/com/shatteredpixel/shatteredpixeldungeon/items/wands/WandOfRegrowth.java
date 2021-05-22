@@ -86,11 +86,11 @@ public class WandOfRegrowth extends Wand {
 
 		float furrowedChance = 0;
 		if (totChrgUsed >= chargeLimit(Dungeon.hero.lvl)){
-			furrowedChance = (chargesOverLimit+1)/5f;
+			furrowedChance = (chargesOverLimit+1)/3f;
 		}
 
 		int chrgUsed = chargesPerCast();
-		int grassToPlace = Math.round((3.67f+buffedLvl()/3f)*chrgUsed);
+		int grassToPlace = Math.round((8f+buffedLvl())*chrgUsed);
 
 		//ignore cells which can't have anything grow in them.
 		for (Iterator<Integer> i = cells.iterator(); i.hasNext();) {
@@ -200,7 +200,7 @@ public class WandOfRegrowth extends Wand {
 			//8 charges at base, plus:
 			//2/3.33/5/7/10/14/20/30/50/110/infinite charges per hero level, based on wand level
 			float lvl = buffedLvl();
-			return Math.round(8 + heroLvl * (2+lvl) * (1f + (lvl/(10 - lvl))));
+			return Math.round(18 + heroLvl * (6+lvl) * (1f + (lvl/(10 - lvl))));
 		}
 	}
 
@@ -232,7 +232,7 @@ public class WandOfRegrowth extends Wand {
 	protected void fx( Ballistica bolt, Callback callback ) {
 
 		// 4/6/8 distance
-		int maxDist = 2 + 2*chargesPerCast();
+		int maxDist = 4 + 4*chargesPerCast();
 		int dist = Math.min(bolt.dist, maxDist);
 
 		cone = new ConeAOE( bolt,

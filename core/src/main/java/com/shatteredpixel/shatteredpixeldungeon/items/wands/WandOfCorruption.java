@@ -133,24 +133,24 @@ public class WandOfCorruption extends Wand {
 
 			Mob enemy = (Mob) ch;
 
-			float corruptingPower = 3 + buffedLvl()/2f;
+			float corruptingPower = 5 + buffedLvl();
 			
 			//base enemy resistance is usually based on their exp, but in special cases it is based on other criteria
-			float enemyResist = 1 + enemy.EXP;
+			float enemyResist = enemy.EXP;
 			if (ch instanceof Mimic || ch instanceof Statue){
-				enemyResist = 1 + Dungeon.depth;
+				enemyResist = Dungeon.depth;
 			} else if (ch instanceof Piranha || ch instanceof Bee) {
-				enemyResist = 1 + Dungeon.depth/2f;
+				enemyResist = Dungeon.depth/2f;
 			} else if (ch instanceof Wraith) {
 				//divide by 5 as wraiths are always at full HP and are therefore ~5x harder to corrupt
-				enemyResist = (1f + Dungeon.depth/3f) / 5f;
+				enemyResist = (Dungeon.depth/3f) / 5f;
 			} else if (ch instanceof Yog.BurningFist || ch instanceof Yog.RottingFist) {
-				enemyResist = 1 + 30;
+				enemyResist = 30;
 			} else if (ch instanceof Yog.Larva || ch instanceof King.Undead){
-				enemyResist = 1 + 5;
+				enemyResist = 5;
 			} else if (ch instanceof Swarm){
 				//child swarms don't give exp, so we force this here.
-				enemyResist = 1 + 3;
+				enemyResist = 3;
 			}
 			
 			//100% health: 5x resist   75%: 3.25x resist   50%: 2x resist   25%: 1.25x resist

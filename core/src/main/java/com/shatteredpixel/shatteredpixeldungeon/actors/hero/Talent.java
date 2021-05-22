@@ -98,7 +98,15 @@ public enum Talent {
 	//Sniper T3
 	FARSIGHT(107, 3), SHARED_ENCHANTMENT(108, 3), SHARED_UPGRADES(109, 3),
 	//Warden T3
-	DURABLE_TIPS(110, 3), BARKSKIN(111, 3), SHIELDING_DEW(112, 3);
+	DURABLE_TIPS(110, 3), BARKSKIN(111, 3), SHIELDING_DEW(112, 3),
+
+	//Adventurer T1;
+	SMORGASBORD(128), DOMINANCE(129), POWER_TRIP(130), BLOCKADE(131),
+	//Adventurer T2
+	SMORGASBORD_2(132), RENEW(133), PRAGMATISM(134), CONTROL(135), DIVINE_SIGHT(136),
+	//Adventurer T3
+	POWER_TRIP_2(137, 3), OMNISTRENGTH(138, 3),
+	ENDURANCE(139, 3), REACTION(140, 3), DIVERSITY(141, 3);
 
 	public static class ImprovisedProjectileCooldown extends FlavourBuff{};
 	public static class LethalMomentumTracker extends FlavourBuff{};
@@ -113,7 +121,7 @@ public enum Talent {
 	int maxPoints;
 
 	// tiers 1/2/3/4 start at levels 2/7/13/21
-	public static int[] tierLevelThresholds = new int[]{0, 2, 7, 13, 22, 31};
+	public static int[] tierLevelThresholds = new int[]{0, 2, 10, 20, 35, 45};
 
 	Talent( int icon ){
 		this(icon, 2);
@@ -141,12 +149,12 @@ public enum Talent {
 	}
 
 	public static void onTalentUpgraded( Hero hero, Talent talent){
-		if (talent == NATURES_BOUNTY){
-			if ( hero.pointsInTalent(NATURES_BOUNTY) == 1) Buff.count(hero, NatureBerriesAvailable.class, 200);
+		if (talent == NATURES_BOUNTY || talent == SMORGASBORD){
+			if ( hero.pointsInTalent(NATURES_BOUNTY, SMORGASBORD) == 1) Buff.count(hero, NatureBerriesAvailable.class, 200);
 			else                                           Buff.count(hero, NatureBerriesAvailable.class, 300);
 		}
 
-		if (talent == FARSIGHT){
+		if (talent == FARSIGHT || talent == ENDURANCE){
 			Dungeon.observe();
 		}
 	}
@@ -155,40 +163,40 @@ public enum Talent {
 	public static class NatureBerriesAvailable extends CounterBuff{};
 
 	public static void onFoodEaten( Hero hero, float foodVal, Item foodSource ){
-		if (hero.hasTalent(HEARTY_MEAL)){
+		if (hero.hasTalent(HEARTY_MEAL, SMORGASBORD)){
 			//3/5 HP healed, when hero is below 25% health
 			if (hero.HP <= hero.HT/4) {
-				hero.HP = (int) Math.min(hero.HP + hero.HT * 0.1f + hero.HT * 0.2f * (hero.pointsInTalent(HEARTY_MEAL)) , hero.HT);
-				hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), 1+hero.pointsInTalent(HEARTY_MEAL));
+				hero.HP = (int) Math.min(hero.HP + hero.HT * 0.1f + hero.HT * 0.2f * (hero.pointsInTalent(HEARTY_MEAL, SMORGASBORD)) , hero.HT);
+				hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), 1+hero.pointsInTalent(HEARTY_MEAL, SMORGASBORD));
 			//2/3 HP healed, when hero is below 50% health
 			} else if (hero.HP <= hero.HT/2){
-				hero.HP = (int) Math.min(hero.HP + hero.HT * 0.05f + hero.HT * 0.1f * hero.pointsInTalent(HEARTY_MEAL), hero.HT);
-				hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), hero.pointsInTalent(HEARTY_MEAL));
+				hero.HP = (int) Math.min(hero.HP + hero.HT * 0.05f + hero.HT * 0.1f * hero.pointsInTalent(HEARTY_MEAL, SMORGASBORD), hero.HT);
+				hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), hero.pointsInTalent(HEARTY_MEAL, SMORGASBORD));
 			}
 		}
-		if (hero.hasTalent(IRON_STOMACH)){
+		if (hero.hasTalent(IRON_STOMACH,SMORGASBORD_2)){
 			if (hero.cooldown() > 0) {
 				Buff.affect(hero, WarriorFoodImmunity.class, hero.cooldown());
 			}
 		}
-		if (hero.hasTalent(EMPOWERING_MEAL)){
+		if (hero.hasTalent(EMPOWERING_MEAL, SMORGASBORD)){
 			//2/3 bonus wand damage for next 3 zaps
-			Buff.affect( hero, WandEmpower.class).set(3 * hero.pointsInTalent(EMPOWERING_MEAL), 30);
+			Buff.affect( hero, WandEmpower.class).set(3 * hero.pointsInTalent(EMPOWERING_MEAL, SMORGASBORD), 30);
 			ScrollOfRecharging.charge( hero );
 		}
-		if (hero.hasTalent(ENERGIZING_MEAL)){
+		if (hero.hasTalent(ENERGIZING_MEAL, SMORGASBORD_2)){
 			//5/8 turns of recharging
-			Buff.prolong( hero, Recharging.class, 10*(hero.pointsInTalent(ENERGIZING_MEAL)) );
+			Buff.prolong( hero, Recharging.class, 10*(hero.pointsInTalent(ENERGIZING_MEAL, SMORGASBORD_2)) );
 			ScrollOfRecharging.charge( hero );
 		}
-		if (hero.hasTalent(MYSTICAL_MEAL)){
+		if (hero.hasTalent(MYSTICAL_MEAL, SMORGASBORD_2)){
 			//3/5 turns of recharging
-			Buff.affect( hero, ArtifactRecharge.class).set(10 + 20*(hero.pointsInTalent(MYSTICAL_MEAL))).ignoreHornOfPlenty = foodSource instanceof HornOfPlenty;
+			Buff.affect( hero, ArtifactRecharge.class).set(10 + 20*(hero.pointsInTalent(MYSTICAL_MEAL, SMORGASBORD_2))).ignoreHornOfPlenty = false;
 			ScrollOfRecharging.charge( hero );
 		}
-		if (hero.hasTalent(INVIGORATING_MEAL)){
+		if (hero.hasTalent(INVIGORATING_MEAL, SMORGASBORD_2)){
 			//effectively 1/2 turns of haste
-			Buff.prolong( hero, Haste.class, (0.67f+hero.pointsInTalent(INVIGORATING_MEAL))*3);
+			Buff.prolong( hero, Haste.class, (0.67f+hero.pointsInTalent(INVIGORATING_MEAL, SMORGASBORD_2))*3);
 		}
 	}
 
@@ -197,14 +205,14 @@ public enum Talent {
 	}
 
 	public static void onHealingPotionUsed( Hero hero ){
-		if (hero.hasTalent(RESTORED_WILLPOWER)){
+		if (hero.hasTalent(RESTORED_WILLPOWER, RENEW)){
 			BrokenSeal.WarriorShield shield = hero.buff(BrokenSeal.WarriorShield.class);
 			if (shield != null){
-				int shieldToGive = Math.round(shield.maxShield() * (1+hero.pointsInTalent(RESTORED_WILLPOWER)));
+				int shieldToGive = Math.round(shield.maxShield() * (1+hero.pointsInTalent(RESTORED_WILLPOWER, RENEW)));
 				shield.supercharge(shieldToGive);
 			}
 		}
-		if (hero.hasTalent(RESTORED_NATURE)){
+		if (hero.hasTalent(RESTORED_NATURE, RENEW)){
 			ArrayList<Integer> grassCells = new ArrayList<>();
 			for (int i : PathFinder.NEIGHBOURS8){
 				grassCells.add(hero.pos+i);
@@ -213,7 +221,7 @@ public enum Talent {
 			for (int cell : grassCells){
 				Char ch = Actor.findChar(cell);
 				if (ch != null){
-					Buff.affect(ch, Roots.class, 20f + hero.pointsInTalent(RESTORED_NATURE)*10);
+					Buff.affect(ch, Roots.class, 20f + hero.pointsInTalent(RESTORED_NATURE, RENEW)*10);
 				}
 				if (Dungeon.level.map[cell] == Terrain.EMPTY ||
 						Dungeon.level.map[cell] == Terrain.EMBERS ||
@@ -223,7 +231,7 @@ public enum Talent {
 				}
 				CellEmitter.get(cell).burst(LeafParticle.LEVEL_SPECIFIC, 4);
 			}
-			if (hero.pointsInTalent(RESTORED_NATURE) == 1){
+			if (hero.pointsInTalent(RESTORED_NATURE, RENEW) == 1){
 				grassCells.remove(0);
 				grassCells.remove(0);
 				grassCells.remove(0);
@@ -242,18 +250,18 @@ public enum Talent {
 	}
 
 	public static void onUpgradeScrollUsed( Hero hero ){
-		if (hero.hasTalent(ENERGIZING_UPGRADE)){
+		if (hero.hasTalent(ENERGIZING_UPGRADE, RENEW)){
 			MagesStaff staff = hero.belongings.getItem(MagesStaff.class);
 			if (staff != null){
-				staff.gainCharge(25 * hero.pointsInTalent(ENERGIZING_UPGRADE), true);
+				staff.gainCharge(10 * hero.pointsInTalent(ENERGIZING_UPGRADE, RENEW), true);
 				ScrollOfRecharging.charge( Dungeon.hero );
 				SpellSprite.show( hero, SpellSprite.CHARGE );
 			}
 		}
-		if (hero.hasTalent(MYSTICAL_UPGRADE)){
+		if (hero.hasTalent(MYSTICAL_UPGRADE, RENEW)){
 			CloakOfShadows cloak = hero.belongings.getItem(CloakOfShadows.class);
 			if (cloak != null){
-				cloak.overCharge(10 + hero.pointsInTalent(MYSTICAL_UPGRADE)*10);
+				cloak.overCharge(10 + hero.pointsInTalent(MYSTICAL_UPGRADE, RENEW)*10);
 				ScrollOfRecharging.charge( Dungeon.hero );
 				SpellSprite.show( hero, SpellSprite.CHARGE );
 			}
@@ -261,8 +269,8 @@ public enum Talent {
 	}
 
 	public static void onArtifactUsed( Hero hero ){
-		if (hero.hasTalent(ENHANCED_RINGS)){
-			Buff.prolong(hero, EnhancedRings.class, 15f*hero.pointsInTalent(ENHANCED_RINGS));
+		if (hero.hasTalent(ENHANCED_RINGS, POWER_TRIP_2)){
+			Buff.prolong(hero, EnhancedRings.class, 15f*hero.pointsInTalent(ENHANCED_RINGS, POWER_TRIP_2));
 		}
 	}
 
@@ -271,33 +279,33 @@ public enum Talent {
 
 	//note that IDing can happen in alchemy scene, so be careful with VFX here
 	public static void onItemIdentified( Hero hero, Item item ){
-		if (hero.hasTalent(TEST_SUBJECT)){
+		if (hero.hasTalent(TEST_SUBJECT, POWER_TRIP)){
 			int heal = 6;
-			if (hero.pointsInTalent(TEST_SUBJECT) == 2) heal = 18;
+			if (hero.pointsInTalent(TEST_SUBJECT, POWER_TRIP) == 2) heal = 18;
 			hero.HP = Math.min(hero.HP + heal, hero.HT);
 			Emitter e = hero.sprite.emitter();
-			if (e != null) e.burst(Speck.factory(Speck.HEALING), hero.pointsInTalent(TEST_SUBJECT));
+			if (e != null) e.burst(Speck.factory(Speck.HEALING), hero.pointsInTalent(TEST_SUBJECT, POWER_TRIP));
 		}
-		if (hero.hasTalent(TESTED_HYPOTHESIS)){
+		if (hero.hasTalent(TESTED_HYPOTHESIS, POWER_TRIP)){
 			//2/3 turns of wand recharging
-			new ScrollOfEnchantment().quantity(hero.pointsInTalent(TESTED_HYPOTHESIS)).collect();
+			new ScrollOfEnchantment().quantity(hero.pointsInTalent(TESTED_HYPOTHESIS, POWER_TRIP)).collect();
 			ScrollOfRecharging.charge(hero);
 		}
 	}
 
 	public static int onAttackProc( Hero hero, Char enemy, int dmg ){
-		if (hero.hasTalent(Talent.SUCKER_PUNCH)
+		if (hero.hasTalent(Talent.SUCKER_PUNCH, POWER_TRIP)
 				&& enemy instanceof Mob && ((Mob) enemy).surprisedBy(hero)
 				&& enemy.buff(SuckerPunchTracker.class) == null){
-			dmg += Random.IntRange(hero.pointsInTalent(Talent.SUCKER_PUNCH)*5, 10);
+			dmg += Random.IntRange(hero.pointsInTalent(Talent.SUCKER_PUNCH, POWER_TRIP)*5, 10);
 			Buff.affect(enemy, SuckerPunchTracker.class);
 		}
 
-		if (hero.hasTalent(Talent.FOLLOWUP_STRIKE)) {
+		if (hero.hasTalent(Talent.FOLLOWUP_STRIKE, POWER_TRIP)) {
 			if (hero.belongings.weapon instanceof MissileWeapon) {
 				Buff.affect(enemy, FollowupStrikeTracker.class);
 			} else if (enemy.buff(FollowupStrikeTracker.class) != null){
-				dmg += 2 + hero.pointsInTalent(FOLLOWUP_STRIKE)*5;
+				dmg += 2 + hero.pointsInTalent(FOLLOWUP_STRIKE, POWER_TRIP)*5;
 				if (!(enemy instanceof Mob) || !((Mob) enemy).surprisedBy(hero)){
 					Sample.INSTANCE.play(Assets.Sounds.HIT_STRONG, 0.75f, 1.2f);
 				}
@@ -305,9 +313,8 @@ public enum Talent {
 			}
 		}
 
-		if (hero.hasTalent(POINT_BLANK) && hero.belongings.stashedWeapon instanceof SpiritBow.SpiritArrow){
-			Buff.affect(enemy, HuntressCombo.class).countUp(1);
-			dmg *= 1f + 0.1f * hero.pointsInTalent(POINT_BLANK) * enemy.buff(HuntressCombo.class).count();
+		if (hero.hasTalent(POINT_BLANK, POWER_TRIP_2) && hero.belongings.weapon instanceof SpiritBow.SpiritArrow){
+			Buff.affect(hero, HuntressCombo.class).countUp(1);
 		}
 
 		return dmg;
@@ -343,6 +350,9 @@ public enum Talent {
 			case HUNTRESS:
 				Collections.addAll(tierTalents, NATURES_BOUNTY, SPIRIT_JAVELINS, FOLLOWUP_STRIKE, NATURES_AID);
 				break;
+			case ADVENTURER:
+				Collections.addAll(tierTalents, SMORGASBORD, DOMINANCE, POWER_TRIP, BLOCKADE);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			talents.get(0).put(talent, 0);
@@ -362,6 +372,9 @@ public enum Talent {
 				break;
 			case HUNTRESS:
 				Collections.addAll(tierTalents, INVIGORATING_MEAL, RESTORED_NATURE, REJUVENATING_STEPS, HEIGHTENED_SENSES, DURABLE_PROJECTILES);
+				break;
+			case ADVENTURER:
+				Collections.addAll(tierTalents, SMORGASBORD_2, RENEW, PRAGMATISM, CONTROL, DIVINE_SIGHT);
 				break;
 		}
 		for (Talent talent : tierTalents){
@@ -383,6 +396,9 @@ public enum Talent {
 			case HUNTRESS:
 				Collections.addAll(tierTalents, POINT_BLANK, SEER_SHOT);
 				break;
+			case ADVENTURER:
+				Collections.addAll(tierTalents, POWER_TRIP_2, OMNISTRENGTH);
+				break;
 		}
 		for (Talent talent : tierTalents){
 			talents.get(2).put(talent, 0);
@@ -397,7 +413,8 @@ public enum Talent {
 		initSubclassTalents( hero.subClass, hero.talents );
 	}
 
-	public static void initSubclassTalents( HeroSubClass cls, ArrayList<LinkedHashMap<Talent, Integer>> talents ){
+	public static void
+	initSubclassTalents( HeroSubClass cls, ArrayList<LinkedHashMap<Talent, Integer>> talents ){
 		if (cls == HeroSubClass.NONE) return;
 
 		while (talents.size() < MAX_TALENT_TIERS){
@@ -408,7 +425,7 @@ public enum Talent {
 
 		//tier 3
 		switch (cls){
-			case BERSERKER: default:
+			case BERSERKER:
 				Collections.addAll(tierTalents, ENDLESS_RAGE, BERSERKING_STAMINA, ENRAGED_CATALYST);
 				break;
 			case GLADIATOR:
@@ -431,6 +448,10 @@ public enum Talent {
 				break;
 			case WARDEN:
 				Collections.addAll(tierTalents, DURABLE_TIPS, BARKSKIN, SHIELDING_DEW);
+				break;
+			case NOTHING_1:
+			case NOTHING_2:
+				Collections.addAll(tierTalents, ENDURANCE, REACTION, DIVERSITY);
 				break;
 		}
 		for (Talent talent : tierTalents){

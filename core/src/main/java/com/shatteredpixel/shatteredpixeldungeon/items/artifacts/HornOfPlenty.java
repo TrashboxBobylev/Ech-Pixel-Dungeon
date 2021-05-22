@@ -109,10 +109,10 @@ public class HornOfPlenty extends Artifact {
 				Sample.INSTANCE.play(Assets.Sounds.EAT);
 				GLog.i( Messages.get(this, "eat") );
 
-				if (Dungeon.hero.hasTalent(Talent.IRON_STOMACH)
-						|| Dungeon.hero.hasTalent(Talent.ENERGIZING_MEAL)
-						|| Dungeon.hero.hasTalent(Talent.MYSTICAL_MEAL)
-						|| Dungeon.hero.hasTalent(Talent.INVIGORATING_MEAL)){
+				if (Dungeon.hero.hasTalent(Talent.IRON_STOMACH, Talent.SMORGASBORD_2)
+						|| Dungeon.hero.hasTalent(Talent.ENERGIZING_MEAL, Talent.SMORGASBORD_2)
+						|| Dungeon.hero.hasTalent(Talent.MYSTICAL_MEAL, Talent.SMORGASBORD_2)
+						|| Dungeon.hero.hasTalent(Talent.INVIGORATING_MEAL, Talent.SMORGASBORD_2)){
 					hero.spend(Food.TIME_TO_EAT - 2);
 				} else {
 					hero.spend(Food.TIME_TO_EAT);

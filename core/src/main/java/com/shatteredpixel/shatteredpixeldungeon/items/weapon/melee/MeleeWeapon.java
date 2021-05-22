@@ -66,7 +66,7 @@ public class MeleeWeapon extends Weapon {
 
 	@Override
 	public int reachFactor(Char owner) {
-		if (Dungeon.hero.pointsInTalent(Talent.BARBARIAN) == 2 && owner == Dungeon.hero){
+		if (Dungeon.hero.pointsInTalent(Talent.BARBARIAN, Talent.DOMINANCE) == 2 && owner == Dungeon.hero){
 			return Integer.MAX_VALUE;
 		}
 		return super.reachFactor(owner);
@@ -74,7 +74,7 @@ public class MeleeWeapon extends Weapon {
 
 	@Override
 	protected void onThrow( int cell ) {
-		if (Dungeon.hero.hasTalent(Talent.BARBARIAN)) {
+		if (Dungeon.hero.hasTalent(Talent.BARBARIAN, Talent.DOMINANCE)) {
 			Char enemy = Actor.findChar(cell);
 			if (enemy == null || enemy == curUser) {
 				super.onThrow(cell);

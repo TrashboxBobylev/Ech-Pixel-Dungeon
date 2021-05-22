@@ -14,8 +14,8 @@ allprojects {
         appName = 'Ech Pixel Dungeon'
         appPackageName = 'com.trashboxbobylev.echdungeon'
 
-        appVersionCode = 535
-        appVersionName = '0.1.2'
+        appVersionCode = 536
+        appVersionName = '0.2.0'
 
         appJavaCompatibility = JavaVersion.VERSION_1_8
 

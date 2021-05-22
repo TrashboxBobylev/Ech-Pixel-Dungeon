@@ -83,9 +83,9 @@ public class WandOfFrost extends DamageWand {
 
 			if (ch.isAlive()){
 				if (Dungeon.level.water[ch.pos])
-					Buff.affect(ch, Chill.class, 4+buffedLvl());
+					Buff.affect(ch, Chill.class, 8+buffedLvl()*4);
 				else
-					Buff.affect(ch, Chill.class, 2+buffedLvl());
+					Buff.affect(ch, Chill.class, 4+buffedLvl()*2);
 			}
 		} else {
 			Dungeon.level.pressCell(bolt.collisionPos);

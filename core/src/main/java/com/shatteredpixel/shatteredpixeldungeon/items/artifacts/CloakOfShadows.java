@@ -54,9 +54,9 @@ public class CloakOfShadows extends Artifact {
 		exp = 0;
 		levelCap = 10;
 
-		charge = Math.min(level()+3, 10);
+		charge = Math.min(level()*2+6, 20);
 		partialCharge = 0;
-		chargeCap = Math.min(level()+3, 10);
+		chargeCap = Math.min(level()*2+6, 20);
 
 		defaultAction = AC_STEALTH;
 
@@ -69,7 +69,7 @@ public class CloakOfShadows extends Artifact {
 	@Override
 	public ArrayList<String> actions( Hero hero ) {
 		ArrayList<String> actions = super.actions( hero );
-		if ((isEquipped( hero ) || hero.hasTalent(Talent.LIGHT_CLOAK))
+		if ((isEquipped( hero ) || hero.hasTalent(Talent.LIGHT_CLOAK, Talent.POWER_TRIP_2))
 				&& !cursed && (charge > 0 || activeBuff != null)) {
 			actions.add(AC_STEALTH);
 		}
@@ -84,7 +84,7 @@ public class CloakOfShadows extends Artifact {
 		if (action.equals( AC_STEALTH )) {
 
 			if (activeBuff == null){
-				if (!isEquipped(hero) && !hero.hasTalent(Talent.LIGHT_CLOAK)) GLog.i( Messages.get(Artifact.class, "need_to_equip") );
+				if (!isEquipped(hero) && !hero.hasTalent(Talent.LIGHT_CLOAK, Talent.POWER_TRIP_2)) GLog.i( Messages.get(Artifact.class, "need_to_equip") );
 				else if (cursed)       GLog.i( Messages.get(this, "cursed") );
 				else if (charge <= 0)  GLog.i( Messages.get(this, "no_charge") );
 				else {
@@ -122,7 +122,7 @@ public class CloakOfShadows extends Artifact {
 	@Override
 	public boolean doUnequip(Hero hero, boolean collect, boolean single) {
 		if (super.doUnequip(hero, collect, single)){
-			if (hero.hasTalent(Talent.LIGHT_CLOAK)){
+			if (hero.hasTalent(Talent.LIGHT_CLOAK, Talent.POWER_TRIP_2)){
 				activate(hero);
 			}
 
@@ -136,7 +136,7 @@ public class CloakOfShadows extends Artifact {
 		if (super.collect(container)){
 			if (container.owner instanceof Hero
 					&& passiveBuff == null
-					&& ((Hero) container.owner).hasTalent(Talent.LIGHT_CLOAK)){
+					&& ((Hero) container.owner).hasTalent(Talent.LIGHT_CLOAK, Talent.POWER_TRIP_2)){
 				activate((Hero) container.owner);
 			}
 			return true;
@@ -170,8 +170,8 @@ public class CloakOfShadows extends Artifact {
 	@Override
 	public void charge(Hero target, float amount) {
 		if (charge < chargeCap) {
-			if (!isEquipped(target)) amount *= target.pointsInTalent(Talent.LIGHT_CLOAK)*2.5f;
-			partialCharge += 0.25f*amount;
+			if (!isEquipped(target)) amount *= target.pointsInTalent(Talent.LIGHT_CLOAK, Talent.POWER_TRIP_2)*2.5f;
+			partialCharge += 0.50f*amount;
 			if (partialCharge >= 1){
 				partialCharge--;
 				charge++;
@@ -187,7 +187,7 @@ public class CloakOfShadows extends Artifact {
 	
 	@Override
 	public Item upgrade() {
-		chargeCap = Math.min(chargeCap + 1, 10);
+		chargeCap = Math.min(chargeCap + 2, 20);
 		return super.upgrade();
 	}
 
@@ -221,12 +221,12 @@ public class CloakOfShadows extends Artifact {
 				LockedFloor lock = target.buff(LockedFloor.class);
 				if (activeBuff == null && (lock == null || lock.regenOn())) {
 					float missing = (chargeCap - charge);
-					if (level() > 7) missing += 5*(level() - 7)/3f;
-					float turnsToCharge = (45 - missing);
+					if (level() > 7) missing += 8*(level() - 7)/2f;
+					float turnsToCharge = (24 - missing);
 					turnsToCharge /= RingOfEnergy.artifactChargeMultiplier(target);
 					float chargeToGain = (1f / turnsToCharge);
 					if (!isEquipped(Dungeon.hero)){
-						chargeToGain *= 0.25f*Dungeon.hero.pointsInTalent(Talent.LIGHT_CLOAK);
+						chargeToGain *= 0.40f*Dungeon.hero.pointsInTalent(Talent.LIGHT_CLOAK, Talent.POWER_TRIP_2);
 					}
 					partialCharge += chargeToGain;
 				}
@@ -269,14 +269,14 @@ public class CloakOfShadows extends Artifact {
 
 		@Override
 		public float iconFadePercent() {
-			return (4f - turnsToCost) / 4f;
+			return (6f - turnsToCost) / 6f;
 		}
 
 		@Override
 		public boolean attachTo( Char target ) {
 			if (super.attachTo( target )) {
 				target.invisible++;
-				if (target instanceof Hero && ((Hero) target).subClass == HeroSubClass.ASSASSIN){
+				if (target instanceof Hero && (((Hero) target).subClass == HeroSubClass.ASSASSIN || ((Hero) target).subClass == HeroSubClass.NOTHING_1 )){
 					Buff.affect(target, Preparation.class);
 				}
 				return true;
@@ -292,10 +292,10 @@ public class CloakOfShadows extends Artifact {
 			turnsToCost--;
 
 			//barrier every 2/1 turns, to a max of 3/5
-			if (((Hero)target).hasTalent(Talent.PROTECTIVE_SHADOWS)){
+			if (((Hero)target).hasTalent(Talent.PROTECTIVE_SHADOWS, Talent.BLOCKADE)){
 				Barrier barrier = Buff.affect(target, Barrier.class);
-				if (barrier.shielding() < 100 + 200*((Hero)target).pointsInTalent(Talent.PROTECTIVE_SHADOWS)) {
-					barrierInc += 0.5f * ((Hero) target).pointsInTalent(Talent.PROTECTIVE_SHADOWS);
+				if (barrier.shielding() < 100 + 200*((Hero)target).pointsInTalent(Talent.PROTECTIVE_SHADOWS, Talent.BLOCKADE)) {
+					barrierInc += 0.5f * ((Hero) target).pointsInTalent(Talent.PROTECTIVE_SHADOWS, Talent.BLOCKADE);
 				}
 				if (barrierInc >= 1 ){
 					barrierInc = 0;
@@ -311,16 +311,16 @@ public class CloakOfShadows extends Artifact {
 					GLog.w(Messages.get(this, "no_charge"));
 					((Hero) target).interrupt();
 				} else {
-					//target hero level is 1 + 2*cloak level
-					int lvlDiffFromTarget = ((Hero) target).lvl - (1+level()*2);
+					//target hero level is 1 + cloak level
+					int lvlDiffFromTarget = ((Hero) target).lvl - (1+level());
 					//plus an extra one for each level after 6
 					if (level() >= 7){
 						lvlDiffFromTarget -= level()-6;
 					}
 					if (lvlDiffFromTarget >= 0){
-						exp += Math.round(10f * Math.pow(1.1f, lvlDiffFromTarget));
+						exp += Math.round(20f * Math.pow(1.1f, lvlDiffFromTarget));
 					} else {
-						exp += Math.round(10f * Math.pow(0.75f, -lvlDiffFromTarget));
+						exp += Math.round(20f * Math.pow(0.75f, -lvlDiffFromTarget));
 					}
 					
 					if (exp >= (level() + 1) * 50 && level() < levelCap) {

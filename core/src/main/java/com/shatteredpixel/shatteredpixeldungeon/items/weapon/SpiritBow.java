@@ -26,14 +26,17 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.HuntressCombo;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.RevealedArea;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Splash;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfFuror;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfSharpshooting;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Elastic;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
+import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.CellSelector;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
@@ -42,6 +45,7 @@ import com.shatteredpixel.shatteredpixeldungeon.sprites.MissileSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.QuickSlotButton;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Callback;
+import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
 
 import java.util.ArrayList;
@@ -135,16 +139,26 @@ public class SpiritBow extends Weapon {
 	
 	@Override
 	public int min(int lvl) {
-		return 2 + Dungeon.hero.lvl/5
+		int i = 2 + Dungeon.hero.lvl / 5
 				+ RingOfSharpshooting.levelDamageBonus(Dungeon.hero)
 				+ (curseInfusionBonus ? 1 : 0);
+		int combonum = 0;
+		HuntressCombo combo = Dungeon.hero.buff(HuntressCombo.class);
+		if (combo != null) combonum = (int) combo.count();
+		i *= Math.pow(1 + 0.08f * Dungeon.hero.pointsInTalent(Talent.POINT_BLANK, Talent.POWER_TRIP_2), combonum);
+		return i;
 	}
 	
 	@Override
 	public int max(int lvl) {
-		return 7 + (int)(Dungeon.hero.lvl/2f)
-				+ 3*RingOfSharpshooting.levelDamageBonus(Dungeon.hero)
+		int i = 7 + (int) (Dungeon.hero.lvl / 2f)
+				+ 3 * RingOfSharpshooting.levelDamageBonus(Dungeon.hero)
 				+ (curseInfusionBonus ? 3 : 0);
+		int combonum = 0;
+		HuntressCombo combo = Dungeon.hero.buff(HuntressCombo.class);
+		if (combo != null) combonum = (int) combo.count();
+		i *= Math.pow(1 + 0.08f * Dungeon.hero.pointsInTalent(Talent.POINT_BLANK, Talent.POWER_TRIP_2), combonum);
+		return i;
 	}
 
 	@Override
@@ -195,12 +209,12 @@ public class SpiritBow extends Weapon {
 				case NONE: default:
 					return 0f;
 				case SPEED:
-					return 1f * RingOfFuror.attackDelayMultiplier(owner);
+					return 0.5f * RingOfFuror.attackDelayMultiplier(owner);
 				case DAMAGE:
-					return 2f * RingOfFuror.attackDelayMultiplier(owner);
+					return 1f * RingOfFuror.attackDelayMultiplier(owner);
 			}
 		} else {
-			return super.speedFactor(owner) * 0.75f;
+			return super.speedFactor(owner) * 0.50f;
 		}
 	}
 	
@@ -221,7 +235,7 @@ public class SpiritBow extends Weapon {
 	}
 	
 	public SpiritArrow knockArrow(){
-		if (Dungeon.hero.hasTalent(Talent.SPIRIT_JAVELINS) && Random.Int(4) < Dungeon.hero.pointsInTalent(Talent.SPIRIT_JAVELINS)){
+		if (Dungeon.hero.hasTalent(Talent.SPIRIT_JAVELINS, Talent.DOMINANCE) && Random.Int(4) < Dungeon.hero.pointsInTalent(Talent.SPIRIT_JAVELINS, Talent.DOMINANCE)){
 			return new SpiritJavelin();
 		}
 		return new SpiritArrow();
@@ -275,12 +289,41 @@ public class SpiritBow extends Weapon {
 			if (enemy == null || enemy == curUser) {
 				parent = null;
 				Splash.at( cell, 0xCC99FFFF, 1 );
+				HuntressCombo combo = curUser.buff(HuntressCombo.class);
+				if (combo != null) combo.detach();
+				if (curUser.hasTalent(Talent.SEER_SHOT, Talent.OMNISTRENGTH) && Dungeon.level.discoverable[cell]){
+					discover(cell);
+				}
 			} else {
 				if (!curUser.shoot( enemy, this )) {
 					Splash.at(cell, 0xCC99FFFF, 1);
+					HuntressCombo combo = curUser.buff(HuntressCombo.class);
+					if (combo != null) combo.detach();
+					if (curUser.hasTalent(Talent.SEER_SHOT, Talent.OMNISTRENGTH) && Dungeon.level.discoverable[cell]){
+						discover(cell);
+					}
 				}
 				if (sniperSpecial && SpiritBow.this.augment != Augment.SPEED) sniperSpecial = false;
 			}
+		}
+
+		public void discover(int c){
+			for (int n : PathFinder.NEIGHBOURS9){
+				int cell = c+n;
+
+				if (Dungeon.level.discoverable[cell])
+					Dungeon.level.mapped[cell] = true;
+
+				int terr = Dungeon.level.map[cell];
+				if ((Terrain.flags[terr] & Terrain.SECRET) != 0) {
+
+					Dungeon.level.discover( cell );
+
+					GameScene.discoverTile( cell, terr );
+					ScrollOfMagicMapping.discover(cell);
+				}
+			}
+			GameScene.updateFog();
 		}
 
 		@Override
@@ -344,17 +387,6 @@ public class SpiritBow extends Weapon {
 				});
 				
 			} else {
-
-				if (user.hasTalent(Talent.SEER_SHOT)
-						&& user.buff(Talent.SeerShotCooldown.class) == null){
-					int shotPos = throwPos(user, dst);
-					if (Actor.findChar(shotPos) == null) {
-						RevealedArea a = Buff.affect(user, RevealedArea.class, 3 + 9 * user.pointsInTalent(Talent.SEER_SHOT));
-						a.depth = Dungeon.depth;
-						a.pos = shotPos;
-						Buff.affect(user, Talent.SeerShotCooldown.class, 15f);
-					}
-				}
 
 				super.cast(user, dst);
 			}

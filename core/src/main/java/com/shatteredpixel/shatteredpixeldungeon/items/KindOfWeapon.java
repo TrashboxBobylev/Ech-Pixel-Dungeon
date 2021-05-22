@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.mechanics.Ballistica;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.utils.BArray;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
@@ -126,7 +127,7 @@ abstract public class KindOfWeapon extends EquipableItem {
 			
 			PathFinder.buildDistanceMap(target, passable, reachFactor(owner));
 			
-			return PathFinder.distance[owner.pos] <= reachFactor(owner);
+			return PathFinder.distance[owner.pos] <= reachFactor(owner) && new Ballistica(owner.pos, target, Ballistica.MAGIC_BOLT).collisionPos == target;
 		}
 	}
 

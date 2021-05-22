@@ -69,9 +69,9 @@ public abstract class Plant implements Bundlable {
 		wither();
 		activate( ch );
 
-		if (Dungeon.level.heroFOV[pos] && Dungeon.hero.hasTalent(Talent.NATURES_AID)){
+		if (Dungeon.level.heroFOV[pos] && Dungeon.hero.hasTalent(Talent.NATURES_AID, Talent.BLOCKADE)){
 			// 3/5 turns based on talent points spent
-			Buff.affect(Dungeon.hero, Barkskin.class).set(9 + (Dungeon.hero.pointsInTalent(Talent.NATURES_AID)*9), 1 + 2*(Dungeon.hero.pointsInTalent(Talent.NATURES_AID)));
+			Buff.affect(Dungeon.hero, Barkskin.class).set(9 + (Dungeon.hero.pointsInTalent(Talent.NATURES_AID, Talent.BLOCKADE)*9), 1 + 2*(Dungeon.hero.pointsInTalent(Talent.NATURES_AID)));
 		}
 	}
 	
@@ -116,7 +116,7 @@ public abstract class Plant implements Bundlable {
 	
 	public String desc() {
 		String desc = Messages.get(this, "desc");
-		if (Dungeon.hero.subClass == HeroSubClass.WARDEN){
+		if (Dungeon.hero.subClass == HeroSubClass.WARDEN || Dungeon.hero.subClass == HeroSubClass.NOTHING_1){
 			desc += "\n\n" + Messages.get(this, "warden_desc");
 		}
 		return desc;
@@ -151,7 +151,7 @@ public abstract class Plant implements Bundlable {
 				super.onThrow( cell );
 			} else {
 				Dungeon.level.plant( this, cell );
-				if (Dungeon.hero.subClass == HeroSubClass.WARDEN) {
+				if ((Dungeon.hero.subClass == HeroSubClass.WARDEN || Dungeon.hero.subClass == HeroSubClass.NOTHING_1)) {
 					for (int i : PathFinder.NEIGHBOURS8) {
 						int c = Dungeon.level.map[cell + i];
 						if ( c == Terrain.EMPTY || c == Terrain.EMPTY_DECO
@@ -208,7 +208,7 @@ public abstract class Plant implements Bundlable {
 		@Override
 		public String desc() {
 			String desc = Messages.get(plantClass, "desc");
-			if (Dungeon.hero.subClass == HeroSubClass.WARDEN){
+			if (Dungeon.hero.subClass == HeroSubClass.WARDEN || Dungeon.hero.subClass == HeroSubClass.NOTHING_1){
 				desc += "\n\n" + Messages.get(plantClass, "warden_desc");
 			}
 			return desc;

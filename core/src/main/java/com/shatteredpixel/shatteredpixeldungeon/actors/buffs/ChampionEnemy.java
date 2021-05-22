@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Fire;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.AbyssalNightmare;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
@@ -98,7 +99,7 @@ public abstract class ChampionEnemy extends Buff {
 
 	public static void rollForChampion(Mob m, int step){
 		if (Dungeon.mobsToChampion[step] <= 0) {
-			Dungeon.mobsToChampion[step] = 5;
+			Dungeon.mobsToChampion[step] = 4;
 			if (step > 0) Dungeon.mobsToChampion[step] = 2;
 		}
 
@@ -114,12 +115,23 @@ public abstract class ChampionEnemy extends Buff {
 				case 4:             Buff.affect(m, Blessed.class);      break;
 				case 5:             Buff.affect(m, Growing.class);      break;
 			}
-			if (!(m.properties().contains(Char.Property.BOSS)) && !(m.properties().contains(Char.Property.MINIBOSS)))
-				m.HP = m.HT = Math.round(m.HT*1.3f);
+//			if (!(m.properties().contains(Char.Property.BOSS)) && !(m.properties().contains(Char.Property.MINIBOSS)))
+				m.HP = m.HT = Math.round(m.HT*1.55f);
+				m.EXP *= 1.25f;
 
 			m.state = m.WANDERING;
 			if (step < 100 && Dungeon.depth > 6) {
 				ChampionEnemy.rollForChampion(m, step+1);
+			}
+		}
+
+		if (--Dungeon.nightmare <= 0){
+			Dungeon.nightmare = 25;
+			if (!(m.properties().contains(Char.Property.BOSS)) && !(m.properties().contains(Char.Property.MINIBOSS)) && !(m instanceof AbyssalNightmare)){
+				Buff.affect(m, Nightmare.class);
+				Buff.affect(m, Adrenaline.class, Adrenaline.DURATION*30);
+				m.state = m.WANDERING;
+				m.EXP = -1;
 			}
 		}
 	}

@@ -148,7 +148,7 @@ abstract public class MissileWeapon extends Weapon {
 	public int throwPos(Hero user, int dst) {
 
 		boolean projecting = hasEnchant(Projecting.class, user);
-		if (!projecting && Random.Int(3) < user.pointsInTalent(Talent.SHARED_ENCHANTMENT)){
+		if (!projecting && Random.Int(3) < user.pointsInTalent(Talent.SHARED_ENCHANTMENT, Talent.REACTION)){
 			if (this instanceof Dart && ((Dart) this).crossbowHasEnchant(Dungeon.hero)){
 				//do nothing
 			} else {
@@ -170,7 +170,7 @@ abstract public class MissileWeapon extends Weapon {
 	public float accuracyFactor(Char owner) {
 		float accFactor = super.accuracyFactor(owner);
 		if (owner instanceof Hero && owner.buff(Momentum.class) != null && owner.buff(Momentum.class).freerunning()){
-			accFactor *= 1f + 0.6f*((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM);
+			accFactor *= 1f + 0.6f*((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM, Talent.REACTION);
 		}
 		return accFactor;
 	}
@@ -200,11 +200,21 @@ abstract public class MissileWeapon extends Weapon {
 
 	@Override
 	public int proc(Char attacker, Char defender, int damage) {
-		if (attacker == Dungeon.hero && Random.Int(3) < Dungeon.hero.pointsInTalent(Talent.SHARED_ENCHANTMENT)){
+		if (attacker == Dungeon.hero && Dungeon.hero.hasTalent(Talent.SHARED_ENCHANTMENT, Talent.REACTION)){
 				SpiritBow bow = Dungeon.hero.belongings.getItem(SpiritBow.class);
 				if (bow != null && bow.enchantment != null && Dungeon.hero.buff(MagicImmune.class) == null) {
 					damage = bow.enchantment.proc(this, attacker, defender, damage);
+					if (Dungeon.hero.pointsInTalent(Talent.SHARED_ENCHANTMENT, Talent.REACTION) == 2){
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+					}
+					if (Dungeon.hero.pointsInTalent(Talent.SHARED_ENCHANTMENT, Talent.REACTION) == 3){
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+					}
 				}
+
 		}
 
 		return super.proc(attacker, defender, damage);
@@ -256,8 +266,8 @@ abstract public class MissileWeapon extends Weapon {
 		float usages = baseUses * (float)(Math.pow(3, level()));
 
 		//+50%/75% durability
-		if (Dungeon.hero.hasTalent(Talent.DURABLE_PROJECTILES)){
-			usages *= 1.25f + (Dungeon.hero.pointsInTalent(Talent.DURABLE_PROJECTILES));
+		if (Dungeon.hero.hasTalent(Talent.DURABLE_PROJECTILES, Talent.DIVINE_SIGHT)){
+			usages *= 1.25f + (Dungeon.hero.pointsInTalent(Talent.DURABLE_PROJECTILES, Talent.DIVINE_SIGHT));
 		}
 		if (holster) {
 			usages *= MagicalHolster.HOLSTER_DURABILITY_FACTOR;
@@ -308,7 +318,7 @@ abstract public class MissileWeapon extends Weapon {
 				damage += Random.IntRange( 0, exStr );
 			}
 			if (owner.buff(Momentum.class) != null && owner.buff(Momentum.class).freerunning()) {
-				damage = Math.round(damage * (1f + 0.45f * ((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM)));
+				damage = Math.round(damage * (1f + 0.45f * ((Hero) owner).pointsInTalent(Talent.PROJECTILE_MOMENTUM, Talent.REACTION)));
 			}
 		}
 		

@@ -46,7 +46,7 @@ public class Invisibility extends FlavourBuff {
 	public boolean attachTo( Char target ) {
 		if (super.attachTo( target )) {
 			target.invisible++;
-			if (target instanceof Hero && ((Hero) target).subClass == HeroSubClass.ASSASSIN){
+			if (target instanceof Hero && (((Hero) target).subClass == HeroSubClass.ASSASSIN || ((Hero) target).subClass == HeroSubClass.NOTHING_1 )){
 				Buff.affect(target, Preparation.class);
 			}
 			return true;
@@ -94,7 +94,7 @@ public class Invisibility extends FlavourBuff {
 			invis.detach();
 		}
 
-		if (Dungeon.hero.pointsInTalent(Talent.BOUNTY_HUNTER) < 2) {
+		if (Dungeon.hero.pointsInTalent(Talent.BOUNTY_HUNTER, Talent.DIVERSITY) < 2) {
 			CloakOfShadows.cloakStealth cloakBuff = Dungeon.hero.buff(CloakOfShadows.cloakStealth.class);
 			if (cloakBuff != null) {
 				cloakBuff.dispel();
@@ -107,7 +107,7 @@ public class Invisibility extends FlavourBuff {
 			timeFreeze.detach();
 		}
 
-		if (Dungeon.hero.pointsInTalent(Talent.BOUNTY_HUNTER) < 1) {
+		if (Dungeon.hero.pointsInTalent(Talent.BOUNTY_HUNTER, Talent.DIVERSITY) < 1) {
 			Preparation prep = Dungeon.hero.buff(Preparation.class);
 			if (prep != null) {
 				prep.detach();

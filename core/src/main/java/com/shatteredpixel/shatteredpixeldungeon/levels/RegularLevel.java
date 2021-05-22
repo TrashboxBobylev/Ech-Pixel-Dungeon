@@ -181,7 +181,7 @@ public abstract class RegularLevel extends Level {
 	public int nMobs() {
 		if (Dungeon.depth <= 1) return 0;
 
-		int mobs = 3 + Dungeon.depth % 5 + Random.Int(3);
+		int mobs = 5 + Dungeon.depth % 3 + Random.Int(6);
 		if (feeling == Feeling.LARGE){
 			mobs = (int)Math.ceil(mobs * 1.33f);
 		}
@@ -417,9 +417,9 @@ public abstract class RegularLevel extends Level {
 		}
 
 		//cached rations try to drop in a special room on floors 2/3/4/6/7/8, to a max of 4/6
-		if (Dungeon.hero.hasTalent(Talent.CACHED_RATIONS)){
+		if (Dungeon.hero.hasTalent(Talent.CACHED_RATIONS, Talent.SMORGASBORD)){
 			Talent.CachedRationsDropped dropped = Buff.affect(Dungeon.hero, Talent.CachedRationsDropped.class);
-			if (dropped.count() < 2 + 6*Dungeon.hero.pointsInTalent(Talent.CACHED_RATIONS)){
+			if (dropped.count() < 2 + 6*Dungeon.hero.pointsInTalent(Talent.CACHED_RATIONS, Talent.SMORGASBORD)){
 				int cell;
 				int tries = 100;
 				do {

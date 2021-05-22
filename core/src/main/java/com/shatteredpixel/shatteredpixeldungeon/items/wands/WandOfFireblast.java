@@ -89,7 +89,7 @@ public class WandOfFireblast extends DamageWand {
 			if (Dungeon.level.adjacent(bolt.sourcePos, cell) && !Dungeon.level.flamable[cell]){
 				adjacentCells.add(cell);
 			} else {
-				GameScene.add( Blob.seed( cell, 1+chargesPerCast(), Fire.class ) );
+				GameScene.add( Blob.seed( cell, 3+chargesPerCast()*3, Fire.class ) );
 			}
 
 			Char ch = Actor.findChar( cell );
@@ -105,7 +105,7 @@ public class WandOfFireblast extends DamageWand {
 				if (Dungeon.level.trueDistance(cell+i, bolt.sourcePos) > Dungeon.level.trueDistance(cell, bolt.sourcePos)
 						&& Dungeon.level.flamable[cell+i]
 						&& Fire.volumeAt(cell+i, Fire.class) == 0){
-					GameScene.add( Blob.seed( cell+i, 1+chargesPerCast(), Fire.class ) );
+					GameScene.add( Blob.seed( cell+i, 3+chargesPerCast()*3, Fire.class ) );
 				}
 			}
 		}
@@ -119,10 +119,10 @@ public class WandOfFireblast extends DamageWand {
 					case 1:
 						break; //no effects
 					case 2:
-						Buff.affect(ch, Cripple.class, 4f);
+						Buff.affect(ch, Cripple.class, 10f);
 						break;
 					case 3:
-						Buff.affect(ch, Paralysis.class, 4f);
+						Buff.affect(ch, Paralysis.class, 10f);
 						break;
 				}
 			}
@@ -140,7 +140,7 @@ public class WandOfFireblast extends DamageWand {
 		//need to perform flame spread logic here so we can determine what cells to put flames in.
 
 		// 5/7/9 distance
-		int maxDist = 3 + 2*chargesPerCast();
+		int maxDist = 6 + 4*chargesPerCast();
 		int dist = Math.min(bolt.dist, maxDist);
 
 		cone = new ConeAOE( bolt,

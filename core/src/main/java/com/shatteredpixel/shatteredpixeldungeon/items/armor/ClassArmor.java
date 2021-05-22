@@ -64,7 +64,12 @@ abstract public class ClassArmor extends Armor {
 			}
 			break;
 		case ROGUE:
+		case ADVENTURER:
 			classArmor = new RogueArmor();
+			seal = armor.checkSeal();
+			if (seal != null) {
+				classArmor.affixSeal(seal);
+			}
 			break;
 		case MAGE:
 			classArmor = new MageArmor();
@@ -144,7 +149,7 @@ abstract public class ClassArmor extends Armor {
 	@Override
 	public void onHeroGainExp(float levelPercent, Hero hero) {
 		super.onHeroGainExp(levelPercent, hero);
-		charge += 50 * levelPercent;
+		charge += 250 * levelPercent;
 		if (charge > 100) charge = 100;
 		updateQuickslot();
 	}

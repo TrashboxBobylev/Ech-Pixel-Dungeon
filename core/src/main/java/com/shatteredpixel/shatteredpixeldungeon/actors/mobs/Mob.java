@@ -189,6 +189,10 @@ public abstract class Mob extends Char {
 	
 	//FIXME this is sort of a band-aid correction for allies needing more intelligent behaviour
 	protected boolean intelligentAlly = false;
+
+	public boolean canSee(int pos){
+		return fieldOfView[pos];
+	}
 	
 	protected Char chooseEnemy() {
 
@@ -205,7 +209,7 @@ public abstract class Mob extends Char {
 		if (alignment == Alignment.ENEMY
 				&& (enemy == null || enemy.buff(StoneOfAggression.Aggression.class) == null)) {
 			for (Char ch : Actor.chars()) {
-				if (ch != this && fieldOfView[ch.pos] &&
+				if (ch != this && canSee(ch.pos) &&
 						ch.buff(StoneOfAggression.Aggression.class) != null) {
 					return ch;
 				}
@@ -240,7 +244,7 @@ public abstract class Mob extends Char {
 				//try to find an enemy mob to attack first.
 				for (Mob mob : Dungeon.level.mobs)
 					if (mob.alignment == Alignment.ENEMY && mob != this
-							&& fieldOfView[mob.pos] && mob.invisible <= 0) {
+							&& canSee(mob.pos) && mob.invisible <= 0) {
 						enemies.add(mob);
 					}
 				
@@ -248,13 +252,13 @@ public abstract class Mob extends Char {
 					//try to find ally mobs to attack second.
 					for (Mob mob : Dungeon.level.mobs)
 						if (mob.alignment == Alignment.ALLY && mob != this
-								&& fieldOfView[mob.pos] && mob.invisible <= 0) {
+								&& canSee(mob.pos) && mob.invisible <= 0) {
 							enemies.add(mob);
 						}
 					
 					if (enemies.isEmpty()) {
 						//try to find the hero third
-						if (fieldOfView[Dungeon.hero.pos] && Dungeon.hero.invisible <= 0) {
+						if (canSee(Dungeon.hero.pos) && Dungeon.hero.invisible <= 0) {
 							enemies.add(Dungeon.hero);
 						}
 					}
@@ -264,7 +268,7 @@ public abstract class Mob extends Char {
 			} else if ( alignment == Alignment.ALLY ) {
 				//look for hostile mobs to attack
 				for (Mob mob : Dungeon.level.mobs)
-					if (mob.alignment == Alignment.ENEMY && fieldOfView[mob.pos]
+					if (mob.alignment == Alignment.ENEMY && canSee(mob.pos)
 							&& mob.invisible <= 0 && !mob.isInvulnerable(getClass()))
 						//intelligent allies do not target mobs which are passive, wandering, or asleep
 						if (!intelligentAlly ||
@@ -276,11 +280,11 @@ public abstract class Mob extends Char {
 			} else if (alignment == Alignment.ENEMY) {
 				//look for ally mobs to attack
 				for (Mob mob : Dungeon.level.mobs)
-					if (mob.alignment == Alignment.ALLY && fieldOfView[mob.pos] && mob.invisible <= 0 && !mob.isInvulnerable(getClass()))
+					if (mob.alignment == Alignment.ALLY && canSee(mob.pos) && mob.invisible <= 0 && !mob.isInvulnerable(getClass()))
 						enemies.add(mob);
 
 				//and look for the hero
-				if (fieldOfView[Dungeon.hero.pos] && Dungeon.hero.invisible <= 0 && !Dungeon.hero.isInvulnerable(getClass())) {
+				if (canSee(Dungeon.hero.pos) && Dungeon.hero.invisible <= 0 && !Dungeon.hero.isInvulnerable(getClass())) {
 					enemies.add(Dungeon.hero);
 				}
 				
@@ -617,10 +621,10 @@ public abstract class Mob extends Char {
 
 			//physical damage that doesn't come from the hero is less effective
 			if (enemy != Dungeon.hero){
-				restoration = Math.round(restoration * 0.3f*Dungeon.hero.pointsInTalent(Talent.SOUL_SIPHON));
+				restoration = Math.round(restoration * 0.3f*Dungeon.hero.pointsInTalent(Talent.SOUL_SIPHON, Talent.REACTION));
 			}
 			if (restoration > 0) {
-				Buff.affect(Dungeon.hero, Hunger.class).affectHunger(restoration*Dungeon.hero.pointsInTalent(Talent.SOUL_EATER)*6f);
+				Buff.affect(Dungeon.hero, Hunger.class).affectHunger(restoration*Dungeon.hero.pointsInTalent(Talent.SOUL_EATER, Talent.ENDURANCE)*6f);
 				Dungeon.hero.HP = (int) Math.ceil(Math.min(Dungeon.hero.HT, Dungeon.hero.HP + (restoration * 0.4f)));
 				Dungeon.hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), 1);
 			}
@@ -644,7 +648,7 @@ public abstract class Mob extends Char {
 				Badges.validateMonstersSlain();
 				Statistics.qualifiedForNoKilling = false;
 				
-				int exp = Dungeon.hero.lvl <= maxLvl ? EXP : 0;
+				int exp = Dungeon.hero.lvl <= maxLvl*1.5f ? EXP+1 : 1;
 				if (exp > 0) {
 					Dungeon.hero.sprite.showStatus(CharSprite.POSITIVE, Messages.get(this, "exp", exp));
 				}
@@ -666,9 +670,15 @@ public abstract class Mob extends Char {
 			rollToDropLoot();
 
 			if (cause == Dungeon.hero
-					&& Dungeon.hero.hasTalent(Talent.LETHAL_MOMENTUM)
-					&& Random.Float() < 0.34f + 0.33f* Dungeon.hero.pointsInTalent(Talent.LETHAL_MOMENTUM)){
+					&& Dungeon.hero.hasTalent(Talent.LETHAL_MOMENTUM, Talent.CONTROL)
+					&& Random.Float() < 0.34f + 0.33f* Dungeon.hero.pointsInTalent(Talent.LETHAL_MOMENTUM, Talent.CONTROL)){
 				Buff.affect(Dungeon.hero, Talent.LethalMomentumTracker.class, 1f);
+			}
+		}
+		if (buff(Nightmare.class) != null) {
+			AbyssalNightmare.spawnAt(pos);
+			if (Dungeon.level.heroFOV[pos]) {
+				Sample.INSTANCE.play(Assets.Sounds.CURSED);
 			}
 		}
 
@@ -682,7 +692,7 @@ public abstract class Mob extends Char {
 
 		if (!(this instanceof Wraith)
 				&& soulMarked
-				&& Random.Int(10) < Dungeon.hero.pointsInTalent(Talent.NECROMANCERS_MINIONS)*4){
+				&& Random.Int(10) < Dungeon.hero.pointsInTalent(Talent.NECROMANCERS_MINIONS, Talent.DIVERSITY)*4){
 			Wraith w = Wraith.spawnAt(pos);
 			if (w != null) {
 				Buff.affect(w, Corruption.class);
@@ -727,7 +737,7 @@ public abstract class Mob extends Char {
 
 		//soul eater talent
 		if (buff(SoulMark.class) != null &&
-				Random.Int(4) < Dungeon.hero.pointsInTalent(Talent.SOUL_EATER)){
+				Random.Int(4) < Dungeon.hero.pointsInTalent(Talent.SOUL_EATER, Talent.ENDURANCE)){
 			Talent.onFoodEaten(Dungeon.hero, 0, null);
 		}
 
@@ -830,11 +840,11 @@ public abstract class Mob extends Char {
 
 				float enemyStealth = enemy.stealth();
 
-				if (enemy instanceof Hero && ((Hero) enemy).hasTalent(Talent.SILENT_STEPS)){
-					if (((Hero) enemy).pointsInTalent(Talent.SILENT_STEPS) == 1 && !Dungeon.level.adjacent(enemy.pos, pos)) {
+				if (enemy instanceof Hero && ((Hero) enemy).hasTalent(Talent.SILENT_STEPS, Talent.CONTROL)){
+					if (((Hero) enemy).pointsInTalent(Talent.SILENT_STEPS, Talent.CONTROL) == 1 && !Dungeon.level.adjacent(enemy.pos, pos)) {
 						enemyStealth = Float.POSITIVE_INFINITY;
 					}
-					else if (((Hero) enemy).pointsInTalent(Talent.SILENT_STEPS) == 2){
+					else if (((Hero) enemy).pointsInTalent(Talent.SILENT_STEPS, Talent.CONTROL) == 2){
 						enemyStealth = Float.POSITIVE_INFINITY;
 					}
 				}
@@ -984,12 +994,12 @@ public abstract class Mob extends Char {
 					spend( TICK );
 					if (!enemyInFOV) {
 						sprite.showLost();
-						if (Dungeon.hero.pointsInTalent(Talent.TRICKERY) == 2){
+						if (Dungeon.hero.pointsInTalent(Talent.TRICKERY, Talent.DOMINANCE) == 2){
 							state = SLEEPING;
 							target = -1;
 							enemy = null;
 						}
-						else if (Dungeon.hero.pointsInTalent(Talent.TRICKERY) == 1){
+						else if (Dungeon.hero.pointsInTalent(Talent.TRICKERY, Talent.DOMINANCE) == 1){
 							state = FLEEING;
 							target = Dungeon.level.randomDestination( Mob.this );
 							enemy = Dungeon.hero;

@@ -337,8 +337,8 @@ public class HeroSelectScene extends PixelScene {
 		private RedButton firstSub;
 		private RedButton secondSub;
 
-		private int WIDTH = 120;
-		private int HEIGHT = 120;
+		private int WIDTH = 155;
+		private int HEIGHT = 155;
 		private int MARGIN = 2;
 		private int INFO_WIDTH = WIDTH - MARGIN*2;
 
@@ -422,6 +422,12 @@ public class HeroSelectScene extends PixelScene {
 							new ItemSprite(ItemSpriteSheet.GLOVES, null)
 					};
 					break;
+				case ADVENTURER:
+					tabIcons = new Image[]{
+							Icons.get(HeroClass.ADVENTURER),
+							new ItemSprite(ItemSpriteSheet.SWORD, null)
+					};
+					break;
 			}
 
 			tab = new IconTab( tabIcons[0] ){
@@ -430,7 +436,7 @@ public class HeroSelectScene extends PixelScene {
 					super.select(value);
 					if (value){
 						title.text(Messages.titleCase(Messages.get(WndHeroInfo.class, "innate_title")));
-						info.text(Messages.get(cl, cl.name() + "_desc_innate"), INFO_WIDTH);
+						info.text(Messages.get(cl, cl.name() + "_desc_innate"), Camera.main.width - 72);
 					}
 				}
 			};
@@ -442,7 +448,7 @@ public class HeroSelectScene extends PixelScene {
 					super.select(value);
 					if (value){
 						title.text(Messages.titleCase(Messages.get(WndHeroInfo.class, "loadout_title")));
-						info.text(Messages.get(cl, cl.name() + "_desc_loadout"), INFO_WIDTH);
+						info.text(Messages.get(cl, cl.name() + "_desc_loadout"), Camera.main.width - 72);
 					}
 				}
 			};
@@ -454,7 +460,7 @@ public class HeroSelectScene extends PixelScene {
 					super.select(value);
 					if (value){
 						title.text(Messages.titleCase(Messages.get(WndHeroInfo.class, "talents_title")));
-						info.text(Messages.get(WndHeroInfo.class, "talents_desc"), INFO_WIDTH);
+						info.text(Messages.get(WndHeroInfo.class, "talents_desc"), Camera.main.width - 72);
 					}
 					talents.visible = talents.active = value;
 					firstSub.visible = firstSub.active = value;
@@ -473,13 +479,13 @@ public class HeroSelectScene extends PixelScene {
 						for (HeroSubClass sub : cl.subClasses()){
 							msg += "\n\n" + sub.desc();
 						}
-						info.text(msg, INFO_WIDTH);
+						info.text(msg, Camera.main.width - 72);
 					}
 				}
 			};
 			add(tab);
 
-			resize(WIDTH, HEIGHT);
+			resize(Camera.main.width - 25, HEIGHT);
 			select(0);
 
 		}
@@ -488,7 +494,9 @@ public class HeroSelectScene extends PixelScene {
 		public void select(Tab tab) {
 			super.select(tab);
 
-			title.setPos((WIDTH-title.width())/2, MARGIN);
+			int widthy = talents.active ? WIDTH : Camera.main.width - 60;
+
+			title.setPos((widthy - title.width())/2, MARGIN);
 			info.setPos(MARGIN, title.bottom()+2*MARGIN);
 
 			firstSub.setPos((title.left() - firstSub.width())/2, 0);
@@ -496,7 +504,18 @@ public class HeroSelectScene extends PixelScene {
 
 			talents.setRect(0, info.bottom()+MARGIN, WIDTH, HEIGHT - (info.bottom()+MARGIN));
 
-			resize(WIDTH, Math.max(HEIGHT, (int)info.bottom()));
+						if (talents.active){
+				resize(WIDTH, (int) talents.bottom() + MARGIN);
+			}
+			if (talents.visible) {
+				resize(WIDTH, /*(int) info.bottom() + MARGIN*20*/HEIGHT);
+				info.setPos(MARGIN, title.bottom()+2*MARGIN);
+//				info.text(Messages.get(WndHeroInfo.class, "talents_desc"), INFO_WIDTH);
+//				info.setSize(info.maxWidth(), info.height());
+				talents.setRect(0, info.bottom()+MARGIN, WIDTH, HEIGHT - (info.bottom()+MARGIN));
+			} else {
+				resize(widthy, (int) (info.bottom()+MARGIN));
+			}
 
 			layoutTabs();
 

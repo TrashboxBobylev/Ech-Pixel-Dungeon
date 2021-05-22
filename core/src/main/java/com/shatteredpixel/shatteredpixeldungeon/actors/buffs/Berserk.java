@@ -89,10 +89,10 @@ public class Berserk extends Buff {
 				}
 			} else {
 				state = State.RECOVERING;
-				levelRecovery = LEVEL_RECOVER_START - Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA)/3f;
-				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA) == 1) levelRecovery = 1;
-				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA) == 2) levelRecovery = 0.5f;
-				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA) == 3) levelRecovery = 0;
+				levelRecovery = LEVEL_RECOVER_START - Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION)/3f;
+				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION) == 1) levelRecovery = 1;
+				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION) == 2) levelRecovery = 0.5f;
+				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION) == 3) levelRecovery = 0;
 				if (buff != null) buff.absorbDamage(buff.shielding());
 				power = 0f;
 			}
@@ -123,7 +123,7 @@ public class Berserk extends Buff {
 			if (shield != null){
 				state = State.BERSERK;
 				int shieldAmount = shield.maxShield() * 8;
-				shieldAmount = Math.round(shieldAmount * (1f + Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA)/3f));
+				shieldAmount = Math.round(shieldAmount * (1f + Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION)/3f));
 				shield.supercharge(shieldAmount);
 
 				SpellSprite.show(target, SpellSprite.BERSERK);
@@ -138,7 +138,7 @@ public class Berserk extends Buff {
 	
 	public void damage(int damage){
 		if (state == State.RECOVERING) return;
-		float maxPower = 1f + 0.5f*((Hero)target).pointsInTalent(Talent.ENDLESS_RAGE);
+		float maxPower = 1f + 0.5f*((Hero)target).pointsInTalent(Talent.ENDLESS_RAGE, Talent.ENDURANCE);
 		power = Math.min(maxPower, power + (damage/(float)target.HT)/3f );
 		BuffIndicator.refreshHero(); //show new power immediately
 	}

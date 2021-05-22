@@ -25,6 +25,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Spinner;
+import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.ChaliceOfBlood;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfEnergy;
@@ -54,7 +55,81 @@ public class v0_9_X_Changes {
 
 	public static void add_Ech_Changes( ArrayList<ChangeInfo> changeInfos ) {
 
-		ChangeInfo changes = new ChangeInfo("v0.1.1", true, "");
+		ChangeInfo changes = new ChangeInfo("v0.2.0", true, "");
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes = new ChangeInfo("Heroes", false, null);
+		changes.hardlight(0x00a0ff);
+		changeInfos.add(changes);
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.WARRIOR, 0, 90, 12, 15), "Ech",
+				"_-_ Fixed Lethal Defense having Shattered's stats.\n\n" +
+						"_-_ Fixed Strongman's strength adjustments.\n\n" +
+						"_-_ Barbarian cannot attack stuff behind the walls."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.MAGE, 0, 90, 12, 15), "Ech",
+				"_-_ Nerfed Energizing Upgrade to give only 10/20 charges instead of 25/50.\n\n" +
+						"_-_ Nerfed Shield Battery shielding from 34%/69% to 14%/28%."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.ROGUE, 0, 90, 12, 15), "Ech",
+				"_-_ Allowed Mystical Meal to charge Horn of Plenty."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.HUNTRESS, 0, 90, 12, 15), "Ech",
+				"_-_ Reworked Beautiful Young Woman's base T3 talents."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.ADVENTURER, 0, 90, 12, 15), "Ech",
+				"_-_ Added Adventurer, who has every class ability, talent and unique item at once, but gets HP penalty."));
+
+		changes = new ChangeInfo("Hero Items", false, null);
+		changes.hardlight(0x002cff);
+		changeInfos.add(changes);
+
+		changes.addButton(new ChangeButton(new ItemSprite(ItemSpriteSheet.SEAL, null), "Ech",
+				"_-_ Broken Seal grants 2x more shielding and charges that shielding 2x faster."));
+
+		changes.addButton(new ChangeButton(new ItemSprite(ItemSpriteSheet.MAGES_STAFF, null), "Ech",
+				"_-_ Wands charge more than 2x faster.\n\n" +
+						"_-_ Increased staff's charging boost from 25% to 50%."));
+
+		changes.addButton(new ChangeButton(new ItemSprite(ItemSpriteSheet.ARTIFACT_CLOAK, null), "Ech",
+				"_-_ The Cloak of Shadows charges 2x faster, has 2x more charges and upgrades 2x faster.\n\n" +
+						"_-_ The invisibility turns per charge is increased to 6 from 4."));
+
+		changes.addButton(new ChangeButton(new ItemSprite(ItemSpriteSheet.SPIRIT_BOW, null), "Ech",
+				"_-_ Increased attack rate from 1.33x to 2x, including specials."));
+
+		changes = new ChangeInfo("Buffs", false, null);
+		changes.hardlight(0x00c837);
+		changeInfos.add(changes);
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.TALENT), "Ech",
+				"_-_ Heroes get one extra EXP (bypassing any limits), get full XP from monsters for more levels and can level up to level 45.\n\n" +
+						"_-_ Class armor charging and item identification with XP are twice as effective.\n\n" +
+						"_-_ Talent tier thresholds have been adjusted to allow you to get every talent for your class."));
+
+		changes.addButton(new ChangeButton(new ItemSprite(ItemSpriteSheet.WAND_MAGIC_MISSILE, null), "Ech",
+				"_-_ Wands have 4 initial charges (6 for Wand of Magic Missile), and gain 2 charges per upgrade, with limit of 15 (18 for Mage's Staff).\n\n" +
+						"_-_ Significantly buffed stats of many wands, not related to damage, like distance and debuff length."));
+
+
+		changes = new ChangeInfo("Difficulty", false, null);
+		changes.hardlight(0x9a000c);
+		changeInfos.add(changes);
+
+		changes.addButton(new ChangeButton(new Image(new GolemSprite()), "Ech",
+				"_-_ Increased HP boost for champs from 30% to 55%.\n\n" +
+						"_-_ Increased champion's spawn rate.\n\n" +
+						"_-_ Increased HP boost for spawning mobs from 100% to 150%.\n\n" +
+						"_-_ Fixed DK softlock.\n\n" +
+						"_-_ Monsters can deal up to (experience points/2) extra melee danage.\n\n" +
+						"_-_ Added abyssal nightmares, that can be spawned from possessed monsters (every 25th monster becomes possessed).\n\n" +
+						"_-_ More monsters spawn overall, the respawn cooldown is significantly shorter, mobs can appear closer to player."));
+
+		changes.addButton(new ChangeButton(new ItemSprite(ItemSpriteSheet.AMULET, null), "Ech",
+				"_-_ You can't immediately leave with Amulet of Yendor."));
+
+		changes = new ChangeInfo("v0.1.1", true, "");
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 

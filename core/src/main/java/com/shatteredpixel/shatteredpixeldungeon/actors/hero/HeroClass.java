@@ -27,16 +27,16 @@ import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
+import com.shatteredpixel.shatteredpixeldungeon.items.TomeOfMastery;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClothArmor;
+import com.shatteredpixel.shatteredpixeldungeon.items.armor.PlateArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
+import com.shatteredpixel.shatteredpixeldungeon.items.bags.MagicalHolster;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.PotionBandolier;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.ScrollHolder;
 import com.shatteredpixel.shatteredpixeldungeon.items.bags.VelvetPouch;
 import com.shatteredpixel.shatteredpixeldungeon.items.food.Food;
-import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfHealing;
-import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfInvisibility;
-import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfLiquidFlame;
-import com.shatteredpixel.shatteredpixeldungeon.items.potions.PotionOfMindVision;
+import com.shatteredpixel.shatteredpixeldungeon.items.potions.*;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfIdentify;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfLullaby;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
@@ -59,7 +59,8 @@ public enum HeroClass {
 	WARRIOR( "warrior", HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
 	MAGE( "mage", HeroSubClass.BATTLEMAGE, HeroSubClass.WARLOCK ),
 	ROGUE( "rogue", HeroSubClass.ASSASSIN, HeroSubClass.FREERUNNER ),
-	HUNTRESS( "huntress", HeroSubClass.SNIPER, HeroSubClass.WARDEN );
+	HUNTRESS( "huntress", HeroSubClass.SNIPER, HeroSubClass.WARDEN ),
+	ADVENTURER("adventurer", HeroSubClass.NOTHING_1, HeroSubClass.NOTHING_1);
 
 	private String title;
 	private HeroSubClass[] subClasses;
@@ -92,6 +93,10 @@ public enum HeroClass {
 			case HUNTRESS:
 				initHuntress( hero );
 				break;
+
+			case ADVENTURER:
+				initAdventurer(hero);
+				break;
 		}
 
 	}
@@ -104,7 +109,6 @@ public enum HeroClass {
 		if (!Challenges.isItemBlocked(i)) i.collect();
 
 		new ScrollOfIdentify().identify();
-
 	}
 
 	public Badges.Badge masteryBadge() {
@@ -190,6 +194,60 @@ public enum HeroClass {
 		new ScrollOfLullaby().identify();
 	}
 
+	private static void initAdventurer( Hero hero ) {
+		MagesStaff staff;
+
+		staff = new MagesStaff(new WandOfMagicMissile());
+
+		(hero.belongings.weapon = staff).identify();
+		hero.belongings.weapon.activate(hero);
+
+		if (hero.belongings.armor != null){
+			hero.belongings.armor.affixSeal(new BrokenSeal());
+		}
+
+		SpiritBow bow = new SpiritBow();
+		bow.identify().collect();
+
+		CloakOfShadows cloak = new CloakOfShadows();
+		(hero.belongings.artifact = cloak).identify();
+		hero.belongings.artifact.activate( hero );
+
+		ThrowingKnife knives = new ThrowingKnife();
+		knives.quantity(3).collect();
+
+		ThrowingStone stones = new ThrowingStone();
+		stones.quantity(3).collect();
+
+		Dungeon.quickslot.setSlot(0, staff);
+		Dungeon.quickslot.setSlot(1, bow);
+		Dungeon.quickslot.setSlot(2, cloak);
+		Dungeon.quickslot.setSlot(3, knives);
+
+		new VelvetPouch().collect();
+		Dungeon.LimitedDrops.VELVET_POUCH.drop();
+
+		new ScrollHolder().collect();
+		Dungeon.LimitedDrops.SCROLL_HOLDER.drop();
+
+		new PotionBandolier().collect();
+		Dungeon.LimitedDrops.POTION_BANDOLIER.drop();
+
+		new MagicalHolster().collect();
+		Dungeon.LimitedDrops.MAGICAL_HOLSTER.drop();
+
+		new ScrollOfUpgrade().identify();
+		new PotionOfLiquidFlame().identify();
+		new PotionOfMindVision().identify();
+		new ScrollOfLullaby().identify();
+		new ScrollOfMagicMapping().identify();
+		new PotionOfInvisibility().identify();
+		new PotionOfHealing().identify();
+		new ScrollOfRage().identify();
+
+		hero.HP = hero.HT = 13;
+	}
+
 	public String title() {
 		return Messages.get(HeroClass.class, title);
 	}
@@ -208,6 +266,8 @@ public enum HeroClass {
 				return Assets.Sprites.ROGUE;
 			case HUNTRESS:
 				return Assets.Sprites.HUNTRESS;
+			case ADVENTURER:
+				return Assets.Sprites.ADVENTURER;
 		}
 	}
 
@@ -221,6 +281,8 @@ public enum HeroClass {
 				return Assets.Splashes.ROGUE;
 			case HUNTRESS:
 				return Assets.Splashes.HUNTRESS;
+			case ADVENTURER:
+				return Assets.Splashes.ADVENTURER;
 		}
 	}
 	
@@ -263,18 +325,7 @@ public enum HeroClass {
 	
 	public boolean isUnlocked(){
 		//always unlock on debug builds
-		if (DeviceCompat.isDebug()) return true;
-		
-		switch (this){
-			case WARRIOR: default:
-				return true;
-			case MAGE:
-				return Badges.isUnlocked(Badges.Badge.UNLOCK_MAGE);
-			case ROGUE:
-				return Badges.isUnlocked(Badges.Badge.UNLOCK_ROGUE);
-			case HUNTRESS:
-				return Badges.isUnlocked(Badges.Badge.UNLOCK_HUNTRESS);
-		}
+		return true;
 	}
 	
 	public String unlockMsg() {

@@ -31,6 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.RenderedTextBlock;
 import com.shatteredpixel.shatteredpixeldungeon.ui.Window;
 import com.watabou.gltextures.SmartTexture;
 import com.watabou.gltextures.TextureCache;
+import com.watabou.noosa.Camera;
 import com.watabou.noosa.Image;
 import com.watabou.noosa.TextureFilm;
 import com.watabou.utils.Callback;
@@ -39,7 +40,7 @@ public class WndInfoTalent extends Window {
 
 	private static final float GAP	= 2;
 
-	private static final int WIDTH = 120;
+	private static final int WIDTH = 155;
 
 	private SmartTexture icons;
 	private TextureFilm film;
@@ -61,15 +62,15 @@ public class WndInfoTalent extends Window {
 			title += " +" + points;
 		}
 		titlebar.label( title, Window.TITLE_COLOR );
-		titlebar.setRect( 0, 0, WIDTH, 0 );
+		titlebar.setRect( 0, 0, Camera.main.width - 20, 0 );
 		add( titlebar );
 
 		RenderedTextBlock txtInfo = PixelScene.renderTextBlock(talent.desc(), 6);
-		txtInfo.maxWidth(WIDTH);
+		txtInfo.maxWidth(Camera.main.width - 20);
 		txtInfo.setPos(titlebar.left(), titlebar.bottom() + 2*GAP);
 		add( txtInfo );
 
-		resize( WIDTH, (int)(txtInfo.bottom() + GAP) );
+		resize( Camera.main.width - 20, (int)(txtInfo.bottom() + GAP) );
 
 		if (onUpgradeButton != null) {
 			RedButton upgrade = new RedButton( Messages.get(this, "upgrade") ) {
@@ -81,9 +82,9 @@ public class WndInfoTalent extends Window {
 				}
 			};
 			upgrade.icon(Icons.get(Icons.TALENT));
-			upgrade.setRect(0, txtInfo.bottom() + 2*GAP, WIDTH, 18);
+			upgrade.setRect(0, txtInfo.bottom() + 2*GAP, Camera.main.width - 20, 18);
 			add(upgrade);
-			resize( WIDTH, (int)upgrade.bottom()+1 );
+			resize( Camera.main.width - 20, (int)upgrade.bottom()+1 );
 		}
 
 

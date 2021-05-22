@@ -33,7 +33,7 @@ public class Corruption extends Buff {
 		announced = true;
 	}
 
-	private float buildToDamage = 0f;
+	protected float buildToDamage = 0f;
 	
 	@Override
 	public boolean attachTo(Char target) {

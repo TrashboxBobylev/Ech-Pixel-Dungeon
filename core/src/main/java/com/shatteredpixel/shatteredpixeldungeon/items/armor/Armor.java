@@ -90,11 +90,11 @@ public class Armor extends EquipableItem {
 		}
 		
 		public int evasionFactor(int level){
-			return Math.round((2 + level) * evasionFactor);
+			return Math.round((3 + level) * evasionFactor);
 		}
 		
 		public int defenseFactor(int level){
-			return Math.round((2 + level) * defenceFactor);
+			return Math.round((3 + level) * defenceFactor);
 		}
 	}
 	
@@ -177,11 +177,11 @@ public class Armor extends EquipableItem {
 				degrade();
 			}
 			if (detaching.getGlyph() != null){
-				if (hero.hasTalent(Talent.RUNIC_TRANSFERENCE)
+				if (hero.hasTalent(Talent.RUNIC_TRANSFERENCE, Talent.PRAGMATISM)
 						&& (Arrays.asList(Glyph.common).contains(detaching.getGlyph().getClass())
 							|| Arrays.asList(Glyph.uncommon).contains(detaching.getGlyph().getClass()))){
 					inscribe(null);
-				} else if (hero.pointsInTalent(Talent.RUNIC_TRANSFERENCE) == 2){
+				} else if (hero.pointsInTalent(Talent.RUNIC_TRANSFERENCE, Talent.PRAGMATISM) == 2){
 					inscribe(null);
 				} else {
 					detaching.setGlyph(null);
@@ -526,20 +526,16 @@ public class Armor extends EquipableItem {
 
 		int base = 8 + Math.round(tier * 2);
 
-		if (Dungeon.hero.hasTalent(Talent.STRONGMAN)){
-			if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN) == 1) base = 6 + Math.round(tier);
-			if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN) == 2) base = 10;
-			if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN) == 1) base = 0;
+		if (Dungeon.hero.hasTalent(Talent.STRONGMAN, Talent.OMNISTRENGTH)){
+			if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN, Talent.OMNISTRENGTH) == 1) base = 8 + tier;
+			if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN, Talent.OMNISTRENGTH) == 2) base = 10;
+			if (Dungeon.hero.pointsInTalent(Talent.STRONGMAN, Talent.OMNISTRENGTH) == 3) base = 0;
 		}
 
 		lvl = Math.max(0, lvl);
 
 		//strength req decreases at +1,+3,+6,+10,etc.
-		int req = base - (int)(Math.sqrt(8 * lvl + 1) - 1)/2;
-
-
-
-		return req;
+		return base - (int)(Math.sqrt(8 * lvl + 1) - 1)/2;
 	}
 	
 	@Override

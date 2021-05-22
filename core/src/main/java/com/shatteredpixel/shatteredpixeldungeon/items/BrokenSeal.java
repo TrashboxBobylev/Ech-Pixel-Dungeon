@@ -163,7 +163,7 @@ public class BrokenSeal extends Item {
 		@Override
 		public synchronized boolean act() {
 			if (shielding() < maxShield()) {
-				partialShield += 1/30f;
+				partialShield += 1/15f;
 			}
 			
 			while (partialShield >= 1){
@@ -191,7 +191,7 @@ public class BrokenSeal extends Item {
 
 		public synchronized int maxShield() {
 			if (armor != null && armor.isEquipped((Hero)target)) {
-				return armor.tier + armor.level() + ((Hero) target).pointsInTalent(Talent.IRON_WILL) * 5;
+				return armor.tier*2 + armor.level()*2 + ((Hero) target).pointsInTalent(Talent.IRON_WILL, Talent.BLOCKADE) * 5;
 			} else {
 				return 0;
 			}
