@@ -19,3 +19,5 @@ local.properties
 *.iml
 *.idea
 /android/debug/output.json
+/core/src/main/assets/sounds/desktop.ini
+/desktop/hs_err_pid13064.log
