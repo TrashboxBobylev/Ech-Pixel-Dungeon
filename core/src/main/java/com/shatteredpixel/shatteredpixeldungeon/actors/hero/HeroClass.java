@@ -25,6 +25,20 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.NaturesPower;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.SpiritHawk;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.SpectralBlades;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.mage.WildMagic;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.mage.WarpBeacon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.mage.ElementalBlast;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.rogue.DeathMark;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.rogue.ShadowClone;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.rogue.SmokeBomb;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.HeroicLeap;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Shockwave;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Endure;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.TomeOfMastery;
@@ -51,22 +65,20 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.WornShortswor
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingKnife;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.ThrowingStone;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
-import com.watabou.utils.Bundle;
 import com.watabou.utils.DeviceCompat;
 
 public enum HeroClass {
 
-	WARRIOR( "warrior", HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
-	MAGE( "mage", HeroSubClass.BATTLEMAGE, HeroSubClass.WARLOCK ),
-	ROGUE( "rogue", HeroSubClass.ASSASSIN, HeroSubClass.FREERUNNER ),
-	HUNTRESS( "huntress", HeroSubClass.SNIPER, HeroSubClass.WARDEN ),
-	ADVENTURER("adventurer", HeroSubClass.NOTHING_1, HeroSubClass.NOTHING_1);
+	WARRIOR( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
+	MAGE( HeroSubClass.BATTLEMAGE, HeroSubClass.WARLOCK ),
+	ROGUE( HeroSubClass.ASSASSIN, HeroSubClass.FREERUNNER ),
+	HUNTRESS( HeroSubClass.SNIPER, HeroSubClass.WARDEN );
+	ADVENTURER(HeroSubClass.NOTHING_1, HeroSubClass.NOTHING_1);
 
-	private String title;
+
 	private HeroSubClass[] subClasses;
 
-	HeroClass( String title, HeroSubClass...subClasses ) {
-		this.title = title;
+	HeroClass( HeroSubClass...subClasses ) {
 		this.subClasses = subClasses;
 	}
 
@@ -75,7 +87,16 @@ public enum HeroClass {
 		hero.heroClass = this;
 		Talent.initClassTalents(hero);
 
-		initCommon( hero );
+		Item i = new ClothArmor().identify();
+		if (!Challenges.isItemBlocked(i)) hero.belongings.armor = (ClothArmor)i;
+
+		i = new Food();
+		if (!Challenges.isItemBlocked(i)) i.collect();
+
+		Waterskin waterskin = new Waterskin();
+		waterskin.collect();
+
+		new ScrollOfIdentify().identify();
 
 		switch (this) {
 			case WARRIOR:
@@ -99,16 +120,12 @@ public enum HeroClass {
 				break;
 		}
 
-	}
-
-	private static void initCommon( Hero hero ) {
-		Item i = new ClothArmor().identify();
-		if (!Challenges.isItemBlocked(i)) hero.belongings.armor = (ClothArmor)i;
-
-		i = new Food();
-		if (!Challenges.isItemBlocked(i)) i.collect();
-
-		new ScrollOfIdentify().identify();
+		for (int s = 0; s < QuickSlot.SIZE; s++){
+			if (Dungeon.quickslot.getItem(s) == null){
+				Dungeon.quickslot.setSlot(s, waterskin);
+				break;
+			}
+		}
 	}
 
 	public Badges.Badge masteryBadge() {
@@ -249,11 +266,28 @@ public enum HeroClass {
 	}
 
 	public String title() {
-		return Messages.get(HeroClass.class, title);
+		return Messages.get(HeroClass.class, name());
+	}
+
+	public String desc(){
+		return Messages.get(HeroClass.class, name()+"_desc");
 	}
 
 	public HeroSubClass[] subClasses() {
 		return subClasses;
+	}
+
+	public ArmorAbility[] armorAbilities(){
+		switch (this) {
+			case WARRIOR: default:
+				return new ArmorAbility[]{new HeroicLeap(), new Shockwave(), new Endure()};
+			case MAGE:
+				return new ArmorAbility[]{new ElementalBlast(), new WildMagic(), new WarpBeacon()};
+			case ROGUE:
+				return new ArmorAbility[]{new SmokeBomb(), new DeathMark(), new ShadowClone()};
+			case HUNTRESS:
+				return new ArmorAbility[]{new SpectralBlades(), new NaturesPower(), new SpiritHawk()};
+		}
 	}
 
 	public String spritesheet() {
@@ -341,14 +375,4 @@ public enum HeroClass {
 		}
 	}
 
-	private static final String CLASS	= "class";
-	
-	public void storeInBundle( Bundle bundle ) {
-		bundle.put( CLASS, toString() );
-	}
-	
-	public static HeroClass restoreInBundle( Bundle bundle ) {
-		String value = bundle.getString( CLASS );
-		return value.length() > 0 ? valueOf( value ) : ROGUE;
-	}
 }

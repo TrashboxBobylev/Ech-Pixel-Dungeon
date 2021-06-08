@@ -108,7 +108,7 @@ abstract public class KindOfWeapon extends EquipableItem {
 		return 1f;
 	}
 	
-	public float speedFactor( Char owner ) {
+	public float delayFactor(Char owner ) {
 		return 1f;
 	}
 

@@ -34,10 +34,12 @@ public class Challenges {
 	public static final int SWARM_INTELLIGENCE	= 16;
 	public static final int DARKNESS			= 32;
 	public static final int NO_SCROLLS		    = 64;
+	public static final int STRONGER_BOSSES 	= 128;
 
 	public static final int MAX_VALUE           = 255;
 
 	public static final String[] NAME_IDS = {
+			"stronger_bosses",
 			"no_food",
 			"no_armor",
 			"no_healing",
@@ -48,7 +50,7 @@ public class Challenges {
 	};
 
 	public static final int[] MASKS = {
-			NO_FOOD, NO_ARMOR, NO_HEALING, NO_HERBALISM, SWARM_INTELLIGENCE, DARKNESS, NO_SCROLLS
+			STRONGER_BOSSES, NO_FOOD, NO_ARMOR, NO_HEALING, NO_HERBALISM, SWARM_INTELLIGENCE, DARKNESS, NO_SCROLLS
 	};
 
 	public static int activeChallenges(){

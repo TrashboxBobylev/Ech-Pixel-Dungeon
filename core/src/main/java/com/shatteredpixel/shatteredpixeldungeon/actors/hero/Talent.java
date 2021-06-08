@@ -23,9 +23,21 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.hero;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.*;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArtifactRecharge;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Recharging;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.RevealedArea;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.WandEmpower;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.Ratmogrify;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
@@ -42,8 +54,12 @@ import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
+import com.shatteredpixel.shatteredpixeldungeon.messages.Languages;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
+import com.shatteredpixel.shatteredpixeldungeon.scenes.HeroSelectScene;
+import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
+import com.watabou.noosa.Image;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.noosa.particles.Emitter;
 import com.watabou.utils.Bundle;
@@ -66,6 +82,12 @@ public enum Talent {
 	ENDLESS_RAGE(11, 3), BERSERKING_STAMINA(12, 3), ENRAGED_CATALYST(13, 3),
 	//Gladiator T3
 	CLEAVE(14, 3), LETHAL_DEFENSE(15, 3), ENHANCED_COMBO(16, 3),
+	//Heroic Leap T4
+	BODY_SLAM(17, 4), IMPACT_WAVE(18, 4), DOUBLE_JUMP(19, 4),
+	//Shockwave T4
+	EXPANDING_WAVE(20, 4), STRIKING_WAVE(21, 4), SHOCK_FORCE(22, 4),
+	//Endure T4
+	SUSTAINED_RETRIBUTION(23, 4), SHRUG_IT_OFF(24, 4), EVEN_THE_ODDS(25, 4),
 
 	//Mage T1
 	EMPOWERING_MEAL(32), MAGIC_PROFICIENCY(33), TESTED_HYPOTHESIS(34), BACKUP_BARRIER(35),
@@ -77,6 +99,12 @@ public enum Talent {
 	EMPOWERED_STRIKE(43, 3), MYSTICAL_CHARGE(44, 3), EXCESS_CHARGE(45, 3),
 	//Warlock T3
 	SOUL_EATER(46, 3), SOUL_SIPHON(47, 3), NECROMANCERS_MINIONS(48, 3),
+	//Elemental Blast T4
+	BLAST_RADIUS(49, 4), ELEMENTAL_POWER(50, 4), REACTIVE_BARRIER(51, 4),
+	//Wild Magic T4
+	WILD_POWER(52, 4), FIRE_EVERYTHING(53, 4), CONSERVED_MAGIC(54, 4),
+	//Warp Beacon T4
+	TELEFRAG(55, 4), REMOTE_BEACON(56, 4), LONGRANGE_WARP(57, 4),
 
 	//Rogue T1
 	CACHED_RATIONS(64), TRICKERY(65), SUCKER_PUNCH(66), PROTECTIVE_SHADOWS(67),
@@ -88,6 +116,12 @@ public enum Talent {
 	ENHANCED_LETHALITY(75, 3), ASSASSINS_REACH(76, 3), BOUNTY_HUNTER(77, 3),
 	//Freerunner T3
 	EVASIVE_ARMOR(78, 3), PROJECTILE_MOMENTUM(79, 3), SPEEDY_STEALTH(80, 3),
+	//Smoke Bomb T4
+	HASTY_RETREAT(81, 4), BODY_REPLACEMENT(82, 4), SHADOW_STEP(83, 4),
+	//Death Mark T4
+	FEAR_THE_REAPER(84, 4), DEATHLY_DURABILITY(85, 4), DOUBLE_MARK(86, 4),
+	//Shadow Clone T4
+	SHADOW_BLADE(87, 4), CLONED_ARMOR(88, 4), PERFECT_COPY(89, 4),
 
 	//Huntress T1
 	NATURES_BOUNTY(96), SPIRIT_JAVELINS(97), FOLLOWUP_STRIKE(98), NATURES_AID(99),
@@ -99,6 +133,12 @@ public enum Talent {
 	FARSIGHT(107, 3), SHARED_ENCHANTMENT(108, 3), SHARED_UPGRADES(109, 3),
 	//Warden T3
 	DURABLE_TIPS(110, 3), BARKSKIN(111, 3), SHIELDING_DEW(112, 3),
+	//Spectral Blades T4
+	FAN_OF_BLADES(113, 4), PROJECTING_BLADES(114, 4), SPIRIT_BLADES(115, 4),
+	//Natures Power T4
+	GROWING_POWER(116, 4), NATURES_WRATH(117, 4), WILD_MOMENTUM(118, 4),
+	//Spirit Hawk T4
+	EAGLE_EYE(119, 4), GO_FOR_THE_EYES(120, 4), SWIFT_SPIRIT(121, 4),
 
 	//Adventurer T1;
 	SMORGASBORD(128), DOMINANCE(129), POWER_TRIP(130), BLOCKADE(131),
@@ -108,13 +148,38 @@ public enum Talent {
 	POWER_TRIP_2(137, 3), OMNISTRENGTH(138, 3),
 	ENDURANCE(139, 4), REACTION(140, 4), DIVERSITY(141, 4);
 
-	public static class ImprovisedProjectileCooldown extends FlavourBuff{};
+	//universal T4
+	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
+	//Ratmogrify T4
+	RATSISTANCE(124, 4), RATLOMACY(125, 4), RATFORCEMENTS(126, 4);
+
+	public static class ImprovisedProjectileCooldown extends FlavourBuff{
+		public int icon() { return BuffIndicator.TIME; }
+		public void tintIcon(Image icon) { icon.hardlight(0.15f, 0.2f, 0.5f); }
+		public float iconFadePercent() { return Math.max(0, visualcooldown() / 50); }
+		public String toString() { return Messages.get(this, "name"); }
+		public String desc() { return Messages.get(this, "desc", dispTurns(visualcooldown())); }
+	};
 	public static class LethalMomentumTracker extends FlavourBuff{};
 	public static class WandPreservationCounter extends CounterBuff{};
 	public static class EmpoweredStrikeTracker extends FlavourBuff{};
 	public static class BountyHunterTracker extends FlavourBuff{};
-	public static class RejuvenatingStepsCooldown extends FlavourBuff{};
-	public static class SeerShotCooldown extends FlavourBuff{};
+	public static class RejuvenatingStepsCooldown extends FlavourBuff{
+		public int icon() { return BuffIndicator.TIME; }
+		public void tintIcon(Image icon) { icon.hardlight(0f, 0.35f, 0.15f); }
+		public float iconFadePercent() { return Math.max(0, visualcooldown() / (15 - 5*Dungeon.hero.pointsInTalent(REJUVENATING_STEPS))); }
+		public String toString() { return Messages.get(this, "name"); }
+		public String desc() { return Messages.get(this, "desc", dispTurns(visualcooldown())); }
+	};
+	public static class RejuvenatingStepsFurrow extends CounterBuff{};
+	public static class SeerShotCooldown extends FlavourBuff{
+		public int icon() { return target.buff(RevealedArea.class) != null ? BuffIndicator.NONE : BuffIndicator.TIME; }
+		public void tintIcon(Image icon) { icon.hardlight(0.7f, 0.4f, 0.7f); }
+		public float iconFadePercent() { return Math.max(0, visualcooldown() / 20); }
+		public String toString() { return Messages.get(this, "name"); }
+		public String desc() { return Messages.get(this, "desc", dispTurns(visualcooldown())); }
+	};
+	public static class SpiritBladesTracker extends FlavourBuff{};
 	public static class TrickeryEffect extends FlavourBuff{};
 
 	int icon;
@@ -133,7 +198,24 @@ public enum Talent {
 	}
 
 	public int icon(){
-		return icon;
+		if (this == HEROIC_ENERGY){
+			if (Dungeon.hero != null && Dungeon.hero.armorAbility instanceof Ratmogrify){
+				return 127;
+			}
+			HeroClass cls = Dungeon.hero != null ? Dungeon.hero.heroClass : GamesInProgress.selectedClass;
+			switch (cls){
+				case WARRIOR: default:
+					return 26;
+				case MAGE:
+					return 58;
+				case ROGUE:
+					return 90;
+				case HUNTRESS:
+					return 122;
+			}
+		} else {
+			return icon;
+		}
 	}
 
 	public int maxPoints(){
@@ -141,6 +223,13 @@ public enum Talent {
 	}
 
 	public String title(){
+		//TODO translate this
+		if (this == HEROIC_ENERGY &&
+				Messages.lang() == Languages.ENGLISH
+				&& Dungeon.hero != null
+				&& Dungeon.hero.armorAbility instanceof Ratmogrify){
+			return "ratroic energy";
+		}
 		return Messages.get(this, name() + ".title");
 	}
 
@@ -152,6 +241,14 @@ public enum Talent {
 		if (talent == NATURES_BOUNTY || talent == SMORGASBORD){
 			if ( hero.pointsInTalent(NATURES_BOUNTY, SMORGASBORD) == 1) Buff.count(hero, NatureBerriesAvailable.class, 200);
 			else                                           Buff.count(hero, NatureBerriesAvailable.class, 300);
+		}
+
+		if (talent == LIGHT_CLOAK && hero.pointsInTalent(LIGHT_CLOAK) == 1){
+			for (Item item : Dungeon.hero.belongings.backpack){
+				if (item instanceof CloakOfShadows){
+					((CloakOfShadows) item).activate(Dungeon.hero);
+				}
+			}
 		}
 
 		if (talent == FARSIGHT || talent == ENDURANCE){
@@ -220,7 +317,7 @@ public enum Talent {
 			Random.shuffle(grassCells);
 			for (int cell : grassCells){
 				Char ch = Actor.findChar(cell);
-				if (ch != null){
+				if (ch != null && ch.alignment == Char.Alignment.ENEMY){
 					Buff.affect(ch, Roots.class, 20f + hero.pointsInTalent(RESTORED_NATURE, RENEW)*10);
 				}
 				if (Dungeon.level.map[cell] == Terrain.EMPTY ||
@@ -323,7 +420,7 @@ public enum Talent {
 	public static class SuckerPunchTracker extends Buff{};
 	public static class FollowupStrikeTracker extends Buff{};
 
-	public static final int MAX_TALENT_TIERS = 3;
+	public static final int MAX_TALENT_TIERS = 4;
 
 	public static void initClassTalents( Hero hero ){
 		initClassTalents( hero.heroClass, hero.talents );
@@ -459,8 +556,22 @@ public enum Talent {
 		}
 		tierTalents.clear();
 
-		//tier4
-		//TBD
+	}
+
+	public static void initArmorTalents( Hero hero ){
+		initArmorTalents( hero.armorAbility, hero.talents);
+	}
+
+	public static void initArmorTalents(ArmorAbility abil, ArrayList<LinkedHashMap<Talent, Integer>> talents ){
+		if (abil == null) return;
+
+		while (talents.size() < MAX_TALENT_TIERS){
+			talents.add(new LinkedHashMap<>());
+		}
+
+		for (Talent t : abil.talents()){
+			talents.get(3).put(t, 0);
+		}
 	}
 
 	private static final String TALENT_TIER = "talents_tier_";
@@ -483,8 +594,9 @@ public enum Talent {
 	}
 
 	public static void restoreTalentsFromBundle( Bundle bundle, Hero hero ){
-		if (hero.heroClass != null) initClassTalents(hero);
-		if (hero.subClass != null)  initSubclassTalents(hero);
+		if (hero.heroClass != null)     initClassTalents(hero);
+		if (hero.subClass != null)      initSubclassTalents(hero);
+		if (hero.armorAbility != null)  initArmorTalents(hero);
 
 		for (int i = 0; i < MAX_TALENT_TIERS; i++){
 			LinkedHashMap<Talent, Integer> tier = hero.talents.get(i);

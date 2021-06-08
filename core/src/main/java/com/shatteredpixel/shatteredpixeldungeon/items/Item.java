@@ -103,7 +103,11 @@ public class Item implements Bundlable {
 		actions.add( AC_THROW );
 		return actions;
 	}
-	
+
+	public String actionName(String action, Hero hero){
+		return Messages.get(this, "ac_" + action);
+	}
+
 	public boolean doPickUp( Hero hero ) {
 		if (collect( hero.belongings.backpack )) {
 			
@@ -201,6 +205,7 @@ public class Item implements Bundlable {
 				if (isSimilar( item )) {
 					item.merge( this );
 					item.updateQuickslot();
+					Talent.onItemCollected( Dungeon.hero, item );
 					return true;
 				}
 			}
@@ -208,6 +213,7 @@ public class Item implements Bundlable {
 
 		if (Dungeon.hero != null && Dungeon.hero.isAlive()) {
 			Badges.validateItemLevelAquired( this );
+			Talent.onItemCollected( Dungeon.hero, this );
 		}
 
 		items.add( this );
@@ -465,9 +471,9 @@ public class Item implements Bundlable {
 	public String status() {
 		return quantity != 1 ? Integer.toString( quantity ) : null;
 	}
-	
+
 	public static void updateQuickslot() {
-			QuickSlotButton.refresh();
+		QuickSlotButton.refresh();
 	}
 	
 	private static final String QUANTITY		= "quantity";

@@ -44,6 +44,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfFireblast;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfFrost;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfLightning;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Blazing;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Blocking;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Grim;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.enchantments.Shocking;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.missiles.MissileWeapon;
@@ -140,11 +141,6 @@ public abstract class Char extends Actor {
 	//swaps places by default
 	public boolean interact(Char c){
 
-		//can't spawn places if one char has restricted movement
-		if (rooted || c.rooted || buff(Vertigo.class) != null || c.buff(Vertigo.class) != null){
-			return true;
-		}
-
 		//don't allow char to swap onto hazard unless they're flying
 		//you can swap onto a hazard though, as you're not the one instigating the swap
 		if (!Dungeon.level.passable[pos] && !c.flying){
@@ -171,7 +167,12 @@ public abstract class Char extends Actor {
 			GameScene.updateFog();
 			return true;
 		}
-		
+
+		//can't swap places if one char has restricted movement
+		if (rooted || c.rooted || buff(Vertigo.class) != null || c.buff(Vertigo.class) != null){
+			return true;
+		}
+
 		moveSprite( pos, Dungeon.hero.pos );
 		move( Dungeon.hero.pos );
 		
@@ -236,8 +237,12 @@ public abstract class Char extends Actor {
 			}
 		}
 	}
-	
-	public boolean attack( Char enemy ) {
+
+	final public boolean attack( Char enemy ){
+		return attack(enemy, 1f, 0f, 1f);
+	}
+
+	public boolean attack( Char enemy, float dmgMulti, float dmgBonus, float accMulti ) {
 
 		if (enemy == null) return false;
 		
@@ -253,10 +258,16 @@ public abstract class Char extends Actor {
 
 			return false;
 
-		} else if (hit( this, enemy, false )) {
+		} else if (hit( this, enemy, accMulti )) {
 			
 			int dr = enemy.drRoll();
-			
+
+			Barkskin bark = enemy.buff(Barkskin.class);
+			if (bark != null)   dr += Random.NormalIntRange( 0 , bark.level() );
+
+			Blocking.BlockBuff block = enemy.buff(Blocking.BlockBuff.class);
+			if (block != null)  dr += block.blockingRoll();
+
 			if (this instanceof Hero){
 				Hero h = (Hero)this;
 				if (h.belongings.weapon instanceof MissileWeapon
@@ -277,11 +288,19 @@ public abstract class Char extends Actor {
 				dmg = damageRoll();
 			}
 
+			dmg = Math.round(dmg*dmgMulti);
+			dmg += dmgBonus;
+
+			Endure.EndureTracker endure = enemy.buff(Endure.EndureTracker.class);
+			if (endure != null){
+				dmg = endure.adjustDamageTaken(dmg);
+			}
+
 			if (this instanceof Hero && ((Hero) this).hasTalent(Talent.BLADE_OF_ENMITY)){
 				dmg *= 1 + 0.5f*Math.pow(2, ((Hero) this).pointsInTalent(Talent.BLADE_OF_ENMITY)-1)
 						*(1f - (enemy.HP/enemy.HT));
 			}
-			
+
 			int effectiveDamage = enemy.defenseProc( this, dmg );
 			effectiveDamage = Math.max( effectiveDamage - dr, 0 );
 			
@@ -315,6 +334,7 @@ public abstract class Char extends Actor {
 				} else {
 					//helps with triggering any on-damage effects that need to activate
 					enemy.damage(-1, this);
+					DeathMark.processFearTheReaper(enemy);
 				}
 				enemy.sprite.showStatus(CharSprite.NEGATIVE, Messages.get(Preparation.class, "assassinated"));
 			}
@@ -357,7 +377,11 @@ public abstract class Char extends Actor {
 	public static int INFINITE_ACCURACY = 1_000_000;
 	public static int INFINITE_EVASION = 1_000_000;
 
-	public static boolean hit( Char attacker, Char defender, boolean magic ) {
+	final public static boolean hit( Char attacker, Char defender, boolean magic ) {
+		return hit(attacker, defender, magic ? 2f : 1f);
+	}
+
+	public static boolean hit( Char attacker, Char defender, float accMulti ) {
 		float acuStat = attacker.attackSkill( defender );
 		float defStat = defender.defenseSkill( attacker );
 
@@ -383,7 +407,7 @@ public abstract class Char extends Actor {
 			defRoll *= buff.evasionAndAccuracyFactor();
 		}
 		
-		return (magic ? acuRoll * 2 : acuRoll) >= defRoll;
+		return (acuRoll * accMulti) >= defRoll;
 	}
 	
 	public int attackSkill( Char target ) {
@@ -504,7 +528,15 @@ public abstract class Char extends Actor {
 		if (this.buff(Doom.class) != null && !isImmune(Doom.class)){
 			dmg *= 2;
 		}
-		
+		if (alignment != Alignment.ALLY && this.buff(DeathMark.DeathMarkTracker.class) != null){
+			dmg *= 1.25f;
+		}
+		Endure.EndureTracker endure = buff(Endure.EndureTracker.class);
+		//reduce damage here if it isn't coming from a chacter (if it is we already reduced it)
+		if (endure != null && !(src instanceof Char)){
+			dmg = endure.adjustDamageTaken(dmg);
+		}
+
 		Class<?> srcClass = src.getClass();
 		if (isImmune( srcClass )) {
 			dmg = 0;
@@ -520,6 +552,10 @@ public abstract class Char extends Actor {
 		
 		if (buff( Paralysis.class ) != null) {
 			buff( Paralysis.class ).processDamage(dmg);
+		}
+
+		if (endure != null){
+			dmg = endure.enforceDamagetakenLimit(dmg);
 		}
 
 		int shielded = dmg;
@@ -544,6 +580,8 @@ public abstract class Char extends Actor {
 
 		if (!isAlive()) {
 			die( src );
+		} else if (HP == 0 && buff(DeathMark.DeathMarkTracker.class) != null){
+			DeathMark.processFearTheReaper(this);
 		}
 	}
 	
@@ -570,6 +608,9 @@ public abstract class Char extends Actor {
 	}
 	
 	public boolean isAlive() {
+		if (buff(DeathMark.DeathMarkTracker.class) != null){
+			return true;
+		}
 		return HP > 0;
 	}
 	

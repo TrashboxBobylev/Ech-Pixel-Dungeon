@@ -147,7 +147,11 @@ public class Preparation extends Buff implements ActionIndicator.Action {
 		super.detach();
 		ActionIndicator.clearAction(this);
 	}
-	
+
+	public int attackLevel(){
+		return AttackLevel.getLvl(turnsInvis).ordinal()+1;
+	}
+
 	public int damageRoll( Char attacker ){
 		return AttackLevel.getLvl(turnsInvis).damageRoll(attacker);
 	}
@@ -300,6 +304,7 @@ public class Preparation extends Buff implements ActionIndicator.Action {
 				Dungeon.level.occupyCell(Dungeon.hero);
 				//prevents the hero from being interrupted by seeing new enemies
 				Dungeon.observe();
+				GameScene.updateFog();
 				Dungeon.hero.checkVisibleMobs();
 				
 				Dungeon.hero.sprite.place( Dungeon.hero.pos );

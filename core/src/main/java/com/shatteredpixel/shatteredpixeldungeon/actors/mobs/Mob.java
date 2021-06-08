@@ -31,6 +31,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.*;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs.DirectableAlly;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Surprise;
@@ -62,6 +63,7 @@ import com.watabou.utils.Reflection;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 
 public abstract class Mob extends Char {
@@ -89,7 +91,7 @@ public abstract class Mob extends Char {
 	
 	protected int target = -1;
 	
-	protected int defenseSkill = 0;
+	public int defenseSkill = 0;
 	
 	public int EXP = 1;
 	public int maxLvl = Hero.MAX_LEVEL;
@@ -193,7 +195,7 @@ public abstract class Mob extends Char {
 	public boolean canSee(int pos){
 		return fieldOfView[pos];
 	}
-	
+
 	protected Char chooseEnemy() {
 
 		Terror terror = buff( Terror.class );
@@ -511,7 +513,7 @@ public abstract class Mob extends Char {
 			sprite.add( CharSprite.State.PARALYSED );
 	}
 	
-	protected float attackDelay() {
+	public float attackDelay() {
 		float delay = 1f;
 		if ( buff(Adrenaline.class) != null) delay /= 1.5f;
 		return delay;
@@ -629,7 +631,7 @@ public abstract class Mob extends Char {
 				Dungeon.hero.sprite.emitter().burst(Speck.factory(Speck.HEALING), 1);
 			}
 		}
-		
+
 		super.damage( dmg, src );
 	}
 	
@@ -1065,27 +1067,35 @@ public abstract class Mob extends Char {
 	
 	
 	private static ArrayList<Mob> heldAllies = new ArrayList<>();
-	
+
 	public static void holdAllies( Level level ){
+		holdAllies(level, Dungeon.hero.pos);
+	}
+
+	public static void holdAllies( Level level, int holdFromPos ){
 		heldAllies.clear();
 		for (Mob mob : level.mobs.toArray( new Mob[0] )) {
-			//preserve the ghost no matter where they are
-			if (mob instanceof DriedRose.GhostHero) {
-				((DriedRose.GhostHero) mob).clearDefensingPos();
+			//preserve directable allies no matter where they are
+			if (mob instanceof DirectableAlly) {
+				((DirectableAlly) mob).clearDefensingPos();
 				level.mobs.remove( mob );
 				heldAllies.add(mob);
 				
 			//preserve intelligent allies if they are near the hero
 			} else if (mob.alignment == Alignment.ALLY
 					&& mob.intelligentAlly
-					&& Dungeon.level.distance(Dungeon.hero.pos, mob.pos) <= 3){
+					&& Dungeon.level.distance(holdFromPos, mob.pos) <= 5){
 				level.mobs.remove( mob );
 				heldAllies.add(mob);
 			}
 		}
 	}
-	
+
 	public static void restoreAllies( Level level, int pos ){
+		restoreAllies(level, pos, -1);
+	}
+
+	public static void restoreAllies( Level level, int pos, int gravitatePos ){
 		if (!heldAllies.isEmpty()){
 			
 			ArrayList<Integer> candidatePositions = new ArrayList<>();
@@ -1094,7 +1104,19 @@ public abstract class Mob extends Char {
 					candidatePositions.add(i+pos);
 				}
 			}
-			Collections.shuffle(candidatePositions);
+
+			//gravitate pos sets a preferred location for allies to be closer to
+			if (gravitatePos == -1) {
+				Collections.shuffle(candidatePositions);
+			} else {
+				Collections.sort(candidatePositions, new Comparator<Integer>() {
+					@Override
+					public int compare(Integer t1, Integer t2) {
+						return Dungeon.level.distance(gravitatePos, t1) -
+								Dungeon.level.distance(gravitatePos, t2);
+					}
+				});
+			}
 			
 			for (Mob ally : heldAllies) {
 				level.mobs.add(ally);
@@ -1105,7 +1127,8 @@ public abstract class Mob extends Char {
 				} else {
 					ally.pos = pos;
 				}
-				
+				if (ally.sprite != null) ally.sprite.place(ally.pos);
+
 			}
 		}
 		heldAllies.clear();

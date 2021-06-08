@@ -35,6 +35,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.wands.CursedWand;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
+import com.shatteredpixel.shatteredpixeldungeon.utils.BArray;
 import com.watabou.noosa.Image;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.PathFinder;
@@ -307,8 +308,18 @@ public abstract class ChampionEnemy extends Buff {
 
 		@Override
 		public boolean canAttackWithExtraReach(Char enemy) {
-			//attack range of 2
-			return target.fieldOfView[enemy.pos] && Dungeon.level.distance(target.pos, enemy.pos) <= 2;
+			if (Dungeon.level.distance( target.pos, enemy.pos ) > 2){
+				return false;
+			} else {
+				boolean[] passable = BArray.not(Dungeon.level.solid, null);
+				for (Char ch : Actor.chars()) {
+					if (ch != target) passable[ch.pos] = false;
+				}
+
+				PathFinder.buildDistanceMap(enemy.pos, passable, 2);
+
+				return PathFinder.distance[target.pos] <= 2;
+			}
 		}
 	}
 
