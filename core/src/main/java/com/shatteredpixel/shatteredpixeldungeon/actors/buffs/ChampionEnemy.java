@@ -22,11 +22,16 @@
 package com.shatteredpixel.shatteredpixeldungeon.actors.buffs;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Fire;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.AbyssalNightmare;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.DwarfKing;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Swarm;
+import com.shatteredpixel.shatteredpixeldungeon.effects.Pushing;
+import com.shatteredpixel.shatteredpixeldungeon.items.wands.CursedWand;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
@@ -34,6 +39,9 @@ import com.watabou.noosa.Image;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
+import com.watabou.utils.Reflection;
+
+import java.util.ArrayList;
 
 public abstract class ChampionEnemy extends Buff {
 
@@ -101,19 +109,32 @@ public abstract class ChampionEnemy extends Buff {
 		if (Dungeon.mobsToChampion[step] <= 0) {
 			Dungeon.mobsToChampion[step] = 4;
 			if (step > 0) Dungeon.mobsToChampion[step] = 2;
+			if (Dungeon.depth > 10){
+				Dungeon.mobsToChampion[step] = 3;
+			}
+			if (Dungeon.depth > 15){
+				Dungeon.mobsToChampion[step] = 2;
+			}
+			if (Dungeon.depth > 20){
+				Dungeon.mobsToChampion[step] = 1;
+			}
+
 		}
 
 
 		Dungeon.mobsToChampion[step]--;
 
 		if (Dungeon.mobsToChampion[step] <= 0){
-			switch (Random.Int(6)){
+			switch (Random.Int(9)){
 				case 0: default:    Buff.affect(m, Blazing.class);      break;
 				case 1:             Buff.affect(m, Projecting.class);   break;
 				case 2:             Buff.affect(m, AntiMagic.class);    break;
 				case 3:             Buff.affect(m, Giant.class);        break;
 				case 4:             Buff.affect(m, Blessed.class);      break;
 				case 5:             Buff.affect(m, Growing.class);      break;
+				case 6:             Buff.affect(m, Cursed.class);       break;
+				case 7:             Buff.affect(m, Splintering.class);  break;
+				case 8:             Buff.affect(m, Stone.class);       break;
 			}
 //			if (!(m.properties().contains(Char.Property.BOSS)) && !(m.properties().contains(Char.Property.MINIBOSS)))
 				m.HP = m.HT = Math.round(m.HT*1.55f);
@@ -126,7 +147,7 @@ public abstract class ChampionEnemy extends Buff {
 		}
 
 		if (--Dungeon.nightmare <= 0){
-			Dungeon.nightmare = 25;
+			Dungeon.nightmare = 30;
 			if (!(m.properties().contains(Char.Property.BOSS)) && !(m.properties().contains(Char.Property.MINIBOSS)) && !(m instanceof AbyssalNightmare)){
 				Buff.affect(m, Nightmare.class);
 				Buff.affect(m, Adrenaline.class, Adrenaline.DURATION*30);
@@ -135,6 +156,8 @@ public abstract class ChampionEnemy extends Buff {
 			}
 		}
 	}
+
+
 
 	public static class Blazing extends ChampionEnemy {
 
@@ -167,6 +190,18 @@ public abstract class ChampionEnemy extends Buff {
 		}
 	}
 
+	public static class Cursed extends ChampionEnemy {
+
+		{
+			color = 0x181212;
+		}
+
+		@Override
+		public void onAttackProc(Char enemy) {
+			CursedWand.cursedEffect(null, target, enemy);
+		}
+	}
+
 	public static class Projecting extends ChampionEnemy {
 
 		{
@@ -184,6 +219,45 @@ public abstract class ChampionEnemy extends Buff {
 		}
 	}
 
+	public static class Splintering extends ChampionEnemy {
+
+		{
+			color = 0xbfba72;
+		}
+
+		@Override
+		public float damageTakenFactor() {
+			if (target.HP >= 2) {
+				ArrayList<Integer> candidates = new ArrayList<>();
+				boolean[] solid = Dungeon.level.solid;
+
+				int[] neighbours = {target.pos + 1, target.pos - 1, target.pos + Dungeon.level.width(), target.pos - Dungeon.level.width()};
+				for (int n : neighbours) {
+					if (!solid[n] && Actor.findChar( n ) == null) {
+						candidates.add( n );
+					}
+				}
+
+				if (candidates.size() > 0) {
+
+					Mob clone = (Mob) Reflection.newInstance(target.getClass());
+					clone.HP = target.HP/ 2;
+					clone.pos = Random.element( candidates );
+					clone.state = clone.HUNTING;
+
+					Dungeon.level.occupyCell(clone);
+
+					GameScene.add( clone, 1f );
+					Actor.addDelayed( new Pushing( clone, target.pos, clone.pos ), -1 );
+
+					target.HP -= clone.HP;
+				}
+			}
+			return 1f;
+		}
+
+	}
+
 	public static class AntiMagic extends ChampionEnemy {
 
 		{
@@ -199,6 +273,24 @@ public abstract class ChampionEnemy extends Buff {
 			immunities.addAll(com.shatteredpixel.shatteredpixeldungeon.items.armor.glyphs.AntiMagic.RESISTS);
 		}
 
+	}
+
+	public static class Stone extends ChampionEnemy {
+		{
+			color = 0x727272;
+		}
+
+		@Override
+		public boolean act() {
+			target.HP = target.HT;
+			spend(TICK);
+			return true;
+		}
+
+		@Override
+		public float damageTakenFactor() {
+			return 2.5f;
+		}
 	}
 
 	//Also makes target large, see Char.properties()

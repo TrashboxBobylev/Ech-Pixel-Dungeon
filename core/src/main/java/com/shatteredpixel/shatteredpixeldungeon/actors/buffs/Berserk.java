@@ -92,7 +92,7 @@ public class Berserk extends Buff {
 				levelRecovery = LEVEL_RECOVER_START - Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION)/3f;
 				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION) == 1) levelRecovery = 1;
 				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION) == 2) levelRecovery = 0.5f;
-				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION) == 3) levelRecovery = 0;
+				if (Dungeon.hero.pointsInTalent(Talent.BERSERKING_STAMINA, Talent.REACTION) >= 3) levelRecovery = 0;
 				if (buff != null) buff.absorbDamage(buff.shielding());
 				power = 0f;
 			}

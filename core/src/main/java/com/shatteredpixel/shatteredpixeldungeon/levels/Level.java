@@ -552,7 +552,7 @@ public abstract class Level implements Bundlable {
 				Mob mob = Dungeon.level.createMob();
 				mob.state = mob.WANDERING;
 				mob.pos = Dungeon.level.randomRespawnCell( mob );
-				if (Dungeon.hero.isAlive() && mob.pos != -1 && PathFinder.distance[mob.pos] >= 7) {
+				if (Dungeon.hero.isAlive() && mob.pos != -1 && PathFinder.distance[mob.pos] >= 7 - Dungeon.depth / 6) {
 					GameScene.add( mob );
 					if (Statistics.amuletObtained) {
 						mob.beckon( Dungeon.hero.pos );
@@ -562,8 +562,8 @@ public abstract class Level implements Bundlable {
 					}
 					spend(Dungeon.level.respawnCooldown());
 				} else {
-					//try again in 1 turn
-					spend(TICK);
+					//try again
+					spend(0.5f);
 				}
 			} else {
 				spend(Dungeon.level.respawnCooldown());
@@ -574,12 +574,13 @@ public abstract class Level implements Bundlable {
 	}
 
 	public float respawnCooldown(){
+		float timeToRespawn = Math.max(8, TIME_TO_RESPAWN - Dungeon.depth*1.2f);
 		if (Statistics.amuletObtained){
-			return TIME_TO_RESPAWN/2f;
+			return timeToRespawn /2f;
 		} else if (Dungeon.level.feeling == Feeling.DARK){
-			return 2*TIME_TO_RESPAWN/3f;
+			return 2* timeToRespawn /3f;
 		} else {
-			return TIME_TO_RESPAWN;
+			return timeToRespawn;
 		}
 	}
 	
@@ -1035,8 +1036,8 @@ public abstract class Level implements Bundlable {
 				if (Dungeon.hero.pos == cell) {
 					Dungeon.hero.interrupt();
 				}
-
-				trap.trigger();
+				if (Dungeon.hero.pos == cell && !Dungeon.hero.hasTalent(Talent.MOUNTAIN_GURU))
+					trap.trigger();
 
 			}
 		}

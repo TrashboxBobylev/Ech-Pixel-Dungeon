@@ -55,7 +55,36 @@ public class v0_9_X_Changes {
 
 	public static void add_Ech_Changes( ArrayList<ChangeInfo> changeInfos ) {
 
-		ChangeInfo changes = new ChangeInfo("v0.2.0", true, "");
+		ChangeInfo changes = new ChangeInfo("v0.2.1", true, "");
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.SUS_RAT, 0, 0, 16, 16), "Ech",
+				"Nerfed Abyssal Nightmares:\n\n" +
+						"_-_ Reduced the frequency of tormented monsters.\n\n" +
+						"_-_ Reduced damage from 100%-300% of wraiths to 150%-200%.\n\n" +
+						"_-_ Can be corrupted now.\n\n" +
+						"_-_ Regeneration reworked: if nightmare doesn't get damage during next 4 turns, it will regenerate to full health.\n\n" +
+						"_-_ Can't see invisible heroes.\n\n" +
+						"_-_ Resprited them into pseudo-rats (thx, Nyrds), ARE YOU HAPPY NOW, 0MICRONRG?"));
+
+		changes.addButton(new ChangeButton(new Image(new GolemSprite()), "Ech",
+						"_-_ Descending increases spawn rates and the frequency of champions; monsters also appear closer to you.\n\n" +
+								"_-_ Secondary mobs can stack in room recursively, creating hordes.\n\n"+
+								"_-_ Added cursed, splintering and stone champions."));
+
+		changes.addButton(new ChangeButton(Icons.get(Icons.TALENT), "Ech",
+				"_-_ Leveling up give 2 talent points.\n\n" +
+						"_-_ Talent tier thresholds are readjusted.\n\n" +
+						"_-_ Added 4 unique talents for each hero, except Adventurer."));
+
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.ADVENTURER, 0, 90, 12, 15), "Ech",
+				"_-_ Adventurer can upgrade subclass talents to +4."));
+
+
+
+
+		changes = new ChangeInfo("v0.2.0", true, "");
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 

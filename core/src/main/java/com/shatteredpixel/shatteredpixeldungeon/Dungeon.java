@@ -176,7 +176,7 @@ public class Dungeon {
 		challenges = SPDSettings.challenges();
 		for (int i = 0; i < 100; i++)
 			mobsToChampion[i] = -1;
-		nightmare = 25;
+		nightmare = 30;
 
 		seed = DungeonSeed.randomSeed();
 

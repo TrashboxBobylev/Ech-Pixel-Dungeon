@@ -43,21 +43,21 @@ public class AbyssalSprite extends MobSprite {
 	public AbyssalSprite() {
 		super();
 		
-		texture( Assets.Sprites.WRAITH );
+		texture( Assets.Sprites.SUS_RAT );
 		
-		TextureFilm frames = new TextureFilm( texture, 14, 15 );
+		TextureFilm frames = new TextureFilm( texture, 16, 16 );
 		
 		idle = new Animation( 10, true );
-		idle.frames( frames, 0, 1 );
+		idle.frames( frames, 0, 0, 0, 1 );
 		
 		run = new Animation( 15, true );
-		run.frames( frames, 0, 1 );
+		run.frames( frames, 6, 7, 8, 9, 10);
 		
 		attack = new Animation( 15, false );
-		attack.frames( frames, 0, 2, 3 );
+		attack.frames( frames, 2, 3, 4, 5, 0 );
 		
 		die = new Animation( 32, false );
-		die.frames( frames, 0, 4, 5, 6, 7 );
+		die.frames( frames, 11, 12, 13, 14 );
 		
 		play( idle );
 	}
@@ -73,7 +73,7 @@ public class AbyssalSprite extends MobSprite {
 
 		if (cloud == null) {
 			cloud = emitter();
-			cloud.pour( Speck.factory( Speck.SMOKE ), 0.03f );
+			cloud.pour( Speck.factory( Speck.SMOKE ), 0.105f );
 		}
 	}
 
@@ -87,7 +87,7 @@ public class AbyssalSprite extends MobSprite {
 		}
 		if (visible){
 			Random.pushGenerator();
-			if (Random.Int(28) == 0)
+			if (Random.Int(48) == 0)
 				Sample.INSTANCE.play(Random.element(
 					Arrays.asList(Assets.Sounds.ABYSSAL_1, Assets.Sounds.ABYSSAL_2, Assets.Sounds.ABYSSAL_3,
 							Assets.Sounds.ABYSSAL_4, Assets.Sounds.ABYSSAL_5, Assets.Sounds.ABYSSAL_6)), 0.5f);

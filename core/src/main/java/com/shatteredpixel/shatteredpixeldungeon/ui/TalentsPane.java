@@ -171,7 +171,7 @@ public class TalentsPane extends ScrollPane {
 				stars.clear();
 			}
 
-			int totStars = Talent.tierLevelThresholds[tier+1] - Talent.tierLevelThresholds[tier];
+			int totStars = Talent.tierLevelThresholds[tier+1]*2 - Talent.tierLevelThresholds[tier]*2;
 			int openStars = Dungeon.hero.talentPointsAvailable(tier);
 			int usedStars = Dungeon.hero.talentPointsSpent(tier);
 			for (int i = 0; i < totStars; i++){
@@ -191,7 +191,7 @@ public class TalentsPane extends ScrollPane {
 			super.layout();
 
 			float titleWidth = title.width();
-			titleWidth += 2 + stars.size()*6;
+			titleWidth += 2 + stars.size()*5;
 			title.setPos(x + (width - titleWidth)/2f, y);
 
 			float left = title.right() + 2;
@@ -199,7 +199,7 @@ public class TalentsPane extends ScrollPane {
 				star.x = left;
 				star.y = title.top();
 				PixelScene.align(star);
-				left += 6;
+				left += 5;
 			}
 
 			float gap = (width - buttons.size()*TalentButton.WIDTH)/(buttons.size()+1);

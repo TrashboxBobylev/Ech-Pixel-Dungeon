@@ -86,6 +86,35 @@ public class ScrollOfMirrorImage extends Scroll {
 		
 		return spawned;
 	}
+
+	//returns the number of images spawned
+	public static int spawnImagesAtPos( int pos, int nImages ){
+
+		ArrayList<Integer> respawnPoints = new ArrayList<>();
+
+		for (int i = 0; i < PathFinder.NEIGHBOURS8.length; i++) {
+			int p = pos + PathFinder.NEIGHBOURS8[i];
+			if (Actor.findChar( p ) == null && Dungeon.level.passable[p]) {
+				respawnPoints.add( p );
+			}
+		}
+
+		int spawned = 0;
+		while (nImages > 0 && respawnPoints.size() > 0) {
+			int index = Random.index( respawnPoints );
+
+			MirrorImage mob = new MirrorImage();
+			mob.duplicate( Dungeon.hero );
+			GameScene.add( mob );
+			ScrollOfTeleportation.appear( mob, respawnPoints.get( index ) );
+
+			respawnPoints.remove( index );
+			nImages--;
+			spawned++;
+		}
+
+		return spawned;
+	}
 	
 	public static class DelayedImageSpawner extends Buff{
 		

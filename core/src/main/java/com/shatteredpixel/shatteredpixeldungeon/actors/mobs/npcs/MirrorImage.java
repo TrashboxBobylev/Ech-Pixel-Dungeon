@@ -31,7 +31,9 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Burning;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Corruption;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.CharSprite;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.MirrorSprite;
@@ -102,7 +104,15 @@ public class MirrorImage extends NPC {
 	@Override
 	public int damageRoll() {
 		int damage;
-		if (hero.belongings.weapon != null){
+		if (hero.hasTalent(Talent.UMBRELLA_ULTIMATUM)){
+			SpiritBow bow = (SpiritBow) hero.belongings.getSimilar(new SpiritBow());
+			if (bow != null){
+				damage = bow.damageRoll(this)*(hero.pointsInTalent(Talent.UMBRELLA_ULTIMATUM)+1);
+			} else {
+				damage = hero.belongings.weapon.damageRoll(this);
+			}
+		}
+		else if (hero.belongings.weapon != null){
 			damage = hero.belongings.weapon.damageRoll(this);
 		} else {
 			damage = hero.damageRoll(); //handles ring of force
@@ -112,7 +122,8 @@ public class MirrorImage extends NPC {
 	
 	@Override
 	public int attackSkill( Char target ) {
-		return hero.attackSkill(target);
+		return (int) (hero.attackSkill(target)
+						* (1 + hero.pointsInTalent(Talent.UMBRELLA_ULTIMATUM) * 0.33f));
 	}
 	
 	@Override
@@ -122,7 +133,8 @@ public class MirrorImage extends NPC {
 			int heroEvasion = hero.defenseSkill(enemy);
 			
 			//if the hero has more/less evasion, 50% of it is applied
-			return super.defenseSkill(enemy) * (baseEvasion + heroEvasion) / 2;
+			return (int) (super.defenseSkill(enemy) * (baseEvasion + heroEvasion) / 2
+								* (1 + hero.pointsInTalent(Talent.UMBRELLA_ULTIMATUM) * 0.33f));
 		} else {
 			return 0;
 		}
@@ -159,7 +171,20 @@ public class MirrorImage extends NPC {
 		if (enemy instanceof Mob) {
 			((Mob)enemy).aggro( this );
 		}
-		if (hero.belongings.weapon != null){
+		if (hero.hasTalent(Talent.UMBRELLA_ULTIMATUM)){
+			SpiritBow bow = (SpiritBow) hero.belongings.getSimilar(new SpiritBow());
+			if (bow != null){
+				damage = bow.proc(this, enemy, damage);
+			} else {
+				damage = hero.belongings.weapon.proc( this, enemy, damage );
+			}
+			if (!enemy.isAlive() && enemy == Dungeon.hero){
+				Dungeon.fail(getClass());
+				GLog.n( Messages.capitalize(Messages.get(Char.class, "kill", name())) );
+			}
+			return damage;
+		}
+		else if (hero.belongings.weapon != null){
 			damage = hero.belongings.weapon.proc( this, enemy, damage );
 			if (!enemy.isAlive() && enemy == Dungeon.hero){
 				Dungeon.fail(getClass());

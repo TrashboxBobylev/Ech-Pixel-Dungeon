@@ -181,7 +181,7 @@ public abstract class RegularLevel extends Level {
 	public int nMobs() {
 		if (Dungeon.depth <= 1) return 0;
 
-		int mobs = 5 + Dungeon.depth % 3 + Random.Int(6);
+		int mobs = 8 + Dungeon.depth % 2 + Random.Int(8);
 		if (feeling == Feeling.LARGE){
 			mobs = (int)Math.ceil(mobs * 1.33f);
 		}
@@ -225,20 +225,8 @@ public abstract class RegularLevel extends Level {
 				mobs.add(mob);
 
 				//add a second mob to this room
-				if (mobsToSpawn > 0 && Random.Int(4) == 0){
-					mob = createMob();
-
-					tries = 30;
-					do {
-						mob.pos = pointToCell(roomToSpawn.random());
-						tries--;
-					} while (tries >= 0 && (findMob(mob.pos) != null || !passable[mob.pos] || solid[mob.pos] || mob.pos == exit
-							|| (!openSpace[mob.pos] && mob.properties().contains(Char.Property.LARGE))));
-
-					if (tries >= 0) {
-						mobsToSpawn--;
-						mobs.add(mob);
-					}
+				if (mobsToSpawn > 0 && Random.Int(3) == 0){
+					mobsToSpawn = spawnMoreMobs(mobsToSpawn, roomToSpawn);
 				}
 			}
 		}
@@ -251,6 +239,25 @@ public abstract class RegularLevel extends Level {
 
 		}
 
+	}
+
+	private int spawnMoreMobs(int mobsToSpawn, Room roomToSpawn) {
+		Mob mob;
+		int tries;
+		mob = createMob();
+
+		tries = 30;
+		do {
+			mob.pos = pointToCell(roomToSpawn.random());
+			tries--;
+		} while (tries >= 0 && (findMob(mob.pos) != null || !passable[mob.pos] || solid[mob.pos] || mob.pos == exit
+				|| (!openSpace[mob.pos] && mob.properties().contains(Char.Property.LARGE))));
+
+		if (tries >= 0) {
+			mobs.add(mob);
+		}
+		if (Random.Int(2) == 0) spawnMoreMobs(mobsToSpawn, roomToSpawn);
+		return mobsToSpawn;
 	}
 
 	@Override

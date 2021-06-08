@@ -94,6 +94,7 @@ import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfMight;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfTenacity;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.Scroll;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMirrorImage;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfLivingEarth;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.SpiritBow;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.Weapon;
@@ -343,9 +344,9 @@ public class Hero extends Char {
 				|| (tier == 3 && subClass == HeroSubClass.NONE)){
 			return 0;
 		} else if (lvl >= Talent.tierLevelThresholds[tier+1]){
-			return Talent.tierLevelThresholds[tier+1] - Talent.tierLevelThresholds[tier] - talentPointsSpent(tier);
+			return Talent.tierLevelThresholds[tier+1]*2 - Talent.tierLevelThresholds[tier]*2 - talentPointsSpent(tier);
 		} else {
-			return 1 + lvl - Talent.tierLevelThresholds[tier] - talentPointsSpent(tier);
+			return (lvl == 1 ? 1 : lvl*2) - Talent.tierLevelThresholds[tier]*2 - talentPointsSpent(tier);
 		}
 	}
 	
@@ -600,8 +601,29 @@ public class Hero extends Char {
 			bubble.processTime(time);
 			return;
 		}
+
+		time *= 1f - 0.2f*pointsInTalent(Talent.ACCELERATED_THINKING);
 		
 		super.spend(time);
+	}
+
+	public void spendRest( float time ) {
+		busy();
+		justMoved = false;
+		TimekeepersHourglass.timeFreeze freeze = buff(TimekeepersHourglass.timeFreeze.class);
+		if (freeze != null) {
+			freeze.processTime(time);
+			return;
+		}
+
+		Swiftthistle.TimeBubble bubble = buff(Swiftthistle.TimeBubble.class);
+		if (bubble != null){
+			bubble.processTime(time);
+			return;
+		}
+
+		super.spend(time);
+		next();
 	}
 	
 	public void spendAndNext( float time ) {
@@ -692,6 +714,10 @@ public class Hero extends Char {
 		
 		if(hasTalent(Talent.BARKSKIN, Talent.REACTION) && Dungeon.level.map[pos] == Terrain.FURROWED_GRASS){
 			Buff.affect(this, Barkskin.class).set( lvl, (int) Math.pow(5, pointsInTalent(Talent.BARKSKIN, Talent.REACTION)));
+		}
+
+		if (pointsInTalent(Talent.MOUNTAIN_GURU) >= 2){
+			flying = true;
 		}
 		
 		return actResult;
@@ -1085,7 +1111,7 @@ public class Hero extends Char {
 	}
 	
 	public void rest( boolean fullRest ) {
-		spendAndNext( TIME_TO_REST );
+		spendRest( TIME_TO_REST );
 		if (!fullRest) {
 			if (hasTalent(Talent.HOLD_FAST, Talent.POWER_TRIP_2)){
 				Buff.affect(this, HoldFast.class);
@@ -1130,6 +1156,10 @@ public class Hero extends Char {
 			}
 			break;
 		default:
+		}
+
+		if (hasTalent(Talent.UMBRELLA_ULTIMATUM)){
+			ScrollOfMirrorImage.spawnImagesAtPos(enemy.pos, pointsInTalent(Talent.UMBRELLA_ULTIMATUM));
 		}
 		
 		return damage;

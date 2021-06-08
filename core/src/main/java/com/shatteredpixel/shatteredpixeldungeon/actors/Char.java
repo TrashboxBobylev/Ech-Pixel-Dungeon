@@ -276,6 +276,11 @@ public abstract class Char extends Actor {
 			} else {
 				dmg = damageRoll();
 			}
+
+			if (this instanceof Hero && ((Hero) this).hasTalent(Talent.BLADE_OF_ENMITY)){
+				dmg *= 1 + 0.5f*Math.pow(2, ((Hero) this).pointsInTalent(Talent.BLADE_OF_ENMITY)-1)
+						*(1f - (enemy.HP/enemy.HT));
+			}
 			
 			int effectiveDamage = enemy.defenseProc( this, dmg );
 			effectiveDamage = Math.max( effectiveDamage - dr, 0 );

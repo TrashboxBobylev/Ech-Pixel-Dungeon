@@ -71,19 +71,23 @@ public class AbyssalNightmare extends Wraith {
 	private static final float SPLIT_DELAY	= 1f;
 	
 	int generation	= 0;
+	int regenTurns = 0;
 	
 	private static final String GENERATION	= "generation";
+	private static final String REGEN       = "regenTurns";
 	
 	@Override
 	public void storeInBundle( Bundle bundle ) {
 		super.storeInBundle( bundle );
 		bundle.put( GENERATION, generation );
+		bundle.put( REGEN, regenTurns);
 	}
 	
 	@Override
 	public void restoreFromBundle( Bundle bundle ) {
 		super.restoreFromBundle( bundle );
 		generation = bundle.getInt( GENERATION );
+		regenTurns = bundle.getInt( REGEN);
 		if (generation > 0) EXP = 0;
 	}
 
@@ -94,7 +98,7 @@ public class AbyssalNightmare extends Wraith {
 
 	@Override
 	public int damageRoll() {
-		return super.damageRoll() * Random.NormalIntRange( 1, 3 );
+		return (int) (super.damageRoll() * Random.NormalFloat( 1.5f, 2f ));
 	}
 
 	@Override
@@ -121,7 +125,10 @@ public class AbyssalNightmare extends Wraith {
 		}
 		Dungeon.level.updateFieldOfView( this, fieldOfView );
 
-		HP = (int) Math.min(HP+HT/1.5f, HT);
+		if (++regenTurns == 3) {
+			HP = HT;
+			CellEmitter.bottom(pos).burst(SmokeParticle.FACTORY, 20);
+		}
 
 		boolean justAlerted = alerted;
 		alerted = false;
@@ -141,9 +148,14 @@ public class AbyssalNightmare extends Wraith {
 
 		enemy = chooseEnemy();
 
-		boolean enemyInFOV = enemy != null && enemy.isAlive();
+		boolean enemyInFOV = enemy != null && enemy.isAlive() && enemy.invisible == 0;
 
 		return state.act( enemyInFOV, justAlerted );
+	}
+
+	@Override
+	public boolean isImmune(Class effect) {
+		return !effect.isAssignableFrom(Corruption.class) && super.isImmune(effect);
 	}
 
 	@Override
@@ -242,7 +254,13 @@ public class AbyssalNightmare extends Wraith {
 		}
 	}
 
-	public static AbyssalNightmare spawnAt( int pos ) {
+	@Override
+	public void damage(int dmg, Object src) {
+		super.damage(dmg, src);
+		regenTurns = -1;
+	}
+
+	public static AbyssalNightmare spawnAt(int pos ) {
 			AbyssalNightmare w = new AbyssalNightmare();
 			w.adjustStats( Dungeon.depth );
 			w.pos = pos;
@@ -275,7 +293,6 @@ public class AbyssalNightmare extends Wraith {
 		immunities.add( ToxicGas.class );
 		immunities.add( Web.class );
 
-
 		immunities.add( Burning.class );
 		immunities.add( Charm.class );
 		immunities.add( Chill.class );
@@ -292,7 +309,6 @@ public class AbyssalNightmare extends Wraith {
 		immunities.add( Slow.class);
 		immunities.add( Blindness.class);
 		immunities.add( Cripple.class);
-		immunities.add( Doom.class);
 		immunities.add( Drowsy.class);
 		immunities.add( Hex.class);
 		immunities.add( Sleep.class);

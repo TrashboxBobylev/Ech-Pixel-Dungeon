@@ -213,6 +213,15 @@ abstract public class MissileWeapon extends Weapon {
 						damage = bow.enchantment.proc(this, attacker, defender, damage);
 						damage = bow.enchantment.proc(this, attacker, defender, damage);
 					}
+					if (Dungeon.hero.pointsInTalent(Talent.SHARED_ENCHANTMENT, Talent.REACTION) == 4){
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+						damage = bow.enchantment.proc(this, attacker, defender, damage);
+					}
 				}
 
 		}

@@ -61,7 +61,7 @@ public enum Talent {
 	//Warrior T2
 	IRON_STOMACH(4), RESTORED_WILLPOWER(5), RUNIC_TRANSFERENCE(6), LETHAL_MOMENTUM(7), IMPROVISED_PROJECTILES(8),
 	//Warrior T3
-	HOLD_FAST(9, 3), STRONGMAN(10, 3),
+	HOLD_FAST(9, 3), STRONGMAN(10, 3), BLADE_OF_ENMITY(17, 3),
 	//Berserker T3
 	ENDLESS_RAGE(11, 3), BERSERKING_STAMINA(12, 3), ENRAGED_CATALYST(13, 3),
 	//Gladiator T3
@@ -72,7 +72,7 @@ public enum Talent {
 	//Mage T2
 	ENERGIZING_MEAL(36), ENERGIZING_UPGRADE(37), WAND_PRESERVATION(38), ARCANE_VISION(39), SHIELD_BATTERY(40),
 	//Mage T3
-	EMPOWERING_SCROLLS(41, 3), ALLY_WARP(42, 3),
+	EMPOWERING_SCROLLS(41, 3), ALLY_WARP(42, 3), MOUNTAIN_GURU(49, 3),
 	//Battlemage T3
 	EMPOWERED_STRIKE(43, 3), MYSTICAL_CHARGE(44, 3), EXCESS_CHARGE(45, 3),
 	//Warlock T3
@@ -83,7 +83,7 @@ public enum Talent {
 	//Rogue T2
 	MYSTICAL_MEAL(68), MYSTICAL_UPGRADE(69), WIDE_SEARCH(70), SILENT_STEPS(71), ROGUES_FORESIGHT(72),
 	//Rogue T3
-	ENHANCED_RINGS(73, 3), LIGHT_CLOAK(74, 3),
+	ENHANCED_RINGS(73, 3), LIGHT_CLOAK(74, 3), ACCELERATED_THINKING(81, 3),
 	//Assassin T3
 	ENHANCED_LETHALITY(75, 3), ASSASSINS_REACH(76, 3), BOUNTY_HUNTER(77, 3),
 	//Freerunner T3
@@ -94,7 +94,7 @@ public enum Talent {
 	//Huntress T2
 	INVIGORATING_MEAL(100), RESTORED_NATURE(101), REJUVENATING_STEPS(102), HEIGHTENED_SENSES(103), DURABLE_PROJECTILES(104),
 	//Huntress T3
-	POINT_BLANK(105, 3), SEER_SHOT(106, 3),
+	POINT_BLANK(105, 3), SEER_SHOT(106, 3), UMBRELLA_ULTIMATUM(113, 3),
 	//Sniper T3
 	FARSIGHT(107, 3), SHARED_ENCHANTMENT(108, 3), SHARED_UPGRADES(109, 3),
 	//Warden T3
@@ -106,7 +106,7 @@ public enum Talent {
 	SMORGASBORD_2(132), RENEW(133), PRAGMATISM(134), CONTROL(135), DIVINE_SIGHT(136),
 	//Adventurer T3
 	POWER_TRIP_2(137, 3), OMNISTRENGTH(138, 3),
-	ENDURANCE(139, 3), REACTION(140, 3), DIVERSITY(141, 3);
+	ENDURANCE(139, 4), REACTION(140, 4), DIVERSITY(141, 4);
 
 	public static class ImprovisedProjectileCooldown extends FlavourBuff{};
 	public static class LethalMomentumTracker extends FlavourBuff{};
@@ -121,7 +121,7 @@ public enum Talent {
 	int maxPoints;
 
 	// tiers 1/2/3/4 start at levels 2/7/13/21
-	public static int[] tierLevelThresholds = new int[]{0, 2, 10, 20, 35, 45};
+	public static int[] tierLevelThresholds = new int[]{0, 1, 5, 10, 19, 30};
 
 	Talent( int icon ){
 		this(icon, 2);
@@ -385,16 +385,16 @@ public enum Talent {
 		//tier 3
 		switch (cls){
 			case WARRIOR: default:
-				Collections.addAll(tierTalents, HOLD_FAST, STRONGMAN);
+				Collections.addAll(tierTalents, HOLD_FAST, STRONGMAN, BLADE_OF_ENMITY);
 				break;
 			case MAGE:
-				Collections.addAll(tierTalents, EMPOWERING_SCROLLS, ALLY_WARP);
+				Collections.addAll(tierTalents, EMPOWERING_SCROLLS, ALLY_WARP, MOUNTAIN_GURU);
 				break;
 			case ROGUE:
-				Collections.addAll(tierTalents, ENHANCED_RINGS, LIGHT_CLOAK);
+				Collections.addAll(tierTalents, ENHANCED_RINGS, LIGHT_CLOAK, ACCELERATED_THINKING);
 				break;
 			case HUNTRESS:
-				Collections.addAll(tierTalents, POINT_BLANK, SEER_SHOT);
+				Collections.addAll(tierTalents, POINT_BLANK, SEER_SHOT, UMBRELLA_ULTIMATUM);
 				break;
 			case ADVENTURER:
 				Collections.addAll(tierTalents, POWER_TRIP_2, OMNISTRENGTH);

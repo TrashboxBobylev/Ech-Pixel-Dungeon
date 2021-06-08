@@ -390,7 +390,10 @@ public abstract class Wand extends Item {
 		Invisibility.dispel();
 		updateQuickslot();
 
-		curUser.spendAndNext( TIME_TO_ZAP );
+		if (Dungeon.hero.justMoved && Dungeon.hero.pointsInTalent(Talent.MOUNTAIN_GURU) == 3) {
+			curUser.spendAndNext( 0 );
+		}
+		else curUser.spendAndNext( TIME_TO_ZAP );
 	}
 	
 	@Override

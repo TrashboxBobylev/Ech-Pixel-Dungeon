@@ -75,7 +75,8 @@ public class Preparation extends Buff implements ActionIndicator.Action {
 				{.03f, .04f, .05f, .06f},
 				{.20f, .34f, .42f, .50f},
 				{.40f, .60f, .80f, 1.0f},
-				{.40f, .60f, .80f, 1.0f}
+				{1f, 1f, 1f, 1f},
+				{1f, 1f, 1f, 1f}
 		};
 
 		public float KOThreshold(){
@@ -87,7 +88,8 @@ public class Preparation extends Buff implements ActionIndicator.Action {
 				{1, 2, 3, 4},
 				{2, 6, 8, 12},
 				{5, 10, 13, 19},
-				{11, 24, 37, 50}
+				{11, 24, 37, 50},
+				{16, 32, 46, 75}
 		};
 
 		public int blinkDistance(){
