@@ -114,7 +114,7 @@ public class AbyssalNightmare extends Wraith {
 	}
 
 	@Override
-	protected float attackDelay() {
+	public float attackDelay() {
 		return super.attackDelay()*1.5f;
 	}
 
@@ -330,9 +330,9 @@ public class AbyssalNightmare extends Wraith {
 		immunities.add( Shaman.EarthenBolt.class );
 		immunities.add( Warlock.DarkBolt.class );
 		immunities.add( Eye.DeathGaze.class );
-		immunities.add( Yog.BurningFist.DarkBolt.class );
+		immunities.add( YogFist.BrightFist.LightBeam.class );
 
-		immunities.add(NewTengu.FireAbility.FireBlob.class);
+		immunities.add(Tengu.FireAbility.FireBlob.class);
 
 		immunities.add(Grim.class);
 		immunities.add(Kinetic.class);

@@ -38,6 +38,7 @@ import com.shatteredpixel.shatteredpixeldungeon.ui.TalentsPane;
 import com.watabou.noosa.Game;
 import com.watabou.noosa.Image;
 import com.watabou.noosa.ui.Component;
+import com.watabou.utils.PointF;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -49,7 +50,7 @@ public class WndHeroInfo extends WndTabbed {
 	private SubclassInfoTab subclassInfo;
 	private ArmorAbilityInfoTab abilityInfo;
 
-	private static int WIDTH = 120;
+	private static int WIDTH = 160;
 	private static int MIN_HEIGHT = 125;
 	private static int MARGIN = 2;
 
@@ -68,6 +69,9 @@ public class WndHeroInfo extends WndTabbed {
 				break;
 			case HUNTRESS:
 				tabIcon = new ItemSprite(ItemSpriteSheet.SPIRIT_BOW, null);
+				break;
+			case ADVENTURER:
+				tabIcon = Icons.get(Icons.ADVENTURER);
 				break;
 		}
 
@@ -181,6 +185,12 @@ public class WndHeroInfo extends WndTabbed {
 							new Image(Assets.Environment.TILES_SEWERS, 112, 96, 16, 16),
 							new ItemSprite(ItemSpriteSheet.GLOVES),
 							new ItemSprite(ItemSpriteSheet.SCROLL_ISAZ)};
+					break;
+				case ADVENTURER:
+					icons = new Image[]{ Icons.get(Icons.ADVENTURER),
+							Icons.get(Icons.INFO),
+							new ItemSprite(ItemSpriteSheet.WEAPON_HOLDER),
+							new ItemSprite(ItemSpriteSheet.SCROLL_TIWAZ)};
 					break;
 			}
 			for (Image im : icons) {
@@ -322,7 +332,7 @@ public class WndHeroInfo extends WndTabbed {
 			title.hardlight(TITLE_COLOR);
 			add(title);
 
-			message = PixelScene.renderTextBlock(Messages.get(WndHeroInfo.class, "abilities_msg"), 6);
+			message = PixelScene.renderTextBlock(Messages.get(WndHeroInfo.class, "abilities_msg"), cls == HeroClass.ADVENTURER ? 3 : 6);
 			add(message);
 
 			ArmorAbility[] abilities = cls.armorAbilities();
@@ -331,7 +341,7 @@ public class WndHeroInfo extends WndTabbed {
 			abilityInfos = new IconButton[abilities.length];
 
 			for (int i = 0; i < abilities.length; i++){
-				abilityDescs[i] = PixelScene.renderTextBlock(abilities[i].shortDesc(), 6);
+				abilityDescs[i] = PixelScene.renderTextBlock(abilities[i].shortDesc(), cls == HeroClass.ADVENTURER ? 3 : 6);
 				int finalI = i;
 				abilityInfos[i] = new IconButton( Icons.get(Icons.INFO) ){
 					@Override
@@ -339,6 +349,7 @@ public class WndHeroInfo extends WndTabbed {
 						Game.scene().addToFront(new WndInfoArmorAbility(cls, abilities[finalI]));
 					}
 				};
+				if (cls == HeroClass.ADVENTURER) abilityInfos[i].icon().scale = new PointF(0.75f, 0.75f);
 				add(abilityDescs[i]);
 				add(abilityInfos[i]);
 			}
@@ -353,18 +364,18 @@ public class WndHeroInfo extends WndTabbed {
 			message.maxWidth((int)width);
 			message.setPos(0, title.bottom()+4*MARGIN);
 
-			float pos = message.bottom()+4*MARGIN;
+			float pos = message.bottom()+2.5f*MARGIN;
 
 			for (int i = 0; i < abilityDescs.length; i++){
-				abilityDescs[i].maxWidth((int)width - 20);
+				abilityDescs[i].maxWidth((int)width - 15);
 				abilityDescs[i].setPos(0, pos);
 
-				abilityInfos[i].setRect(width-20, abilityDescs[i].top() + (abilityDescs[i].height()-20)/2, 20, 20);
+				abilityInfos[i].setRect(width-15, abilityDescs[i].top() + (abilityDescs[i].height()-20)/2, 16, 16);
 
-				pos = abilityDescs[i].bottom() + 4*MARGIN;
+				pos = abilityDescs[i].bottom() + 2.5f*MARGIN;
 			}
 
-			height = Math.max(height, pos - 4*MARGIN);
+			height = Math.max(height, pos - 2*MARGIN);
 
 		}
 	}

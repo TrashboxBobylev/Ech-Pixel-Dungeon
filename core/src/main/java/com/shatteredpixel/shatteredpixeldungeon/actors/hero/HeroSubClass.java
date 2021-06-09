@@ -101,6 +101,9 @@ public enum HeroSubClass {
 				return new Image(Assets.Interfaces.BUFFS_LARGE, 176, 16, 16, 16);
 			case WARDEN:
 				return new Image(Assets.Interfaces.BUFFS_LARGE, 208, 0, 16, 16);
+
+			case NOTHING_1:
+				return new Image(Assets.Interfaces.BUFFS_LARGE, 208, 32, 16, 16);
 		}
 	}
 

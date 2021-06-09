@@ -205,7 +205,6 @@ public class Item implements Bundlable {
 				if (isSimilar( item )) {
 					item.merge( this );
 					item.updateQuickslot();
-					Talent.onItemCollected( Dungeon.hero, item );
 					return true;
 				}
 			}
@@ -213,7 +212,6 @@ public class Item implements Bundlable {
 
 		if (Dungeon.hero != null && Dungeon.hero.isAlive()) {
 			Badges.validateItemLevelAquired( this );
-			Talent.onItemCollected( Dungeon.hero, this );
 		}
 
 		items.add( this );

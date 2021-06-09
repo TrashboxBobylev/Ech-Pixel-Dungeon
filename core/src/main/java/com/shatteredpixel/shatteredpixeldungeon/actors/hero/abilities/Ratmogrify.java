@@ -4,6 +4,8 @@ import com.shatteredpixel.shatteredpixeldungeon.Assets;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
+import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Fire;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Adrenaline;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Invisibility;
@@ -13,12 +15,14 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Rat;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
+import com.shatteredpixel.shatteredpixeldungeon.effects.particles.FlameParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.sprites.RatSprite;
 import com.shatteredpixel.shatteredpixeldungeon.ui.TargetHealthIndicator;
+import com.shatteredpixel.shatteredpixeldungeon.utils.BArray;
 import com.shatteredpixel.shatteredpixeldungeon.utils.GLog;
 import com.watabou.noosa.audio.Sample;
 import com.watabou.utils.Bundle;
@@ -30,7 +34,7 @@ import java.util.ArrayList;
 public class Ratmogrify extends ArmorAbility {
 
 	{
-		baseChargeUse = 50f;
+		baseChargeUse = 35f;
 	}
 
 	@Override
@@ -64,7 +68,16 @@ public class Ratmogrify extends ArmorAbility {
 					}
 				}
 
-				int ratsToSpawn = hero.pointsInTalent(Talent.RATFORCEMENTS);
+				PathFinder.buildDistanceMap( hero.pos, BArray.not( Dungeon.level.solid, null ), 2 );
+				for (int i = 0; i < PathFinder.distance.length; i++) {
+					if (PathFinder.distance[i] < Integer.MAX_VALUE) {
+						if (Actor.findChar( i ) == null && Dungeon.level.passable[i] && !spawnPoints.contains(i)) {
+							spawnPoints.add( i );
+						}
+					}
+				}
+
+				int ratsToSpawn = hero.pointsInTalent(Talent.RATFORCEMENTS)*4;
 
 				while (ratsToSpawn > 0 && spawnPoints.size() > 0) {
 					int index = Random.index( spawnPoints );
@@ -92,7 +105,7 @@ public class Ratmogrify extends ArmorAbility {
 				ch.sprite.emitter().start(Speck.factory(Speck.HEART), 0.2f, 5);
 				Sample.INSTANCE.play(Assets.Sounds.TELEPORT);
 				if (hero.pointsInTalent(Talent.RATLOMACY) > 1){
-					Buff.affect(ch, Adrenaline.class, 2*(hero.pointsInTalent(Talent.RATLOMACY)-1));
+					Buff.affect(ch, Adrenaline.class, 20*((hero.pointsInTalent(Talent.RATLOMACY)-1)));
 				}
 			}
 		} else if (Char.hasProp(ch, Char.Property.MINIBOSS) || Char.hasProp(ch, Char.Property.BOSS)){
@@ -130,8 +143,6 @@ public class Ratmogrify extends ArmorAbility {
 
 		{
 			spriteClass = RatSprite.class;
-
-			maxLvl = -2;
 		}
 
 		private Mob original;
@@ -174,7 +185,7 @@ public class Ratmogrify extends ArmorAbility {
 		public int damageRoll() {
 			int damage = original.damageRoll();
 			if (!allied && Dungeon.hero.hasTalent(Talent.RATSISTANCE)){
-				damage = Math.round(damage * (1f - .1f*Dungeon.hero.pointsInTalent(Talent.RATSISTANCE)));
+				damage = Math.round(damage * (1f - .25f*Dungeon.hero.pointsInTalent(Talent.RATSISTANCE)));
 			}
 			return damage;
 		}

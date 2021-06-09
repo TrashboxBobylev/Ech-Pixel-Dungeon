@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.windows;
 
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.items.KingsCrown;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.Armor;
@@ -39,8 +40,8 @@ import com.watabou.noosa.Image;
 
 public class WndChooseAbility extends Window {
 
-	private static final int WIDTH		= 130;
-	private static final float GAP		= 2;
+	private static final int WIDTH		= 140;
+	private static float GAP		= 2;
 
 	public WndChooseAbility(final KingsCrown crown, final Armor armor, final Hero hero){
 
@@ -52,8 +53,9 @@ public class WndChooseAbility extends Window {
 		titlebar.label( Messages.titleCase(crown == null ? armor.name() : crown.name()) );
 		titlebar.setRect( 0, 0, WIDTH, 0 );
 		add( titlebar );
+		if (hero.heroClass == HeroClass.ADVENTURER) GAP = 0.6f;
 
-		RenderedTextBlock body = PixelScene.renderTextBlock( 6 );
+		RenderedTextBlock body = PixelScene.renderTextBlock( hero.heroClass == HeroClass.ADVENTURER ? 3 : 6 );
 		if (crown != null) {
 			body.text(Messages.get(this, "message"), WIDTH);
 		} else {
@@ -65,9 +67,10 @@ public class WndChooseAbility extends Window {
 		float pos = body.bottom() + 3*GAP;
 		for (ArmorAbility ability : hero.heroClass.armorAbilities()) {
 
-			RedButton abilityButton = new RedButton(ability.shortDesc(), 6){
+			RedButton abilityButton = new RedButton(ability.shortDesc(), hero.heroClass == HeroClass.ADVENTURER ? 3 : 6){
 				@Override
 				protected void onClick() {
+
 					GameScene.show(new WndOptions( new ItemSprite( crown == null ? armor.image() : crown.image(), null ),
 							Messages.titleCase(ability.name()),
 							Messages.get(WndChooseAbility.this, "are_you_sure"),

@@ -26,17 +26,20 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Blob;
 import com.shatteredpixel.shatteredpixeldungeon.actors.blobs.Fire;
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.AbyssalNightmare;
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.DwarfKing;
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
-import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Swarm;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.*;
+import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Pushing;
+import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ShadowParticle;
+import com.shatteredpixel.shatteredpixeldungeon.effects.particles.SmokeParticle;
+import com.shatteredpixel.shatteredpixeldungeon.items.bombs.Bomb;
+import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfTeleportation;
 import com.shatteredpixel.shatteredpixeldungeon.items.wands.CursedWand;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
 import com.shatteredpixel.shatteredpixeldungeon.ui.BuffIndicator;
 import com.shatteredpixel.shatteredpixeldungeon.utils.BArray;
 import com.watabou.noosa.Image;
+import com.watabou.noosa.tweeners.AlphaTweener;
 import com.watabou.utils.Bundle;
 import com.watabou.utils.PathFinder;
 import com.watabou.utils.Random;
@@ -50,7 +53,7 @@ public abstract class ChampionEnemy extends Buff {
 		type = buffType.POSITIVE;
 	}
 
-	protected int color;
+	public int color;
 
 	@Override
 	public int icon() {
@@ -110,23 +113,23 @@ public abstract class ChampionEnemy extends Buff {
 		if (Dungeon.mobsToChampion[step] <= 0) {
 			Dungeon.mobsToChampion[step] = 4;
 			if (step > 0) Dungeon.mobsToChampion[step] = 2;
-			if (Dungeon.depth > 10){
-				Dungeon.mobsToChampion[step] = 3;
+			else {
+				if (Dungeon.depth > 10) {
+					Dungeon.mobsToChampion[step]--;
+				}
+				if (Dungeon.depth > 15) {
+					Dungeon.mobsToChampion[step]--;
+				}
+				if (Dungeon.depth > 20) {
+					Dungeon.mobsToChampion[step]--;
+				}
 			}
-			if (Dungeon.depth > 15){
-				Dungeon.mobsToChampion[step] = 2;
-			}
-			if (Dungeon.depth > 20){
-				Dungeon.mobsToChampion[step] = 1;
-			}
-
 		}
-
 
 		Dungeon.mobsToChampion[step]--;
 
 		if (Dungeon.mobsToChampion[step] <= 0){
-			switch (Random.Int(9)){
+			switch (Random.Int(12)){
 				case 0: default:    Buff.affect(m, Blazing.class);      break;
 				case 1:             Buff.affect(m, Projecting.class);   break;
 				case 2:             Buff.affect(m, AntiMagic.class);    break;
@@ -135,11 +138,14 @@ public abstract class ChampionEnemy extends Buff {
 				case 5:             Buff.affect(m, Growing.class);      break;
 				case 6:             Buff.affect(m, Cursed.class);       break;
 				case 7:             Buff.affect(m, Splintering.class);  break;
-				case 8:             Buff.affect(m, Stone.class);       break;
+				case 8:             Buff.affect(m, Stone.class);        break;
+				case 9:             Buff.affect(m, Flowing.class);      break;
+				case 10:            Buff.affect(m, Voodoo.class);       break;
+				case 11:            Buff.affect(m, Explosive.class);    break;
 			}
 //			if (!(m.properties().contains(Char.Property.BOSS)) && !(m.properties().contains(Char.Property.MINIBOSS)))
-				m.HP = m.HT = Math.round(m.HT*1.55f);
-				m.EXP *= 1.25f;
+				m.HP = m.HT = Math.round(m.HT*(1.5f + Dungeon.depth/15));
+				m.EXP *= 1.4f;
 
 			m.state = m.WANDERING;
 			if (step < 100 && Dungeon.depth > 6) {
@@ -276,21 +282,66 @@ public abstract class ChampionEnemy extends Buff {
 
 	}
 
+	public static class Explosive extends ChampionEnemy {
+
+		{
+			color = 0xff4400;
+		}
+
+		@Override
+		public void detach() {
+			for (int i : PathFinder.NEIGHBOURS4){
+				if (!Dungeon.level.solid[target.pos+i]){
+					new Bomb().explode(target.pos+i);
+				}
+			}
+			super.detach();
+		}
+	}
+
+	public static class Voodoo extends ChampionEnemy {
+
+		{
+			color = 0x3d0082;
+		}
+
+		@Override
+		public float damageTakenFactor() {
+			return 1.25f;
+		}
+
+		@Override
+		public void detach() {
+			ArrayList<Class<?extends Mob>> mobsToSpawn;
+
+			mobsToSpawn = Bestiary.getMobRotation(Dungeon.depth);
+
+			Mob clone = Reflection.newInstance(mobsToSpawn.remove(0));
+			ChampionEnemy.rollForChampion(clone);
+			clone.HP = clone.HT = Math.round(clone.HT * 2.5f);
+			clone.pos = target.pos;
+			clone.state = clone.HUNTING;
+
+			Dungeon.level.occupyCell(clone);
+			GameScene.add( clone );
+			super.detach();
+		}
+	}
+
 	public static class Stone extends ChampionEnemy {
 		{
 			color = 0x727272;
 		}
 
 		@Override
-		public boolean act() {
-			target.HP = target.HT;
-			spend(TICK);
-			return true;
-		}
-
-		@Override
 		public float damageTakenFactor() {
-			return 2.5f;
+			return Math.max(0.1f, (target.HP * 1f /target.HT));
+		}
+	}
+
+	public static class Flowing extends ChampionEnemy {
+		{
+			color = 0xb7f5ff;
 		}
 	}
 

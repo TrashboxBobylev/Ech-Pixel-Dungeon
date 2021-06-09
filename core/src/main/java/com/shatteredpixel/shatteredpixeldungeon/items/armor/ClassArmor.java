@@ -26,6 +26,7 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.LockedFloor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
@@ -36,6 +37,8 @@ import com.watabou.utils.Bundle;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+
+import static com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass.ADVENTURER;
 
 abstract public class ClassArmor extends Armor {
 
@@ -109,15 +112,20 @@ abstract public class ClassArmor extends Armor {
 		}
 		
 		classArmor.level(armor.level() - (armor.curseInfusionBonus ? 1 : 0));
-		classArmor.tier = armor.tier;
+		classArmor.tier = owner.heroClass == ADVENTURER ? (armor.tier == 6 ? 5 : armor.tier) : armor.tier;
 		classArmor.augment = armor.augment;
 		classArmor.inscribe( armor.glyph );
 		classArmor.cursed = armor.cursed;
 		classArmor.curseInfusionBonus = armor.curseInfusionBonus;
 		classArmor.identify();
+		classArmor.defaultAction = AC_ABILITY;
 
+		if (armor instanceof ClassArmor) {
+			classArmor.charge = ((ClassArmor) armor).charge;
+			return classArmor;
+		}
 		classArmor.charge = 50;
-		
+
 		return classArmor;
 	}
 
@@ -216,7 +224,11 @@ abstract public class ClassArmor extends Armor {
 		public boolean act() {
 			LockedFloor lock = target.buff(LockedFloor.class);
 			if (lock == null || lock.regenOn()) {
-				charge += 100 / 500f; //500 turns to full charge
+				float chargeIncrement = 100 / 500f;
+				if (Dungeon.hero.pointsInTalent(Talent.HEROIC_ENERGY) > 1){
+					chargeIncrement = 100 / (500f - (Dungeon.hero.pointsInTalent(Talent.HEROIC_ENERGY)-1)*100f);
+				}
+				charge += chargeIncrement; //500/400/300/200 turns to full charge
 				updateQuickslot();
 				if (charge > 100) {
 					charge = 100;

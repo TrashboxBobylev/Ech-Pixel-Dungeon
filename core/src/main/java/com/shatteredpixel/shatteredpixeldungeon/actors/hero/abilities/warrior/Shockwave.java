@@ -48,7 +48,7 @@ import com.watabou.utils.Random;
 public class Shockwave extends ArmorAbility {
 
 	{
-		baseChargeUse = 35f;
+		baseChargeUse = 25f;
 	}
 
 	@Override
@@ -72,12 +72,12 @@ public class Shockwave extends ArmorAbility {
 
 		Ballistica aim = new Ballistica(hero.pos, target, Ballistica.WONT_STOP);
 
-		int maxDist = 5 + hero.pointsInTalent(Talent.EXPANDING_WAVE);
+		int maxDist = 5 + hero.pointsInTalent(Talent.EXPANDING_WAVE)*3;
 		int dist = Math.min(aim.dist, maxDist);
 
 		ConeAOE cone = new ConeAOE(aim,
 				dist,
-				60 + 15*hero.pointsInTalent(Talent.EXPANDING_WAVE),
+				(hero.hasTalent(Talent.EXPANDING_WAVE) ? 0 : 60) + 90*hero.pointsInTalent(Talent.EXPANDING_WAVE),
 				Ballistica.STOP_SOLID | Ballistica.STOP_TARGET);
 
 		//cast to cells at the tip, rather than all cells, better performance.
@@ -108,7 +108,7 @@ public class Shockwave extends ArmorAbility {
 							if (ch != null && ch.alignment != hero.alignment){
 								int scalingStr = hero.STR()-10;
 								int damage = Random.NormalIntRange(5 + scalingStr, 10 + 2*scalingStr);
-								damage = Math.round(damage * (1f + 0.15f*hero.pointsInTalent(Talent.SHOCK_FORCE)));
+								damage = Math.round(damage * (1f + 0.6f*hero.pointsInTalent(Talent.SHOCK_FORCE)));
 								damage -= ch.drRoll();
 
 								if (Random.Int(4) < hero.pointsInTalent(Talent.STRIKING_WAVE)){

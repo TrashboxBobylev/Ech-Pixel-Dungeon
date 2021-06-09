@@ -27,6 +27,7 @@ import com.shatteredpixel.shatteredpixeldungeon.Challenges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.QuickSlot;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.Ratmogrify;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.NaturesPower;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.SpiritHawk;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.SpectralBlades;
@@ -39,9 +40,8 @@ import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.rogue.Smok
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.HeroicLeap;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Shockwave;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Endure;
-import com.shatteredpixel.shatteredpixeldungeon.items.BrokenSeal;
-import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.TomeOfMastery;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Tengu;
+import com.shatteredpixel.shatteredpixeldungeon.items.*;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClothArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.PlateArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.CloakOfShadows;
@@ -72,8 +72,8 @@ public enum HeroClass {
 	WARRIOR( HeroSubClass.BERSERKER, HeroSubClass.GLADIATOR ),
 	MAGE( HeroSubClass.BATTLEMAGE, HeroSubClass.WARLOCK ),
 	ROGUE( HeroSubClass.ASSASSIN, HeroSubClass.FREERUNNER ),
-	HUNTRESS( HeroSubClass.SNIPER, HeroSubClass.WARDEN );
-	ADVENTURER(HeroSubClass.NOTHING_1, HeroSubClass.NOTHING_1);
+	HUNTRESS( HeroSubClass.SNIPER, HeroSubClass.WARDEN ),
+	ADVENTURER(HeroSubClass.NOTHING_1);
 
 
 	private HeroSubClass[] subClasses;
@@ -287,6 +287,11 @@ public enum HeroClass {
 				return new ArmorAbility[]{new SmokeBomb(), new DeathMark(), new ShadowClone()};
 			case HUNTRESS:
 				return new ArmorAbility[]{new SpectralBlades(), new NaturesPower(), new SpiritHawk()};
+			case ADVENTURER:
+				return new ArmorAbility[]{new HeroicLeap(), new Shockwave(), new Endure(),
+						new ElementalBlast(), new WildMagic(), new WarpBeacon(),
+						new SmokeBomb(), new DeathMark(), new ShadowClone(),
+						new SpectralBlades(), new NaturesPower(), new SpiritHawk(), new Ratmogrify()};
 		}
 	}
 

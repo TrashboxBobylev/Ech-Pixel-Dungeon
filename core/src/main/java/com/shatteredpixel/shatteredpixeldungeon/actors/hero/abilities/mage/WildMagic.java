@@ -43,7 +43,7 @@ import java.util.ArrayList;
 public class WildMagic extends ArmorAbility {
 
 	{
-		baseChargeUse = 35f;
+		baseChargeUse = 25f;
 	}
 
 	@Override
@@ -67,7 +67,8 @@ public class WildMagic extends ArmorAbility {
 		ArrayList<Wand> wands = hero.belongings.getAllItems(Wand.class);
 		Random.shuffle(wands);
 
-		float chargeUsePerShot = (float)Math.pow(0.563f, hero.pointsInTalent(Talent.CONSERVED_MAGIC));
+		float chargeUsePerShot = (float)Math.pow(0.563f, hero.pointsInTalent(Talent.CONSERVED_MAGIC))/2;
+		if (hero.pointsInTalent(Talent.CONSERVED_MAGIC) == 4) chargeUsePerShot = 0;
 
 		for (Wand w : wands.toArray(new Wand[0])){
 			if (w.curCharges < 1 && w.partialCharge < chargeUsePerShot){
@@ -75,7 +76,7 @@ public class WildMagic extends ArmorAbility {
 			}
 		}
 
-		int maxWands = 4 + Dungeon.hero.pointsInTalent(Talent.FIRE_EVERYTHING);
+		int maxWands = 4 + Dungeon.hero.pointsInTalent(Talent.FIRE_EVERYTHING)*4;
 
 		if (wands.size() < maxWands){
 			ArrayList<Wand> dupes = new ArrayList<>(wands);

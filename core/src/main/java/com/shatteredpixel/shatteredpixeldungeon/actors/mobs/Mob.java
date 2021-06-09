@@ -38,9 +38,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.Surprise;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Wound;
 import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ShadowParticle;
 import com.shatteredpixel.shatteredpixeldungeon.items.Generator;
-import com.shatteredpixel.shatteredpixeldungeon.items.Gold;
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
-import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.DriedRose;
 import com.shatteredpixel.shatteredpixeldungeon.items.artifacts.TimekeepersHourglass;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.Ring;
 import com.shatteredpixel.shatteredpixeldungeon.items.rings.RingOfWealth;
@@ -650,7 +648,7 @@ public abstract class Mob extends Char {
 				Badges.validateMonstersSlain();
 				Statistics.qualifiedForNoKilling = false;
 				
-				int exp = Dungeon.hero.lvl <= maxLvl*1.5f ? EXP+1 : 1;
+				int exp = Dungeon.hero.lvl <= maxLvl*1.5f ? EXP : 1;
 				if (exp > 0) {
 					Dungeon.hero.sprite.showStatus(CharSprite.POSITIVE, Messages.get(this, "exp", exp));
 				}
@@ -745,10 +743,23 @@ public abstract class Mob extends Char {
 
 		//bounty hunter talent
 		if (Dungeon.hero.buff(Talent.BountyHunterTracker.class) != null){
-			Buff.affect(Dungeon.hero, Invisibility.class, 10f);
+			Buff.affect(Dungeon.hero, bounty.class, 0f);
 		}
 
 	}
+
+	public static class bounty extends FlavourBuff
+		{
+
+			{
+				actPriority = HERO_PRIO;
+			}
+
+			@Override
+			public void detach() {
+				Buff.affect(Dungeon.hero, Invisibility.class, 10f);
+			}
+		}
 	
 	protected Object loot = null;
 	protected float lootChance = 0;
@@ -932,7 +943,10 @@ public abstract class Mob extends Char {
 			
 			int oldPos = pos;
 			if (target != -1 && getCloser( target )) {
-				spend( 1 / speed() );
+				if (Dungeon.level.water[pos] && buff(ChampionEnemy.Flowing.class) != null){
+					spend(0f);
+				}
+				else spend( 1 / speed() );
 				return moveSprite( oldPos, pos );
 			} else {
 				target = Dungeon.level.randomDestination( Mob.this );
@@ -973,8 +987,10 @@ public abstract class Mob extends Char {
 				
 				int oldPos = pos;
 				if (target != -1 && getCloser( target )) {
-					
-					spend( 1 / speed() );
+					if (Dungeon.level.water[pos] && buff(ChampionEnemy.Flowing.class) != null){
+						spend(0f);
+					}
+					else spend( 1 / speed() );
 					return moveSprite( oldPos,  pos );
 
 				} else {
@@ -1036,8 +1052,10 @@ public abstract class Mob extends Char {
 
 			int oldPos = pos;
 			if (target != -1 && getFurther( target )) {
-
-				spend( 1 / speed() );
+				if (Dungeon.level.water[pos] && buff(ChampionEnemy.Flowing.class) != null){
+					spend(0f);
+				}
+				else spend( 1 / speed() );
 				return moveSprite( oldPos, pos );
 
 			} else {

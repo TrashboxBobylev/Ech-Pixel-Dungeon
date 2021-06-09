@@ -527,14 +527,9 @@ public class CharSprite extends MovieClip implements Tweener.Listener, MovieClip
 		}
 		if (ch != null){
 			for (ChampionEnemy buff : ch.buffs(ChampionEnemy.class)) {
-				if (flashTime <= 0) {
-					float interval = (Game.timeTotal % 9) / 2f;
-					tint(interval > 2 ? interval - 2 : Math.max(0, 1 - interval),
-							interval > 1 ? Math.max(0, 2 - interval) : interval,
-							interval > 2 ? Math.max(0, 3 - interval) : interval - 1, 0.5f);
-				}
+				hardlight(buff.color);
 			}
-			}
+		}
 	}
 	
 	@Override

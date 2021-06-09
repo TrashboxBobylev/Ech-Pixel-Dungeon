@@ -71,7 +71,7 @@ public class ShadowClone extends ArmorAbility {
 	}
 
 	{
-		baseChargeUse = 50f;
+		baseChargeUse = 35f;
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class ShadowClone extends ArmorAbility {
 		{
 			spriteClass = ShadowSprite.class;
 
-			HP = HT = 100;
+			HP = HT = 200;
 		}
 
 		public ShadowAlly(){
@@ -151,7 +151,7 @@ public class ShadowClone extends ArmorAbility {
 		public ShadowAlly( int heroLevel ){
 			super();
 			int hpBonus = 20 + 5*heroLevel;
-			hpBonus = Math.round(0.1f * Dungeon.hero.pointsInTalent(Talent.PERFECT_COPY) * hpBonus);
+			hpBonus = Math.round(0.35f * Dungeon.hero.pointsInTalent(Talent.PERFECT_COPY) * hpBonus);
 			if (hpBonus > 0){
 				HT += hpBonus;
 				HP += hpBonus;
@@ -188,11 +188,16 @@ public class ShadowClone extends ArmorAbility {
 		}
 
 		@Override
+		public float attackDelay() {
+			return super.attackDelay() * 0.5f;
+		}
+
+		@Override
 		public int damageRoll() {
-			int damage = Random.NormalIntRange(10, 20);
+			int damage = Random.NormalIntRange(20, 40);
 			int heroDamage = Dungeon.hero.damageRoll();
 			heroDamage /= Dungeon.hero.attackDelay(); //normalize hero damage based on atk speed
-			heroDamage = Math.round(0.0625f * Dungeon.hero.pointsInTalent(Talent.SHADOW_BLADE) * heroDamage);
+			heroDamage = Math.round(0.0625f * 3 * Dungeon.hero.pointsInTalent(Talent.SHADOW_BLADE) * heroDamage);
 			if (heroDamage > 0){
 				damage += heroDamage;
 			}
@@ -202,7 +207,7 @@ public class ShadowClone extends ArmorAbility {
 		@Override
 		public int attackProc( Char enemy, int damage ) {
 			damage = super.attackProc( enemy, damage );
-			if (Random.Int(4) < Dungeon.hero.pointsInTalent(Talent.SHADOW_BLADE)
+			if (Random.Int(4) < (Dungeon.hero.pointsInTalent(Talent.SHADOW_BLADE) + 1)
 					&& Dungeon.hero.belongings.weapon != null){
 				return Dungeon.hero.belongings.weapon.proc( this, enemy, damage );
 			} else {
@@ -214,7 +219,7 @@ public class ShadowClone extends ArmorAbility {
 		public int drRoll() {
 			int dr = super.drRoll();
 			int heroRoll = Dungeon.hero.drRoll();
-			heroRoll = Math.round(0.125f * Dungeon.hero.pointsInTalent(Talent.CLONED_ARMOR) * heroRoll);
+			heroRoll = Math.round(0.125f * 3 * Dungeon.hero.pointsInTalent(Talent.CLONED_ARMOR) * heroRoll);
 			if (heroRoll > 0){
 				dr += heroRoll;
 			}
@@ -224,7 +229,7 @@ public class ShadowClone extends ArmorAbility {
 		@Override
 		public int defenseProc(Char enemy, int damage) {
 			damage = super.defenseProc(enemy, damage);
-			if (Random.Int(4) < Dungeon.hero.pointsInTalent(Talent.CLONED_ARMOR)
+			if (Random.Int(4) < (Dungeon.hero.pointsInTalent(Talent.CLONED_ARMOR) + 1)
 					&& Dungeon.hero.belongings.armor != null){
 				return Dungeon.hero.belongings.armor.proc( enemy, this, damage );
 			} else {
@@ -236,7 +241,8 @@ public class ShadowClone extends ArmorAbility {
 		public boolean canInteract(Char c) {
 			if (super.canInteract(c)){
 				return true;
-			} else if (Dungeon.level.distance(pos, c.pos) <= Dungeon.hero.pointsInTalent(Talent.PERFECT_COPY)) {
+			} else if (Dungeon.level.distance(pos, c.pos) <= (Dungeon.hero.pointsInTalent(Talent.PERFECT_COPY) *
+					(Dungeon.hero.pointsInTalent(Talent.PERFECT_COPY)+1))) {
 				return true;
 			} else {
 				return false;

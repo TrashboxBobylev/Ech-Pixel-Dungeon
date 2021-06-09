@@ -18,7 +18,7 @@ public class WndInfoArmorAbility extends WndTitledMessage {
 		super( new ItemSprite( ItemSpriteSheet.CROWN, null ), Messages.titleCase(ability.name()), ability.desc());
 
 		ArrayList<LinkedHashMap<Talent, Integer>> talentList = new ArrayList<>();
-		Talent.initArmorTalents(ability, talentList);
+		Talent.initArmorTalents(cls, ability, talentList);
 
 		TalentsPane.TalentTierPane talentPane = new TalentsPane.TalentTierPane(talentList.get(3), 4, false);
 		talentPane.title.text( Messages.titleCase(Messages.get(WndHeroInfo.class, "talents")));

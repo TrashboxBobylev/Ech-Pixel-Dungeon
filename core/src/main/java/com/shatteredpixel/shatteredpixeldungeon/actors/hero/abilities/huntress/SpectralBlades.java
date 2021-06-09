@@ -44,7 +44,7 @@ import java.util.HashSet;
 public class SpectralBlades extends ArmorAbility {
 
 	{
-		baseChargeUse = 25f;
+		baseChargeUse = 16f;
 	}
 
 	@Override
@@ -76,24 +76,12 @@ public class SpectralBlades extends ArmorAbility {
 		targets.add(enemy);
 
 		if (hero.hasTalent(Talent.FAN_OF_BLADES)){
-			ConeAOE cone = new ConeAOE(b, 30*hero.pointsInTalent(Talent.FAN_OF_BLADES));
+			ConeAOE cone = new ConeAOE(b, 90*hero.pointsInTalent(Talent.FAN_OF_BLADES));
 			for (Ballistica ray : cone.rays){
-				Char toAdd = findChar(ray, hero, 2*hero.pointsInTalent(Talent.PROJECTING_BLADES), targets);
+				Char toAdd = findChar(ray, hero, 7*hero.pointsInTalent(Talent.PROJECTING_BLADES), targets);
 				if (toAdd != null && hero.fieldOfView[toAdd.pos]){
 					targets.add(toAdd);
 				}
-			}
-			while (targets.size() > 1 + hero.pointsInTalent(Talent.FAN_OF_BLADES)){
-				Char furthest = null;
-				for (Char ch : targets){
-					if (furthest == null){
-						furthest = ch;
-					} else if (Dungeon.level.trueDistance(enemy.pos, ch.pos) >
-							Dungeon.level.trueDistance(enemy.pos, furthest.pos)){
-						furthest = ch;
-					}
-				}
-				targets.remove(furthest);
 			}
 		}
 
@@ -109,7 +97,8 @@ public class SpectralBlades extends ArmorAbility {
 				@Override
 				public void call() {
 					float dmgMulti = ch == enemy ? 1f : 0.5f;
-					float accmulti = 1f + 0.25f*hero.pointsInTalent(Talent.PROJECTING_BLADES);
+					dmgMulti += (hero.pointsInTalent(Talent.FAN_OF_BLADES)-1)*0.5f;
+					float accmulti = 1f + 0.75f*hero.pointsInTalent(Talent.PROJECTING_BLADES);
 					if (hero.hasTalent(Talent.SPIRIT_BLADES)){
 						Buff.affect(hero, Talent.SpiritBladesTracker.class, 0f);
 					}

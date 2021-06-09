@@ -23,6 +23,7 @@ package com.shatteredpixel.shatteredpixeldungeon.ui;
 
 import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroSubClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
@@ -194,6 +195,9 @@ public class TalentsPane extends ScrollPane {
 			}
 
 			int totStars = Talent.tierLevelThresholds[tier+1]*2 - Talent.tierLevelThresholds[tier]*2;
+			if (tier == 4 && Dungeon.hero.heroClass == HeroClass.ADVENTURER){
+				totStars = 160;
+			}
 			int openStars = Dungeon.hero.talentPointsAvailable(tier);
 			int usedStars = Dungeon.hero.talentPointsSpent(tier);
 			for (int i = 0; i < totStars; i++){
@@ -213,26 +217,43 @@ public class TalentsPane extends ScrollPane {
 			super.layout();
 
 			float titleWidth = title.width();
-			titleWidth += 2 + stars.size()*5;
+			if (stars.size() > 20){
+				titleWidth += 2 + stars.size();
+			}
+			else titleWidth += 2 + stars.size()*5;
 			title.setPos(x + (width - titleWidth)/2f, y);
 
 			float left = title.right() + 2;
 			for (Image star : stars){
 				star.x = left;
 				star.y = title.top();
+				if (stars.size() > 20){
+					left += 1;
+					star.scale.set(0.5f);
+				}
+				else left += 5;
 				PixelScene.align(star);
-				left += 5;
 			}
-
-			float gap = (width - buttons.size()*TalentButton.WIDTH)/(buttons.size()+1);
+			int rows = buttons.size() > 7 ? buttons.size() / 8 : 1;
+			// this assumes that there's an even number of talents all around. THIS IS VERY BRITTLE
+			int buttonsPerRow = buttons.size();
+			if (buttons.size() > 7) buttonsPerRow = 8;
+			float gap = (width - buttonsPerRow*TalentButton.WIDTH)/(buttonsPerRow+1);
+			float bottom = title.bottom();
+			int placed = 0;
 			left = x + gap;
 			for (TalentButton btn : buttons){
-				btn.setPos(left, title.bottom() + 4);
+				btn.setPos(left, bottom + 3);
 				PixelScene.align(btn);
 				left += btn.width() + gap;
+				if(++placed == buttonsPerRow && rows-- >= 0) {
+					left = x + gap;
+					bottom = btn.bottom();
+					placed = 0;
+				}
 			}
 
-			height = buttons.get(0).bottom() - y;
+			height = bottom - y;
 
 		}
 

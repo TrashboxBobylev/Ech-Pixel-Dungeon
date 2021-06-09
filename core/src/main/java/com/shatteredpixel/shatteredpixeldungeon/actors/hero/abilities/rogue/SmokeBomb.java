@@ -62,7 +62,7 @@ public class SmokeBomb extends ArmorAbility {
 			return super.chargeUse(hero);
 		} else {
 			//reduced charge use by 24%/42%/56%/67%
-			return (float)(super.chargeUse(hero) * Math.pow(0.76, hero.pointsInTalent(Talent.SHADOW_STEP)));
+			return (float)(super.chargeUse(hero) * Math.pow(0.54, hero.pointsInTalent(Talent.SHADOW_STEP)));
 		}
 	}
 
@@ -95,11 +95,6 @@ public class SmokeBomb extends ArmorAbility {
 				}
 
 				if (hero.hasTalent(Talent.BODY_REPLACEMENT)) {
-					for (Char ch : Actor.chars()){
-						if (ch instanceof NinjaLog){
-							ch.die(null);
-						}
-					}
 
 					NinjaLog n = new NinjaLog();
 					n.pos = hero.pos;
@@ -107,7 +102,7 @@ public class SmokeBomb extends ArmorAbility {
 				}
 
 				if (hero.hasTalent(Talent.HASTY_RETREAT)){
-					int duration = 1+hero.pointsInTalent(Talent.HASTY_RETREAT);
+					int duration = 1+hero.pointsInTalent(Talent.HASTY_RETREAT)*5;
 					Buff.affect(hero, Haste.class, duration);
 					Buff.affect(hero, Invisibility.class, duration);
 				}
@@ -143,13 +138,13 @@ public class SmokeBomb extends ArmorAbility {
 
 			alignment = Alignment.ALLY;
 
-			HP = HT = 20*Dungeon.hero.pointsInTalent(Talent.BODY_REPLACEMENT);
+			HP = HT = 120*Dungeon.hero.pointsInTalent(Talent.BODY_REPLACEMENT);
 		}
 
 		@Override
 		public int drRoll() {
 			return Random.NormalIntRange(Dungeon.hero.pointsInTalent(Talent.BODY_REPLACEMENT),
-					5*Dungeon.hero.pointsInTalent(Talent.BODY_REPLACEMENT));
+					8*Dungeon.hero.pointsInTalent(Talent.BODY_REPLACEMENT));
 		}
 
 	}

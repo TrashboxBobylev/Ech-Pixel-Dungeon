@@ -26,18 +26,21 @@ import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.GamesInProgress;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ArtifactRecharge;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.CounterBuff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.EnhancedRings;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.FlavourBuff;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Haste;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Recharging;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.RevealedArea;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Roots;
-import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.WandEmpower;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.*;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.Ratmogrify;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.NaturesPower;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.SpectralBlades;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.SpiritHawk;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.mage.ElementalBlast;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.mage.WarpBeacon;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.mage.WildMagic;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.rogue.DeathMark;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.rogue.ShadowClone;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.rogue.SmokeBomb;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Endure;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.HeroicLeap;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.warrior.Shockwave;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.shatteredpixel.shatteredpixeldungeon.effects.CellEmitter;
 import com.shatteredpixel.shatteredpixeldungeon.effects.Speck;
@@ -69,6 +72,7 @@ import com.watabou.utils.Random;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public enum Talent {
 
@@ -77,7 +81,7 @@ public enum Talent {
 	//Warrior T2
 	IRON_STOMACH(4), RESTORED_WILLPOWER(5), RUNIC_TRANSFERENCE(6), LETHAL_MOMENTUM(7), IMPROVISED_PROJECTILES(8),
 	//Warrior T3
-	HOLD_FAST(9, 3), STRONGMAN(10, 3), BLADE_OF_ENMITY(17, 3),
+	HOLD_FAST(9, 3), STRONGMAN(10, 3), BLADE_OF_ENMITY(27, 3),
 	//Berserker T3
 	ENDLESS_RAGE(11, 3), BERSERKING_STAMINA(12, 3), ENRAGED_CATALYST(13, 3),
 	//Gladiator T3
@@ -94,7 +98,7 @@ public enum Talent {
 	//Mage T2
 	ENERGIZING_MEAL(36), ENERGIZING_UPGRADE(37), WAND_PRESERVATION(38), ARCANE_VISION(39), SHIELD_BATTERY(40),
 	//Mage T3
-	EMPOWERING_SCROLLS(41, 3), ALLY_WARP(42, 3), MOUNTAIN_GURU(49, 3),
+	EMPOWERING_SCROLLS(41, 3), ALLY_WARP(42, 3), MOUNTAIN_GURU(59, 3),
 	//Battlemage T3
 	EMPOWERED_STRIKE(43, 3), MYSTICAL_CHARGE(44, 3), EXCESS_CHARGE(45, 3),
 	//Warlock T3
@@ -111,7 +115,7 @@ public enum Talent {
 	//Rogue T2
 	MYSTICAL_MEAL(68), MYSTICAL_UPGRADE(69), WIDE_SEARCH(70), SILENT_STEPS(71), ROGUES_FORESIGHT(72),
 	//Rogue T3
-	ENHANCED_RINGS(73, 3), LIGHT_CLOAK(74, 3), ACCELERATED_THINKING(81, 3),
+	ENHANCED_RINGS(73, 3), LIGHT_CLOAK(74, 3), ACCELERATED_THINKING(91, 3),
 	//Assassin T3
 	ENHANCED_LETHALITY(75, 3), ASSASSINS_REACH(76, 3), BOUNTY_HUNTER(77, 3),
 	//Freerunner T3
@@ -128,7 +132,7 @@ public enum Talent {
 	//Huntress T2
 	INVIGORATING_MEAL(100), RESTORED_NATURE(101), REJUVENATING_STEPS(102), HEIGHTENED_SENSES(103), DURABLE_PROJECTILES(104),
 	//Huntress T3
-	POINT_BLANK(105, 3), SEER_SHOT(106, 3), UMBRELLA_ULTIMATUM(113, 3),
+	POINT_BLANK(105, 3), SEER_SHOT(106, 3), UMBRELLA_ULTIMATUM(123, 3),
 	//Sniper T3
 	FARSIGHT(107, 3), SHARED_ENCHANTMENT(108, 3), SHARED_UPGRADES(109, 3),
 	//Warden T3
@@ -146,7 +150,7 @@ public enum Talent {
 	SMORGASBORD_2(132), RENEW(133), PRAGMATISM(134), CONTROL(135), DIVINE_SIGHT(136),
 	//Adventurer T3
 	POWER_TRIP_2(137, 3), OMNISTRENGTH(138, 3),
-	ENDURANCE(139, 4), REACTION(140, 4), DIVERSITY(141, 4);
+	ENDURANCE(139, 4), REACTION(140, 4), DIVERSITY(141, 4),
 
 	//universal T4
 	HEROIC_ENERGY(26, 4), //See icon() and title() for special logic for this one
@@ -186,7 +190,7 @@ public enum Talent {
 	int maxPoints;
 
 	// tiers 1/2/3/4 start at levels 2/7/13/21
-	public static int[] tierLevelThresholds = new int[]{0, 1, 5, 10, 19, 30};
+	public static int[] tierLevelThresholds = new int[]{0, 1, 5, 10, 19, 35};
 
 	Talent( int icon ){
 		this(icon, 2);
@@ -559,18 +563,30 @@ public enum Talent {
 	}
 
 	public static void initArmorTalents( Hero hero ){
-		initArmorTalents( hero.armorAbility, hero.talents);
+		initArmorTalents( hero.heroClass, hero.armorAbility, hero.talents);
 	}
 
-	public static void initArmorTalents(ArmorAbility abil, ArrayList<LinkedHashMap<Talent, Integer>> talents ){
+	public static void initArmorTalents(HeroClass cls, ArmorAbility abil, ArrayList<LinkedHashMap<Talent, Integer>> talents ){
 		if (abil == null) return;
 
 		while (talents.size() < MAX_TALENT_TIERS){
 			talents.add(new LinkedHashMap<>());
 		}
 
-		for (Talent t : abil.talents()){
-			talents.get(3).put(t, 0);
+		if (cls == HeroClass.ADVENTURER){
+			talents.get(3).put(HEROIC_ENERGY, 0);
+			ArmorAbility[] allAbilities = new ArmorAbility[] {new HeroicLeap(), new Shockwave(), new Endure(),
+			new ElementalBlast(), new WildMagic(), new WarpBeacon(), new SmokeBomb(), new DeathMark(), new ShadowClone(),
+			new NaturesPower(), new SpectralBlades(), new SpiritHawk(), new Ratmogrify()};
+			for (ArmorAbility abi : allAbilities){
+				for (Talent t : abi.talents()){
+					if (t != HEROIC_ENERGY)
+						talents.get(3).put(t, 0);
+				}
+			}
+		}
+		else for (Talent t : abil.talents()){
+				talents.get(3).put(t, 0);
 		}
 	}
 

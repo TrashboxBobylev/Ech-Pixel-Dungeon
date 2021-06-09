@@ -57,7 +57,21 @@ public class v0_9_X_Changes {
 
 	public static void add_Ech_Changes( ArrayList<ChangeInfo> changeInfos ) {
 
-		ChangeInfo changes = new ChangeInfo("v0.2.1", true, "");
+		ChangeInfo changes = new ChangeInfo("v0.2.2", true, "");
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+		changes.addButton(new ChangeButton(new Image(new GolemSprite()), "Ech",
+				"_-_ Reworked stone champions, added flowing, voodoo and explosive champions.\n\n" +
+						"_-_ Monsters no longer give 1 extra EXP.\n\n"+
+						"_-_ Increased additional EXP from champions.\n\n" +
+						"_-_ Champions get additional HP boosts as game progresses."));
+		changes.addButton( new ChangeButton(Icons.get(Icons.SHPX), "Ech",
+				"Ported Shattered 0.9.3 without talent balance changes.\n\n" +
+						"_-_ Armor ability costs reduced down to 35/25/16, from 50/35/25."));
+		changes.addButton(new ChangeButton(new Image(Assets.Sprites.ROGUE, 0, 90, 12, 15), "Ech",
+				"_-_ Fixed crashes for Guershk's Reach and Enhanced Lethality."));
+
+		changes = new ChangeInfo("v0.2.1", true, "");
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 
@@ -81,8 +95,8 @@ public class v0_9_X_Changes {
 						"_-_ Added 4 unique talents for each hero, except Adventurer."));
 
 		changes.addButton(new ChangeButton(new Image(Assets.Sprites.ADVENTURER, 0, 90, 12, 15), "Ech",
-				"_-_ Adventurer can upgrade subclass talents to +4."));
-
+				"_-_ Adventurer can upgrade subclass talents to +4.\n\n" +
+						"_-_ Adventurer can choose any of 13 armor abilities at any time he desires, he also get every T4 talent."));
 
 
 

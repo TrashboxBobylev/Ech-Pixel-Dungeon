@@ -38,14 +38,14 @@ import com.watabou.noosa.audio.Sample;
 public class NaturesPower extends ArmorAbility {
 
 	{
-		baseChargeUse = 35f;
+		baseChargeUse = 25f;
 	}
 
 	@Override
 	protected void activate(ClassArmor armor, Hero hero, Integer target) {
 
 		Buff.prolong(hero, naturesPowerTracker.class, naturesPowerTracker.DURATION);
-		hero.buff(naturesPowerTracker.class).extensionsLeft = 2;
+		hero.buff(naturesPowerTracker.class).extensionsLeft = Integer.MAX_VALUE;
 		hero.sprite.operate(hero.pos);
 		Sample.INSTANCE.play(Assets.Sounds.CHARGEUP);
 		hero.sprite.emitter().burst(LeafParticle.GENERAL, 10);
@@ -64,7 +64,7 @@ public class NaturesPower extends ArmorAbility {
 
 	public static class naturesPowerTracker extends FlavourBuff{
 
-		public static final float DURATION = 8f;
+		public static final float DURATION = 3f;
 
 		public int extensionsLeft = 2;
 

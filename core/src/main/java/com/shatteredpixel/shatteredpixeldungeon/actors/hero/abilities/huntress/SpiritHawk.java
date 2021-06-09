@@ -70,7 +70,7 @@ public class SpiritHawk extends ArmorAbility {
 	}
 
 	{
-		baseChargeUse = 35f;
+		baseChargeUse = 25f;
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public class SpiritHawk extends ArmorAbility {
 		{
 			spriteClass = HawkSprite.class;
 
-			HP = HT = 10;
+			HP = HT = 100;
 			defenseSkill = 50;
 
 			flying = true;
@@ -157,12 +157,17 @@ public class SpiritHawk extends ArmorAbility {
 			return 50;
 		}
 
+		@Override
+		public float attackDelay() {
+			return super.attackDelay() * 0.5f;
+		}
+
 		private int dodgesUsed = 0;
-		private float timeRemaining = 50f;
+		private float timeRemaining = 200f;
 
 		@Override
 		public int defenseSkill(Char enemy) {
-			if (dodgesUsed < Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT)){
+			if (dodgesUsed < Math.pow(2, Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT))){
 				dodgesUsed++;
 				return Char.INFINITE_EVASION;
 			}
@@ -171,14 +176,14 @@ public class SpiritHawk extends ArmorAbility {
 
 		@Override
 		public int damageRoll() {
-			return Random.NormalIntRange(5, 10);
+			return Random.NormalIntRange(15, 30);
 		}
 
 		@Override
 		public int attackProc(Char enemy, int damage) {
 			damage = super.attackProc( enemy, damage );
 			if (Dungeon.hero.hasTalent(Talent.GO_FOR_THE_EYES)) {
-				Buff.prolong( enemy, Blindness.class, 1 + Dungeon.hero.pointsInTalent(Talent.GO_FOR_THE_EYES) );
+				Buff.prolong( enemy, Blindness.class, 10*Dungeon.hero.pointsInTalent(Talent.GO_FOR_THE_EYES) );
 			}
 
 			return damage;
@@ -186,8 +191,8 @@ public class SpiritHawk extends ArmorAbility {
 
 		@Override
 		protected boolean act() {
-			viewDistance = (int)GameMath.gate(6, 6+Dungeon.hero.pointsInTalent(Talent.EAGLE_EYE), 8);
-			baseSpeed = 2f + Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT)/2f;
+			viewDistance = (int)GameMath.gate(8, 8+Dungeon.hero.pointsInTalent(Talent.EAGLE_EYE), 12);
+			baseSpeed = 2f + Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT);
 			boolean result = super.act();
 			Dungeon.level.updateFieldOfView( this, fieldOfView );
 			GameScene.updateFog(pos, viewDistance+(int)Math.ceil(speed()));
@@ -225,7 +230,7 @@ public class SpiritHawk extends ArmorAbility {
 		@Override
 		public String description() {
 			String message = Messages.get(this, "desc", (int)timeRemaining);
-			if (dodgesUsed < Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT)){
+			if (dodgesUsed < Math.pow(2, Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT))){
 				message += "\n" + Messages.get(this, "desc_dodges", (Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT) - dodgesUsed));
 			}
 			return message;

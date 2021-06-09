@@ -52,20 +52,7 @@ import com.shatteredpixel.shatteredpixeldungeon.effects.particles.ShadowParticle
 import com.shatteredpixel.shatteredpixeldungeon.items.Item;
 import com.shatteredpixel.shatteredpixeldungeon.items.armor.ClassArmor;
 import com.shatteredpixel.shatteredpixeldungeon.items.scrolls.ScrollOfMagicMapping;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.Wand;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfBlastWave;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfCorrosion;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfCorruption;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfDisintegration;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfFireblast;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfFrost;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfLightning;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfLivingEarth;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfMagicMissile;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfPrismaticLight;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfRegrowth;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfTransfusion;
-import com.shatteredpixel.shatteredpixeldungeon.items.wands.WandOfWarding;
+import com.shatteredpixel.shatteredpixeldungeon.items.wands.*;
 import com.shatteredpixel.shatteredpixeldungeon.items.weapon.melee.MagesStaff;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Level;
 import com.shatteredpixel.shatteredpixeldungeon.levels.Terrain;
@@ -120,7 +107,7 @@ public class ElementalBlast extends ArmorAbility {
 	}
 
 	{
-		baseChargeUse = 35f;
+		baseChargeUse = 25f;
 	}
 
 	@Override
@@ -143,7 +130,7 @@ public class ElementalBlast extends ArmorAbility {
 			return;
 		}
 
-		int aoeSize = 4 + hero.pointsInTalent(Talent.BLAST_RADIUS);
+		int aoeSize = 4 + hero.pointsInTalent(Talent.BLAST_RADIUS)*4;
 
 		int projectileProps = Ballistica.STOP_SOLID | Ballistica.STOP_TARGET;
 
@@ -173,7 +160,7 @@ public class ElementalBlast extends ArmorAbility {
 			);
 		}
 
-		final float effectMulti = 1f + 0.15f*hero.pointsInTalent(Talent.ELEMENTAL_POWER);
+		final float effectMulti = 1f + 0.75f*hero.pointsInTalent(Talent.ELEMENTAL_POWER);
 
 		//cast a ray 2/3 the way, and do effects
 		Class<? extends Wand> finalWandCls = wandCls;
@@ -252,9 +239,17 @@ public class ElementalBlast extends ArmorAbility {
 
 							//### Deal damage ###
 							Char mob = Actor.findChar(cell);
-							int damage = Math.round(Random.NormalIntRange(10, 20)
-									* effectMulti
-									* damageFactors.get(finalWandCls));
+							Wand wand = hero.belongings.getItem(MagesStaff.class).wand;
+							int damage;
+							if (wand instanceof DamageWand) {
+								damage = Math.round(((DamageWand) wand).damageRoll()
+										* effectMulti
+										* damageFactors.get(finalWandCls));
+							} else {
+								damage = Math.round(Random.NormalIntRange(20, 40)
+										* effectMulti
+										* damageFactors.get(finalWandCls));
+							}
 
 							if (mob != null && damage > 0 && mob.alignment != Char.Alignment.ALLY){
 								mob.damage(damage, Reflection.newInstance(finalWandCls));
@@ -388,9 +383,8 @@ public class ElementalBlast extends ArmorAbility {
 
 						}
 
-						charsHit = Math.min(5, charsHit);
 						if (charsHit > 0 && hero.hasTalent(Talent.REACTIVE_BARRIER)){
-							Buff.affect(hero, Barrier.class).setShield(charsHit*2*hero.pointsInTalent(Talent.REACTIVE_BARRIER));
+							Buff.affect(hero, Barrier.class).setShield(charsHit*7*hero.pointsInTalent(Talent.REACTIVE_BARRIER));
 						}
 
 						hero.spendAndNext(Actor.TICK);

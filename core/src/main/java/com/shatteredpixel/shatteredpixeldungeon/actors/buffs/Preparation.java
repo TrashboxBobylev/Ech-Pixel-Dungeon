@@ -72,11 +72,10 @@ public class Preparation extends Buff implements ActionIndicator.Action {
 
 		//1st index is prep level, 2nd is talent level
 		private static final float[][] KOThresholds = new float[][]{
-				{.03f, .04f, .05f, .06f},
-				{.20f, .34f, .42f, .50f},
-				{.40f, .60f, .80f, 1.0f},
-				{1f, 1f, 1f, 1f},
-				{1f, 1f, 1f, 1f}
+				{.03f, .20f, .40f, 1f, 1f},
+				{.10f, .34f, .60f, 1f, 1f},
+				{.20f, .42f, .80f, 1f, 1f},
+				{.40f, .55f, 1f, 1f, 1f}
 		};
 
 		public float KOThreshold(){
@@ -85,11 +84,10 @@ public class Preparation extends Buff implements ActionIndicator.Action {
 
 		//1st index is prep level, 2nd is talent level
 		private static final int[][] blinkRanges = new int[][]{
-				{1, 2, 3, 4},
-				{2, 6, 8, 12},
-				{5, 10, 13, 19},
-				{11, 24, 37, 50},
-				{16, 32, 46, 75}
+				{1, 2, 5, 11, 16},
+				{2, 6, 10, 24, 32},
+				{3, 8, 13, 37, 46},
+				{4, 12, 19, 50, 75}
 		};
 
 		public int blinkDistance(){

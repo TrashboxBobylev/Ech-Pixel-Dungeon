@@ -22,8 +22,10 @@
 package com.shatteredpixel.shatteredpixeldungeon.items;
 
 import com.shatteredpixel.shatteredpixeldungeon.Assets;
+import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Hero;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.HeroClass;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.ArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.Ratmogrify;
@@ -46,6 +48,7 @@ public class KingsCrown extends Item {
 	
 	{
 		image = ItemSpriteSheet.CROWN;
+		defaultAction = AC_WEAR;
 		
 		unique = true;
 	}
@@ -86,11 +89,13 @@ public class KingsCrown extends Item {
 	
 	public void upgradeArmor(Hero hero, Armor armor, ArmorAbility ability) {
 
+		if (hero.heroClass != HeroClass.ADVENTURER)
 		detach(hero.belongings.backpack);
 
 		hero.sprite.emitter().burst( Speck.factory( Speck.CROWN), 12 );
 		hero.spend(Actor.TICK);
 		hero.busy();
+		ClassArmor classArmor = ClassArmor.upgrade(hero, armor);
 
 		if (armor != null){
 
@@ -100,7 +105,7 @@ public class KingsCrown extends Item {
 				GLog.p(Messages.get(this, "upgraded"));
 			}
 
-			ClassArmor classArmor = ClassArmor.upgrade(hero, armor);
+			classArmor = ClassArmor.upgrade(hero, armor);
 			if (hero.belongings.armor == armor) {
 
 				hero.belongings.armor = classArmor;
@@ -116,7 +121,11 @@ public class KingsCrown extends Item {
 		}
 
 		hero.armorAbility = ability;
-		Talent.initArmorTalents(hero);
+		if (Dungeon.quickslot.contains(armor)){
+			Dungeon.quickslot.setSlot(Dungeon.quickslot.getSlot(armor), classArmor);
+		}
+		if (!(armor instanceof ClassArmor))
+			Talent.initArmorTalents(hero);
 
 		hero.sprite.operate( hero.pos );
 		Sample.INSTANCE.play( Assets.Sounds.MASTERY );

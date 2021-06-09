@@ -3,6 +3,8 @@ package com.shatteredpixel.shatteredpixeldungeon.actors.mobs.npcs;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Actor;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.Talent;
+import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.huntress.SpiritHawk;
 import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
 import com.watabou.utils.Bundle;
 
@@ -111,7 +113,10 @@ public class DirectableAlly extends NPC {
 				target = defendingPos != -1 ? defendingPos : Dungeon.hero.pos;
 				//always move towards the hero when wandering
 				if (getCloser( target )) {
-					spend( 1 / speed() );
+					if (spriteClass == SpiritHawk.HawkSprite.class && Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT) == 4){
+						spend(0f);
+					}
+					else spend( 1 / speed() );
 					if (pos == defendingPos) movingToDefendPos = false;
 					return moveSprite( oldPos, pos );
 				} else {

@@ -50,7 +50,7 @@ public class DeathMark extends ArmorAbility {
 	}
 
 	{
-		baseChargeUse = 25f;
+		baseChargeUse = 16f;
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class DeathMark extends ArmorAbility {
 		float chargeUse = super.chargeUse(hero);
 		if (hero.buff(DoubleMarkTracker.class) != null){
 			//reduced charge use by 33%/55%/70%/80%
-			chargeUse *= Math.pow(0.67, hero.pointsInTalent(Talent.DOUBLE_MARK));
+			chargeUse *= Math.pow(0.40, hero.pointsInTalent(Talent.DOUBLE_MARK));
 		}
 		return chargeUse;
 	}
@@ -80,7 +80,7 @@ public class DeathMark extends ArmorAbility {
 		}
 
 		if (ch != null){
-			Buff.affect(ch, DeathMarkTracker.class, 5f).setInitialHP(ch.HP);
+			Buff.affect(ch, DeathMarkTracker.class, 3f).setInitialHP(ch.HP);
 		}
 
 		armor.charge -= chargeUse( hero );
@@ -104,21 +104,21 @@ public class DeathMark extends ArmorAbility {
 
 		if (Dungeon.hero.hasTalent(Talent.FEAR_THE_REAPER)) {
 			if (Dungeon.hero.pointsInTalent(Talent.FEAR_THE_REAPER) >= 2) {
-				Buff.prolong(ch, Terror.class, 5f).target = Dungeon.hero;
+				Buff.prolong(ch, Terror.class, 35f).target = Dungeon.hero;
 			}
-			Buff.prolong(ch, Cripple.class, 5f);
+			Buff.prolong(ch, Cripple.class, 35f);
 
 			if (Dungeon.hero.pointsInTalent(Talent.FEAR_THE_REAPER) >= 3) {
 				boolean[] passable = BArray.not(Dungeon.level.solid, null);
-				PathFinder.buildDistanceMap(ch.pos, passable, 3);
+				PathFinder.buildDistanceMap(ch.pos, passable, 8);
 
 				for (Char near : Actor.chars()) {
 					if (near != ch && near.alignment == Char.Alignment.ENEMY
 							&& PathFinder.distance[near.pos] != Integer.MAX_VALUE) {
 						if (Dungeon.hero.pointsInTalent(Talent.FEAR_THE_REAPER) == 4) {
-							Buff.prolong(near, Terror.class, 5f).target = Dungeon.hero;
+							Buff.prolong(near, Terror.class, 35f).target = Dungeon.hero;
 						}
-						Buff.prolong(near, Cripple.class, 5f);
+						Buff.prolong(near, Cripple.class, 35f);
 					}
 				}
 			}
@@ -172,7 +172,7 @@ public class DeathMark extends ArmorAbility {
 				Sample.INSTANCE.play(Assets.Sounds.HIT_STAB);
 				Sample.INSTANCE.play(Assets.Sounds.HIT_STRONG);
 				target.die(this);
-				int shld = Math.round(initialHP * (0.125f*Dungeon.hero.pointsInTalent(Talent.DEATHLY_DURABILITY)));
+				int shld = Math.round(initialHP * (0.125f*Dungeon.hero.pointsInTalent(Talent.DEATHLY_DURABILITY)*4.5f));
 				if (shld > 0 && target.alignment != Char.Alignment.ALLY){
 					Buff.affect(Dungeon.hero, Barrier.class).setShield(shld);
 				}

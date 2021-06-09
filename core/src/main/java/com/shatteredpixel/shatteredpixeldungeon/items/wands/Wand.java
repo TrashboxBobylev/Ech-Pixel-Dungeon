@@ -308,7 +308,7 @@ public abstract class Wand extends Item {
 
 		if (charger != null && charger.target != null) {
 			if (charger.target.buff(WildMagic.WildMagicTracker.class) != null){
-				int level = 2 + ((Hero)charger.target).pointsInTalent(Talent.WILD_POWER);
+				int level = 2 + ((Hero)charger.target).pointsInTalent(Talent.WILD_POWER)*3;
 				if (Random.Int(2) == 0) level++;
 				return level/2; // +1/+1.5/+2/+2.5/+3 at 0/1/2/3/4 talent points
 			}

@@ -354,13 +354,17 @@ public class Hero extends Char {
 	}
 
 	public int talentPointsAvailable(int tier){
+		if (lvl >= 20 && heroClass == HeroClass.ADVENTURER && tier == 4){
+			return (lvl - 19)*26 - talentPointsSpent(tier);
+		}
 		if (lvl < Talent.tierLevelThresholds[tier]
 				|| (tier == 3 && subClass == HeroSubClass.NONE)
 			|| (tier == 4 && armorAbility == null)){
 			return 0;
 		} else if (lvl >= Talent.tierLevelThresholds[tier+1]){
 			return Talent.tierLevelThresholds[tier+1]*2 - Talent.tierLevelThresholds[tier]*2 - talentPointsSpent(tier);
-		} else {
+		}
+		else {
 			return (lvl == 1 ? 1 : lvl*2) - Talent.tierLevelThresholds[tier]*2 - talentPointsSpent(tier);
 		}
 	}
@@ -1159,8 +1163,7 @@ public class Hero extends Char {
 
 		if (wep != null) damage = wep.proc( this, enemy, damage );
 
-		if (buff(Talent.SpiritBladesTracker.class) != null
-				&& Random.Int(4) < pointsInTalent(Talent.SPIRIT_BLADES)){
+		if (buff(Talent.SpiritBladesTracker.class) != null){
 			SpiritBow bow = belongings.getItem(SpiritBow.class);
 			if (bow != null) damage = bow.proc( this, enemy, damage );
 			buff(Talent.SpiritBladesTracker.class).detach();
