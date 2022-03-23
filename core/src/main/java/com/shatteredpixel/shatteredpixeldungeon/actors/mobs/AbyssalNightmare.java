@@ -160,7 +160,7 @@ public class AbyssalNightmare extends Wraith {
 
 	@Override
 	public int attackProc(Char enemy, int damage) {
-		if (Random.Int(3) == 0){
+		if (Random.Int(3) == 0 && generation == 0){
 			ArrayList<Integer> candidates = new ArrayList<>();
 			boolean[] solid = Dungeon.level.solid;
 
@@ -192,6 +192,7 @@ public class AbyssalNightmare extends Wraith {
 		clone.EXP = 0;
 		clone.adjustStats(level);
 		clone.state = clone.HUNTING;
+		clone.generation = generation+1;
 		ChampionEnemy.rollForChampion(clone);
 		if (buff(Corruption.class ) != null) {
 			Buff.affect( clone, Corruption.class);
