@@ -113,10 +113,9 @@ public class DirectableAlly extends NPC {
 				target = defendingPos != -1 ? defendingPos : Dungeon.hero.pos;
 				//always move towards the hero when wandering
 				if (getCloser( target )) {
-					if (spriteClass == SpiritHawk.HawkSprite.class && Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT) == 4){
-						spend(0f);
+					if (!(spriteClass == SpiritHawk.HawkSprite.class && Dungeon.hero.pointsInTalent(Talent.SWIFT_SPIRIT) == 4)){
+						spend( 1 / speed() );
 					}
-					else spend( 1 / speed() );
 					if (pos == defendingPos) movingToDefendPos = false;
 					return moveSprite( oldPos, pos );
 				} else {

@@ -1,7 +1,7 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.4'
@@ -14,8 +14,8 @@ allprojects {
         appName = 'Ech Pixel Dungeon'
         appPackageName = 'com.trashboxbobylev.echdungeon'
 
-        appVersionCode = 538
-        appVersionName = '0.2.2'
+        appVersionCode = 539
+        appVersionName = '0.2.3'
 
         appJavaCompatibility = JavaVersion.VERSION_1_8
 
@@ -23,13 +23,13 @@ allprojects {
         appAndroidMinSDK = 9
         appAndroidTargetSDK = 30
 
-        gdxVersion = '1.9.10'
+        gdxVersion = '1.10.0'
     }
     version = appVersionName
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
 }
