@@ -943,10 +943,9 @@ public abstract class Mob extends Char {
 			
 			int oldPos = pos;
 			if (target != -1 && getCloser( target )) {
-				if (Dungeon.level.water[pos] && buff(ChampionEnemy.Flowing.class) != null){
-					spend(0f);
+				if (!(Dungeon.level.water[pos] && buff(ChampionEnemy.Flowing.class) != null)){
+					spend( 1 / speed() );
 				}
-				else spend( 1 / speed() );
 				return moveSprite( oldPos, pos );
 			} else {
 				target = Dungeon.level.randomDestination( Mob.this );
@@ -987,10 +986,9 @@ public abstract class Mob extends Char {
 				
 				int oldPos = pos;
 				if (target != -1 && getCloser( target )) {
-					if (Dungeon.level.water[pos] && buff(ChampionEnemy.Flowing.class) != null){
-						spend(0f);
+					if (!(Dungeon.level.water[pos] && buff(ChampionEnemy.Flowing.class) != null)){
+						spend( 1 / speed() );
 					}
-					else spend( 1 / speed() );
 					return moveSprite( oldPos,  pos );
 
 				} else {
@@ -1052,10 +1050,9 @@ public abstract class Mob extends Char {
 
 			int oldPos = pos;
 			if (target != -1 && getFurther( target )) {
-				if (Dungeon.level.water[pos] && buff(ChampionEnemy.Flowing.class) != null){
-					spend(0f);
+				if (!(Dungeon.level.water[pos] && buff(ChampionEnemy.Flowing.class) != null)){
+					spend( 1 / speed() );
 				}
-				else spend( 1 / speed() );
 				return moveSprite( oldPos, pos );
 
 			} else {
