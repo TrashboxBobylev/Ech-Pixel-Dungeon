@@ -609,6 +609,10 @@ public abstract class Mob extends Char {
 	@Override
 	public void damage( int dmg, Object src ) {
 
+		if (src instanceof Char && surprisedBy((Char)src)){
+			dmg *= 2;
+		}
+
 		if (state == SLEEPING) {
 			state = WANDERING;
 		}
