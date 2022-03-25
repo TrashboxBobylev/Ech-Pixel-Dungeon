@@ -648,7 +648,7 @@ public abstract class Mob extends Char {
 				Badges.validateMonstersSlain();
 				Statistics.qualifiedForNoKilling = false;
 				
-				int exp = Dungeon.hero.lvl <= maxLvl*1.5f ? EXP : 1;
+				int exp = EXP;
 				if (exp > 0) {
 					Dungeon.hero.sprite.showStatus(CharSprite.POSITIVE, Messages.get(this, "exp", exp));
 				}
@@ -705,13 +705,18 @@ public abstract class Mob extends Char {
 	}
 	
 	public void rollToDropLoot(){
-		if (Dungeon.hero.lvl > maxLvl + 2) return;
 		
 		float lootChance = this.lootChance;
 		lootChance *= RingOfWealth.dropChanceMultiplier( Dungeon.hero );
 		
 		if (Random.Float() < lootChance) {
 			Item loot = createLoot();
+			if (loot != null) {
+				Dungeon.level.drop(loot, pos).sprite.drop();
+			}
+		}
+		if (Random.Float() < 0.25f) {
+			Item loot = Generator.random();
 			if (loot != null) {
 				Dungeon.level.drop(loot, pos).sprite.drop();
 			}
