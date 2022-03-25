@@ -1665,7 +1665,7 @@ public class Hero extends Char {
 		}
 
 		if (ankh != null && ankh.isBlessed()) {
-			this.HP = HT/4;
+			this.HP = HT;
 
 			//ensures that you'll get to act first in almost any case, to prevent reviving and then instantly dieing again.
 			PotionOfHealing.cure(this);

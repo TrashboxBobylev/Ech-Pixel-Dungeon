@@ -187,50 +187,70 @@ public class ShopRoom extends SpecialRoom {
 		w.level(0);
 		w.identify();
 		itemsToSpawn.add(w);
-		
-		itemsToSpawn.add( TippedDart.randomTipped(2) );
-
-		itemsToSpawn.add( new MerchantsBeacon() );
-
-		itemsToSpawn.add( new PotionOfStrength());
-		itemsToSpawn.add( new ScrollOfUpgrade());
 
 
 		itemsToSpawn.add(ChooseBag(Dungeon.hero.belongings));
 
+		for (int i = 0; i < 2; i++) {
+			itemsToSpawn.add( new PotionOfHealing() );
+			itemsToSpawn.add( Generator.randomUsingDefaults( Generator.Category.POTION ) );
+			itemsToSpawn.add( Generator.randomUsingDefaults( Generator.Category.POTION ) );
 
-		itemsToSpawn.add( new PotionOfHealing() );
-		itemsToSpawn.add( Generator.randomUsingDefaults( Generator.Category.POTION ) );
-		itemsToSpawn.add( Generator.randomUsingDefaults( Generator.Category.POTION ) );
+			itemsToSpawn.add( new ScrollOfIdentify() );
+			itemsToSpawn.add( new ScrollOfRemoveCurse() );
+			itemsToSpawn.add( new ScrollOfMagicMapping() );
+			itemsToSpawn.add( TippedDart.randomTipped(2) );
 
-		itemsToSpawn.add( new ScrollOfIdentify() );
-		itemsToSpawn.add( new ScrollOfRemoveCurse() );
-		itemsToSpawn.add( new ScrollOfMagicMapping() );
+			itemsToSpawn.add( new MerchantsBeacon() );
 
-		for (int i=0; i < 2; i++)
-			itemsToSpawn.add( Random.Int(2) == 0 ?
-					Generator.randomUsingDefaults( Generator.Category.POTION ) :
-					Generator.randomUsingDefaults( Generator.Category.SCROLL ) );
+			itemsToSpawn.add( new PotionOfStrength());
+			itemsToSpawn.add( new ScrollOfUpgrade());
+
+			for (int l=0; l < 3; l++)
+				itemsToSpawn.add( Random.Int(2) == 0 ?
+						Generator.randomUsingDefaults( Generator.Category.POTION ) :
+						Generator.randomUsingDefaults( Generator.Category.SCROLL ) );
 
 
-		itemsToSpawn.add( new SmallRation() );
-		itemsToSpawn.add( new SmallRation() );
-		
-		switch (Random.Int(4)){
-			case 0:
-				itemsToSpawn.add( new Bomb() );
-				break;
-			case 1:
-			case 2:
-				itemsToSpawn.add( new Bomb.DoubleBomb() );
-				break;
-			case 3:
-				itemsToSpawn.add( new Honeypot() );
-				break;
+			itemsToSpawn.add( new SmallRation() );
+			itemsToSpawn.add( new SmallRation() );
+			Ankh ankh = new Ankh();
+			ankh.bless();
+			itemsToSpawn.add(ankh);
+			switch (Random.Int(4)){
+				case 0:
+					itemsToSpawn.add( new Bomb() );
+					break;
+				case 1:
+				case 2:
+					itemsToSpawn.add( new Bomb.DoubleBomb() );
+					break;
+				case 3:
+					itemsToSpawn.add( new Honeypot() );
+					break;
+			}
+			itemsToSpawn.add( new StoneOfAugmentation() );
+
+			Item rare;
+			switch (Random.Int(10)){
+				case 0:
+					rare = Generator.random( Generator.Category.WAND );
+					rare.level( 0 );
+					break;
+				case 1:
+					rare = Generator.random(Generator.Category.RING);
+					rare.level( 0 );
+					break;
+				case 2:
+					rare = Generator.random( Generator.Category.ARTIFACT );
+					break;
+				default:
+					rare = new Stylus();
+			}
+			rare.cursed = false;
+			rare.cursedKnown = true;
+			itemsToSpawn.add( rare );
 		}
-
-		itemsToSpawn.add( new Ankh() );
-		itemsToSpawn.add( new StoneOfAugmentation() );
 
 		TimekeepersHourglass hourglass = Dungeon.hero.belongings.getItem(TimekeepersHourglass.class);
 		if (hourglass != null && hourglass.isIdentified() && !hourglass.cursed){
@@ -253,26 +273,6 @@ public class ShopRoom extends SpecialRoom {
 				hourglass.sandBags ++;
 			}
 		}
-
-		Item rare;
-		switch (Random.Int(10)){
-			case 0:
-				rare = Generator.random( Generator.Category.WAND );
-				rare.level( 0 );
-				break;
-			case 1:
-				rare = Generator.random(Generator.Category.RING);
-				rare.level( 0 );
-				break;
-			case 2:
-				rare = Generator.random( Generator.Category.ARTIFACT );
-				break;
-			default:
-				rare = new Stylus();
-		}
-		rare.cursed = false;
-		rare.cursedKnown = true;
-		itemsToSpawn.add( rare );
 
 		//hard limit is 63 items + 1 shopkeeper, as shops can't be bigger than 8x8=64 internally
 		if (itemsToSpawn.size() > 63)
