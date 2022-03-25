@@ -57,7 +57,25 @@ public class v0_9_X_Changes {
 
 	public static void add_Ech_Changes( ArrayList<ChangeInfo> changeInfos ) {
 
-		ChangeInfo changes = new ChangeInfo("v0.2.2", true, "");
+		ChangeInfo changes = new ChangeInfo("v0.2.3", true, "");
+		changes.hardlight(Window.TITLE_COLOR);
+		changeInfos.add(changes);
+		changes.addButton(new ChangeButton(Icons.get(Icons.ENTER), "Ech",
+				"_-_ Fixed softlocks for DK.\n" +
+						"_-_ Removed HP boost for bosses.\n" +
+						"_-_ Abyssal Nightmares are twice less frequent, and only main one can split.\n" +
+						"_-_ Buffed Ankhs. They also have 1% chance to replace any randomly dropped item.\n" +
+						"_-_ Removed levelling cap.\n" +
+						"_-_ Enemies drop random items with 25% chance.\n" +
+						"_-_ Rat King is now an enemy.\n" +
+						"_-_ Fixed softlocks connected to Infinite speed.\n" +
+						"_-_ Fixed graphics for spirit javelin.\n" +
+						"_-_ Significantly increased amount of items in shops.\n" +
+						"_-_ Surprise attacks deal double damage.\n" +
+						"_-_ Wands recharge slightly slower.\n" +
+						"_-_ Updated app icons."));
+
+		changes = new ChangeInfo("v0.2.2", true, "");
 		changes.hardlight(Window.TITLE_COLOR);
 		changeInfos.add(changes);
 		changes.addButton(new ChangeButton(new Image(new GolemSprite()), "Ech",
