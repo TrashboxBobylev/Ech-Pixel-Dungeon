@@ -143,9 +143,9 @@ public abstract class ChampionEnemy extends Buff {
 				case 10:            Buff.affect(m, Voodoo.class);       break;
 				case 11:            Buff.affect(m, Explosive.class);    break;
 			}
-//			if (!(m.properties().contains(Char.Property.BOSS)) && !(m.properties().contains(Char.Property.MINIBOSS)))
+			if (!(m.properties().contains(Char.Property.BOSS)))
 				m.HP = m.HT = Math.round(m.HT*(1.5f + Dungeon.depth/15));
-				m.EXP *= 1.4f;
+			m.EXP *= 1.4f;
 
 			m.state = m.WANDERING;
 			if (step < 100 && Dungeon.depth > 6) {
