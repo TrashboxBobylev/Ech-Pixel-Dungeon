@@ -154,7 +154,7 @@ public abstract class ChampionEnemy extends Buff {
 		}
 
 		if (--Dungeon.nightmare <= 0){
-			Dungeon.nightmare = 30;
+			Dungeon.nightmare = 60;
 			if (!(m.properties().contains(Char.Property.BOSS)) && !(m.properties().contains(Char.Property.MINIBOSS)) && !(m instanceof AbyssalNightmare)){
 				Buff.affect(m, Nightmare.class);
 				Buff.affect(m, Adrenaline.class, Adrenaline.DURATION*30);
