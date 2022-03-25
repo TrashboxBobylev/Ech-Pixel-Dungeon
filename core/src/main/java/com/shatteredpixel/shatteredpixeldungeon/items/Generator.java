@@ -494,7 +494,12 @@ public class Generator {
 			cat = Random.chances( categoryProbs );
 		}
 		categoryProbs.put( cat, categoryProbs.get( cat ) - 1);
-		return random( cat );
+		Item random = random(cat);
+		if (Random.Int(100) == 0) {
+			random = new Ankh();
+			((Ankh)random).bless();
+		}
+		return random;
 	}
 	
 	public static Item random( Category cat ) {
