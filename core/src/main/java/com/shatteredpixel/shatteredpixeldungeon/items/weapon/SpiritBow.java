@@ -468,7 +468,7 @@ public class SpiritBow extends Weapon {
 
 	public class SpiritJavelin extends SpiritArrow {
 		{
-			image = ItemSpriteSheet.SPIRIT_JAVELIN;
+			image = ItemSpriteSheet.SHOCKING_DART;
 
 			hitSound = Assets.Sounds.HIT_STAB;
 		}
