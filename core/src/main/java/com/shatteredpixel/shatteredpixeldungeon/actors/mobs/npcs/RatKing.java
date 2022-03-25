@@ -25,7 +25,10 @@ import com.shatteredpixel.shatteredpixeldungeon.Badges;
 import com.shatteredpixel.shatteredpixeldungeon.Dungeon;
 import com.shatteredpixel.shatteredpixeldungeon.actors.Char;
 import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.Buff;
+import com.shatteredpixel.shatteredpixeldungeon.actors.buffs.ChampionEnemy;
 import com.shatteredpixel.shatteredpixeldungeon.actors.hero.abilities.Ratmogrify;
+import com.shatteredpixel.shatteredpixeldungeon.actors.mobs.Mob;
+import com.shatteredpixel.shatteredpixeldungeon.items.Amulet;
 import com.shatteredpixel.shatteredpixeldungeon.items.KingsCrown;
 import com.shatteredpixel.shatteredpixeldungeon.messages.Messages;
 import com.shatteredpixel.shatteredpixeldungeon.scenes.GameScene;
@@ -34,41 +37,39 @@ import com.shatteredpixel.shatteredpixeldungeon.windows.WndInfoArmorAbility;
 import com.shatteredpixel.shatteredpixeldungeon.windows.WndOptions;
 import com.watabou.noosa.Game;
 import com.watabou.utils.Callback;
+import com.watabou.utils.Random;
 
-public class RatKing extends NPC {
+public class RatKing extends Mob {
 
 	{
 		spriteClass = RatKingSprite.class;
-		
+		defenseSkill = 45;
+		HP = HT = 455;
+		baseSpeed = 2f;
+
+		EXP = 97;
+		maxLvl = 90;
+
 		state = SLEEPING;
+		alignment = Alignment.ENEMY;
+		loot = new Amulet();
+		lootChance = 1f;
+		properties.add(Property.BOSS);
 	}
-	
+
 	@Override
-	public int defenseSkill( Char enemy ) {
-		return INFINITE_EVASION;
+	public int damageRoll() {
+		return Random.NormalIntRange( 34, 79 );
 	}
-	
+
 	@Override
-	public float speed() {
-		return 2f;
+	public int attackSkill( Char target ) {
+		return 65;
 	}
-	
+
 	@Override
-	protected Char chooseEnemy() {
-		return null;
-	}
-	
-	@Override
-	public void damage( int dmg, Object src ) {
-	}
-	
-	@Override
-	public void add( Buff buff ) {
-	}
-	
-	@Override
-	public boolean reset() {
-		return true;
+	public int drRoll() {
+		return Random.NormalIntRange(0, 15);
 	}
 
 	//***This functionality is for when rat king may be summoned by a distortion trap
@@ -103,59 +104,67 @@ public class RatKing extends NPC {
 
 	//***
 
+//	@Override
+//	public boolean interact(Char c) {
+//		sprite.turnTo( pos, c.pos );
+//
+//		if (c != Dungeon.hero){
+//			return super.interact(c);
+//		}
+//
+//		KingsCrown crown = Dungeon.hero.belongings.getItem(KingsCrown.class);
+//		if (state == SLEEPING) {
+//			notice();
+//			yell( Messages.get(this, "not_sleeping") );
+//			state = WANDERING;
+//		} else if (crown != null){
+//			if (Dungeon.hero.belongings.armor == null){
+//				yell( Messages.get(RatKing.class, "crown_clothes") );
+//			} else {
+//				Badges.validateRatmogrify();
+//				Game.runOnRenderThread(new Callback() {
+//					@Override
+//					public void call() {
+//						GameScene.show(new WndOptions(
+//								sprite(),
+//								Messages.titleCase(name()),
+//								Messages.get(RatKing.class, "crown_desc"),
+//								Messages.get(RatKing.class, "crown_yes"),
+//								Messages.get(RatKing.class, "crown_info"),
+//								Messages.get(RatKing.class, "crown_no")
+//						){
+//							@Override
+//							protected void onSelect(int index) {
+//								if (index == 0){
+//									crown.upgradeArmor(Dungeon.hero, Dungeon.hero.belongings.armor, new Ratmogrify());
+//									((RatKingSprite)sprite).resetAnims();
+//									yell(Messages.get(RatKing.class, "crown_thankyou"));
+//								} else if (index == 1) {
+//									GameScene.show(new WndInfoArmorAbility(Dungeon.hero.heroClass, new Ratmogrify()));
+//								} else {
+//									yell(Messages.get(RatKing.class, "crown_fine"));
+//								}
+//							}
+//						});
+//					}
+//				});
+//			}
+//		} else if (Dungeon.hero.armorAbility instanceof Ratmogrify) {
+//			yell( Messages.get(RatKing.class, "crown_after") );
+//		} else {
+//			yell( Messages.get(this, "what_is_it") );
+//		}
+//		return true;
+//	}
+
+
 	@Override
-	public boolean interact(Char c) {
-		sprite.turnTo( pos, c.pos );
-
-		if (c != Dungeon.hero){
-			return super.interact(c);
-		}
-
-		KingsCrown crown = Dungeon.hero.belongings.getItem(KingsCrown.class);
-		if (state == SLEEPING) {
-			notice();
-			yell( Messages.get(this, "not_sleeping") );
-			state = WANDERING;
-		} else if (crown != null){
-			if (Dungeon.hero.belongings.armor == null){
-				yell( Messages.get(RatKing.class, "crown_clothes") );
-			} else {
-				Badges.validateRatmogrify();
-				Game.runOnRenderThread(new Callback() {
-					@Override
-					public void call() {
-						GameScene.show(new WndOptions(
-								sprite(),
-								Messages.titleCase(name()),
-								Messages.get(RatKing.class, "crown_desc"),
-								Messages.get(RatKing.class, "crown_yes"),
-								Messages.get(RatKing.class, "crown_info"),
-								Messages.get(RatKing.class, "crown_no")
-						){
-							@Override
-							protected void onSelect(int index) {
-								if (index == 0){
-									crown.upgradeArmor(Dungeon.hero, Dungeon.hero.belongings.armor, new Ratmogrify());
-									((RatKingSprite)sprite).resetAnims();
-									yell(Messages.get(RatKing.class, "crown_thankyou"));
-								} else if (index == 1) {
-									GameScene.show(new WndInfoArmorAbility(Dungeon.hero.heroClass, new Ratmogrify()));
-								} else {
-									yell(Messages.get(RatKing.class, "crown_fine"));
-								}
-							}
-						});
-					}
-				});
-			}
-		} else if (Dungeon.hero.armorAbility instanceof Ratmogrify) {
-			yell( Messages.get(RatKing.class, "crown_after") );
-		} else {
-			yell( Messages.get(this, "what_is_it") );
-		}
-		return true;
+	public void notice() {
+		super.notice();
+		ChampionEnemy.rollForChampion(this);
+		HP = HT = (int) (HT * 1.4f);
 	}
-	
+
 	@Override
 	public String description() {
 		return ((RatKingSprite)sprite).festive ?
